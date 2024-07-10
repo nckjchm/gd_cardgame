@@ -1,0 +1,18 @@
+[gd_scene load_steps=2 format=3 uid="uid://dbw8d765u3dtj"]
+
+[ext_resource type="Script" path="res://CardMenu.gd" id="1_q1tdm"]
+
+[node name="CardMenu" type="PanelContainer"]
+top_level = true
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_q1tdm")
+
+[node name="MenuContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+alignment = 1
+
+[node name="NameLabel" type="Label" parent="MenuContainer"]
+custom_minimum_size = Vector2(200, 26)
+layout_mode = 2
+text = "card name"

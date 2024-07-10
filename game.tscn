@@ -1,0 +1,134 @@
+[gd_scene load_steps=7 format=3 uid="uid://dbk3l3nbj70oc"]
+
+[ext_resource type="Script" path="res://Field.gd" id="1_evxwu"]
+[ext_resource type="Script" path="res://FieldCamera.gd" id="2_7kr53"]
+[ext_resource type="Script" path="res://HandDisplay.gd" id="3_1f808"]
+[ext_resource type="Script" path="res://InputController.gd" id="3_3l6ug"]
+[ext_resource type="Script" path="res://GameManager.gd" id="4_f0wwg"]
+[ext_resource type="Script" path="res://GUIController.gd" id="6_f6m72"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="GameViewContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="SideGUI" type="Panel" parent="GameViewContainer"]
+custom_minimum_size = Vector2(300, 2.08165e-12)
+layout_mode = 2
+
+[node name="SideGUIBoxContainer" type="VBoxContainer" parent="GameViewContainer/SideGUI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MenuLabel" type="Label" parent="GameViewContainer/SideGUI/SideGUIBoxContainer"]
+layout_mode = 2
+text = "Menu"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="GameViewContainer/SideGUI/SideGUIBoxContainer"]
+layout_mode = 2
+
+[node name="TurnPhaseLabel" type="Label" parent="GameViewContainer/SideGUI/SideGUIBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(120, 2.08165e-12)
+layout_mode = 2
+text = "Turn Phase"
+
+[node name="TurnPhaseText" type="Label" parent="GameViewContainer/SideGUI/SideGUIBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Phase Text"
+
+[node name="PassPhaseButton" type="Button" parent="GameViewContainer/SideGUI/SideGUIBoxContainer"]
+layout_mode = 2
+disabled = true
+text = "Pass Phase"
+
+[node name="DrawButton" type="Button" parent="GameViewContainer/SideGUI/SideGUIBoxContainer"]
+layout_mode = 2
+disabled = true
+text = "Draw"
+
+[node name="DeclineButton" type="Button" parent="GameViewContainer/SideGUI/SideGUIBoxContainer"]
+layout_mode = 2
+disabled = true
+text = "Decline Choice"
+
+[node name="AutoDeclineCheck" type="CheckButton" parent="GameViewContainer/SideGUI/SideGUIBoxContainer"]
+layout_mode = 2
+text = "Auto Decline"
+
+[node name="RecoverButton" type="Button" parent="GameViewContainer/SideGUI/SideGUIBoxContainer"]
+layout_mode = 2
+disabled = true
+text = "Recover All"
+
+[node name="AllChoicesButton" type="Button" parent="GameViewContainer/SideGUI/SideGUIBoxContainer"]
+layout_mode = 2
+text = "Show All Choices"
+
+[node name="FieldVPC" type="SubViewportContainer" parent="GameViewContainer"]
+custom_minimum_size = Vector2(2.08165e-12, 2.08165e-12)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+stretch = true
+
+[node name="FieldVP" type="SubViewport" parent="GameViewContainer/FieldVPC"]
+disable_3d = true
+handle_input_locally = false
+physics_object_picking = true
+size = Vector2i(848, 648)
+render_target_update_mode = 4
+
+[node name="Field" type="Node2D" parent="GameViewContainer/FieldVPC/FieldVP"]
+script = ExtResource("1_evxwu")
+
+[node name="FieldCamera" type="Camera2D" parent="GameViewContainer/FieldVPC/FieldVP"]
+script = ExtResource("2_7kr53")
+
+[node name="HandCanvas" type="CanvasLayer" parent="GameViewContainer/FieldVPC/FieldVP"]
+follow_viewport_scale = 2.0
+
+[node name="HandPanel" type="PanelContainer" parent="GameViewContainer/FieldVPC/FieldVP/HandCanvas"]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 288.0
+offset_top = -400.0
+offset_right = -288.0
+offset_bottom = 0.000854492
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+script = ExtResource("3_1f808")
+
+[node name="HandHBox" type="HBoxContainer" parent="GameViewContainer/FieldVPC/FieldVP/HandCanvas/HandPanel"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="InputController" type="Node" parent="."]
+script = ExtResource("3_3l6ug")
+
+[node name="GameManager" type="Node" parent="."]
+script = ExtResource("4_f0wwg")
+
+[node name="GUIController" type="Node" parent="."]
+script = ExtResource("6_f6m72")

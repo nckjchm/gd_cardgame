@@ -1,0 +1,121 @@
+[gd_scene load_steps=11 format=3 uid="uid://dtfcivf7a6ten"]
+
+[ext_resource type="Script" path="res://Card.gd" id="1_vdmro"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_shm34"]
+
+[sub_resource type="TextMesh" id="TextMesh_2ifs4"]
+custom_aabb = AABB(2.08165e-12, 2.08165e-12, 2.08165e-12, 2.08165e-12, 2.08165e-12, 2.08165e-12)
+text = "Name"
+font_size = 80
+horizontal_alignment = 0
+vertical_alignment = 0
+autowrap_mode = 2
+width = 620.0
+
+[sub_resource type="TextMesh" id="TextMesh_ovc5x"]
+text = "Cost"
+font_size = 60
+horizontal_alignment = 0
+vertical_alignment = 0
+autowrap_mode = 2
+width = 160.0
+
+[sub_resource type="TextMesh" id="TextMesh_u3pra"]
+custom_aabb = AABB(2.08165e-12, 2.08165e-12, 2.08165e-12, 2.08165e-12, 2.08165e-12, 2.08165e-12)
+text = "[Attribute]"
+font_size = 50
+horizontal_alignment = 0
+vertical_alignment = 0
+autowrap_mode = 2
+width = 780.0
+
+[sub_resource type="TextMesh" id="TextMesh_hx7hs"]
+text = "CardText"
+font_size = 60
+horizontal_alignment = 0
+vertical_alignment = 0
+autowrap_mode = 2
+width = 770.0
+
+[sub_resource type="TextMesh" id="TextMesh_nn18w"]
+text = "Atk"
+font_size = 50
+horizontal_alignment = 0
+vertical_alignment = 0
+
+[sub_resource type="TextMesh" id="TextMesh_36xhg"]
+text = "Spd"
+font_size = 50
+horizontal_alignment = 0
+vertical_alignment = 0
+
+[sub_resource type="TextMesh" id="TextMesh_2gsik"]
+text = "Hlt"
+font_size = 50
+horizontal_alignment = 0
+vertical_alignment = 0
+
+[sub_resource type="TextMesh" id="TextMesh_n24u7"]
+text = "Def"
+font_size = 50
+horizontal_alignment = 0
+vertical_alignment = 0
+
+[node name="Card" type="Node2D"]
+position = Vector2(2.08165e-12, 2.08165e-12)
+scale = Vector2(17, 17)
+script = ExtResource("1_vdmro")
+
+[node name="CardArea" type="Area2D" parent="."]
+scale = Vector2(0.78, 1)
+
+[node name="CardCollisionRectangle" type="CollisionShape2D" parent="CardArea"]
+shape = SubResource("RectangleShape2D_shm34")
+
+[node name="Background" type="Polygon2D" parent="CardArea"]
+scale = Vector2(10, 10)
+color = Color(0.203922, 0.145098, 0.980392, 1)
+polygon = PackedVector2Array(-1, -1, 1, -1, 1, -0.883978, 1, 1, -1, 1)
+
+[node name="NameTextMesh" type="MeshInstance2D" parent="."]
+position = Vector2(-7.52941, -10.2353)
+scale = Vector2(2, -2)
+mesh = SubResource("TextMesh_2ifs4")
+
+[node name="CostTextMesh" type="MeshInstance2D" parent="."]
+position = Vector2(4.876, -9.901)
+scale = Vector2(2, -2)
+mesh = SubResource("TextMesh_ovc5x")
+
+[node name="AttributeTextMesh" type="MeshInstance2D" parent="."]
+position = Vector2(-7.47059, -1.88235)
+scale = Vector2(2, -2)
+mesh = SubResource("TextMesh_u3pra")
+
+[node name="CardTextMesh" type="MeshInstance2D" parent="."]
+position = Vector2(-7.52941, -0.411765)
+scale = Vector2(2, -2)
+mesh = SubResource("TextMesh_hx7hs")
+
+[node name="AttackTextMesh" type="MeshInstance2D" parent="."]
+position = Vector2(-2.76471, 5.35294)
+scale = Vector2(2, -2)
+mesh = SubResource("TextMesh_nn18w")
+
+[node name="SpeedTextMesh" type="MeshInstance2D" parent="."]
+position = Vector2(5.23529, 5.29412)
+scale = Vector2(2, -2)
+mesh = SubResource("TextMesh_36xhg")
+
+[node name="HealthTextMesh" type="MeshInstance2D" parent="."]
+position = Vector2(-2.70588, 7.70588)
+scale = Vector2(2, -2)
+mesh = SubResource("TextMesh_2gsik")
+
+[node name="DefenseTextMesh" type="MeshInstance2D" parent="."]
+position = Vector2(5.29412, 7.70588)
+scale = Vector2(2, -2)
+mesh = SubResource("TextMesh_n24u7")
+
+[connection signal="input_event" from="CardArea" to="." method="_on_card_area_input_event"]

@@ -1,0 +1,62 @@
+[gd_scene load_steps=2 format=3 uid="uid://rogc8ab18dty"]
+
+[ext_resource type="Script" path="res://AllChoicesMenu.gd" id="1_vum7b"]
+
+[node name="MenuPanel" type="PanelContainer"]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_vum7b")
+
+[node name="MenuVBC" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="OptionGrid" type="GridContainer" parent="MenuVBC"]
+layout_mode = 2
+columns = 7
+
+[node name="Type" type="Label" parent="MenuVBC/OptionGrid"]
+custom_minimum_size = Vector2(100, 2.08165e-12)
+layout_mode = 2
+text = "Choice Type"
+horizontal_alignment = 1
+
+[node name="Text" type="Label" parent="MenuVBC/OptionGrid"]
+custom_minimum_size = Vector2(100, 2.08165e-12)
+layout_mode = 2
+text = "Choice Type"
+horizontal_alignment = 1
+
+[node name="Player" type="Label" parent="MenuVBC/OptionGrid"]
+custom_minimum_size = Vector2(100, 2.08165e-12)
+layout_mode = 2
+text = "Player"
+horizontal_alignment = 1
+
+[node name="Card" type="Label" parent="MenuVBC/OptionGrid"]
+custom_minimum_size = Vector2(100, 2.08165e-12)
+layout_mode = 2
+text = "Card"
+horizontal_alignment = 1
+
+[node name="Cell" type="Label" parent="MenuVBC/OptionGrid"]
+custom_minimum_size = Vector2(100, 2.08165e-12)
+layout_mode = 2
+text = "Cell"
+horizontal_alignment = 1
+
+[node name="Effect" type="Label" parent="MenuVBC/OptionGrid"]
+custom_minimum_size = Vector2(100, 2.08165e-12)
+layout_mode = 2
+text = "Cell"
+horizontal_alignment = 1
+
+[node name="Choose" type="Label" parent="MenuVBC/OptionGrid"]
+custom_minimum_size = Vector2(100, 2.08165e-12)
+layout_mode = 2
+text = "Choose"
+horizontal_alignment = 1
+
+[node name="Button" type="Button" parent="MenuVBC"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Exit"

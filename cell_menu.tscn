@@ -1,0 +1,25 @@
+[gd_scene load_steps=2 format=3 uid="uid://m6lhh7gt0sa7"]
+
+[ext_resource type="Script" path="res://CellMenu.gd" id="1_yau1c"]
+
+[node name="Control" type="PanelContainer"]
+offset_right = 83.0
+offset_bottom = 26.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+script = ExtResource("1_yau1c")
+
+[node name="MenuContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+alignment = 1
+
+[node name="NameLabel" type="Label" parent="MenuContainer"]
+custom_minimum_size = Vector2(200, 26)
+layout_mode = 2
+text = "Cell [x,y] - CellType"
+clip_text = true
+
+[node name="ViewStackButton" type="Button" parent="MenuContainer"]
+layout_mode = 2
+text = "View Stack"
+text_overrun_behavior = 3
