@@ -19,6 +19,13 @@ var all_choices_menu_prefab = preload("res://all_choices_menu.tscn")
 @onready var turn_phase_display : Label = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/HBoxContainer/TurnPhaseText"
 @onready var hand : HandDisplay = $"../GameViewContainer/FieldVPC/FieldVP/HandCanvas/HandPanel"
 
+func click_to_close():
+	if card_menu_open or cell_menu_open:
+		close_cell_menu()
+		close_card_menu()
+		return true
+	return false
+
 func update_buttons():
 	var options = game_manager.current_options
 	var buttons : Array[Button] = [btn_pass_phase, btn_draw, btn_decline, btn_recover]
@@ -95,20 +102,16 @@ func open_cell_menu(cell : Cell, position : Vector2):
 	main_control.add_child(cell_menu)
 	cell_menu.position = position
 
-func close_onclick_menus():
-	close_card_menu()
-	close_cell_menu()
-
 func player_card_click(card : Card, _player : Player, click_event : InputEventMouseButton):
-	close_onclick_menus()
-	open_card_menu(card, click_event.global_position)
+	if not click_to_close():
+		open_card_menu(card, click_event.global_position)
 
 func player_cell_click(cell : Cell, _player : Player, click_event : InputEventMouseButton):
-	close_onclick_menus()
-	open_cell_menu(cell, click_event.global_position)
+	if not click_to_close():
+		open_cell_menu(cell, click_event.global_position)
 
 func player_background_click(_player : Player, click_event: InputEventMouseButton):
-	close_onclick_menus()
+	click_to_close()
 
 func update_turndisplay():
 	var turn_phase_text = ""

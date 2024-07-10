@@ -1,4 +1,4 @@
-class_name Card extends Node2D
+class_name Card extends CanvasGroup
 
 enum CardStatus { Alive, Dead, Limbo, Banished, Hidden }
 enum CardPosition { Deck, Hand, Field, Graveyard, Limbo, Banishment, Unknown}
@@ -110,6 +110,8 @@ func die():
 
 func init_meshes():
 	name_text_mesh.mesh.text = card_name
+	name_text_mesh.mesh.font_size = 76
+	name_text_mesh.mesh.width = 620
 	attack_text_mesh.mesh.text = str(attack)
 	speed_text_mesh.mesh.text = str(speed)
 	health_text_mesh.mesh.text = str(health)
@@ -140,6 +142,7 @@ func _ready():
 		mesh.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 		mesh.vertical_alignment = VERTICAL_ALIGNMENT_TOP
 		mesh.font_size = 50
+		mesh.autowrap_mode = TextServer.AUTOWRAP_WORD
 	init_meshes()
 	set_color(template.card_color)
 

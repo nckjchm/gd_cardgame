@@ -6,8 +6,8 @@ var cells : Array[Array]
 const CELLWIDTHFACTOR = sqrt(12) / 4.0
 const CELLHEIGHTFACTOR = 3.0 / 4.0
 @export var cellradius := 130.0
-@onready var field_camera = $"../FieldCamera"
 var fieldpreset : Dictionary
+var middle : Vector2
 
 const fieldcell = [Cell.CellType.Field, Cell.StackType.None, -1]
 const player1_home = [Cell.CellType.Field, Cell.StackType.None, 0]
@@ -73,10 +73,7 @@ func initialize():
 		else:
 			row_offset += Vector2(CELLWIDTHFACTOR * -cellradius, 0)
 		cells.append(row_array)
-	field_camera.limit_left = -2000
-	field_camera.limit_top = -2000
-	field_camera.limit_bottom = row_offset.y + column_offset.y + 3000
-	field_camera.limit_right = row_offset.x + column_offset.x + 3000
+	middle = (row_offset + column_offset)
 
 func get_neighbors(x_index : int, y_index : int):
 	var lower_x : int = x_index - y_index % 2

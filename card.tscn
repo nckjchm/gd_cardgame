@@ -62,7 +62,7 @@ font_size = 50
 horizontal_alignment = 0
 vertical_alignment = 0
 
-[node name="Card" type="Node2D"]
+[node name="Card" type="CanvasGroup"]
 position = Vector2(2.08165e-12, 2.08165e-12)
 scale = Vector2(17, 17)
 script = ExtResource("1_vdmro")
