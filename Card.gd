@@ -34,7 +34,7 @@ var card_aspects : Array[CardAspect]
 var card_origin : CardOrigin
 var microstates : Dictionary = {}
 var effects : Array[CardEffect] = []
-var cost : Game.ResourceList
+var cost : ResourceList
 var has_attacked := false
 var needs_recovery := false
 var has_moved := false
@@ -79,13 +79,13 @@ func refresh_stats():
 	tap_status = 0
 
 func check_attack_viability(gm : GameManager):
-	if tap_status == 0 and not has_attacked and card_position == CardPosition.Field and card_type == CardType.Creature and gm.game.current_turn.current_phase == Game.TurnPhase.Battle:
+	if tap_status == 0 and not has_attacked and card_position == CardPosition.Field and card_type == CardType.Creature and gm.game.current_turn.current_phase == Turn.TurnPhase.Battle:
 		#Needs additional check for whether there are any viable targets
 		return true
 	return false
 
 func check_movement_viability(gm : GameManager):
-	return tap_status == 0 and not has_moved and card_type == CardType.Creature and card_position == CardPosition.Field and gm.game.current_turn.current_phase in [Game.TurnPhase.Main1, Game.TurnPhase.Main2]
+	return tap_status == 0 and not has_moved and card_type == CardType.Creature and card_position == CardPosition.Field and gm.game.current_turn.current_phase in [Turn.TurnPhase.Main1, Turn.TurnPhase.Main2]
 
 func check_play_viability(gm : GameManager):
 	if not card_position == CardPosition.Hand:

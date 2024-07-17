@@ -4,14 +4,15 @@ var templates = {
 	YlwCrtFarmer = YlwCrtFarmer.new(),
 	YlwLndAcre = YlwLndAcre.new()
 }
+var card_prefab = preload("res://card.tscn")
 
 class YlwCrtFarmer extends CardTemplate:
 	func _init():
 		name = "Farmer"
 		card_color = Card.CardColor.Yellow
 		type = Card.CardType.Creature
-		cost = Game.ResourceList.new([
-			Game.ResourceElement.new(Game.ResourceKind.Mana, Card.CardColor.Yellow, 1)
+		cost = ResourceList.new([
+			ResourceList.ResourceElement.new(ResourceList.ResourceKind.Mana, Card.CardColor.Yellow, 1)
 		])
 		health = 1
 		defense = 0
@@ -25,7 +26,7 @@ class YlwLndAcre extends CardTemplate:
 		name = "Acre"
 		card_color = Card.CardColor.Yellow
 		type = Card.CardType.Land
-		cost = Game.ResourceList.new()
+		cost = ResourceList.new()
 		health = 0
 		defense = 0
 		attack = 0

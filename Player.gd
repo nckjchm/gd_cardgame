@@ -12,7 +12,7 @@ var graveyard_cell : Cell
 var limbo_cell : Cell
 var banishment_cell : Cell
 var home_cells : Array[Cell] = []
-var resources : Game.ResourceList
+var resources : ResourceList
 
 func _init(name : String):
 	self.name = name

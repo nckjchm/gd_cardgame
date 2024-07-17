@@ -1,6 +1,5 @@
 class_name GameManager extends Node
 
-var card_prefab = preload("res://card.tscn")
 @onready var field : Field = $"../GameViewContainer/FieldVPC/FieldVP/Field"
 @onready var input_controller : InputController = $"../InputController"
 var game : Game
@@ -102,11 +101,8 @@ func finish_action(action : Action):
 
 func initialize_game(playerList : Array[Player]):
 	game = Game.new(playerList)
-	for player in game.players:
-		player.hand = Hand.new(player)
-		player.resources = Game.ResourceList.new([])
 	init_field()
-	init_cards()
+	game.init_cards()
 
 func start_game():
 	game.start()
@@ -136,40 +132,6 @@ func init_field():
 							player.limbo_cell = field.cells[row][column]
 						Cell.StackType.Banishment:
 							player.banishment_cell = field.cells[row][column]
-
-func init_cards():
-	var card_index := 0
-	var effect_index := 0
-	for player in game.players:
-		var deck_templates = [player.deck.deck_template.main_deck_keys, player.deck.deck_template.resource_deck_keys, player.deck.deck_template.special_deck_keys]
-		for deck_template in deck_templates:
-			var card_origin : Card.CardOrigin
-			match deck_template:
-				player.deck.deck_template.main_deck_keys:
-					card_origin = Card.CardOrigin.MainDeck
-				player.deck.deck_template.resource_deck_keys:
-					card_origin = Card.CardOrigin.ResourceDeck
-				player.deck.deck_template.special_deck_keys:
-					card_origin = Card.CardOrigin.SpecialDeck
-			var card_list : Array[Card] = []
-			for template_key in deck_template:
-				var card : Card = init_card(template_key, card_index, player, card_origin, effect_index)
-				card_index += 1
-				effect_index += len(card.effects)
-
-func init_card(template_key : String, card_index : int, player : Player, card_origin : Card.CardOrigin, effect_index_start : int):
-	var card : Card = card_prefab.instantiate()
-	var card_template = CardTemplates.templates[template_key]
-	card.initialize(card_template, card_index, player, card_origin, effect_index_start)
-	match card_origin:
-		Card.CardOrigin.MainDeck:
-			player.maindeck_cell.insert_card(card)
-		Card.CardOrigin.ResourceDeck:
-			player.resourcedeck_cell.insert_card(card)
-		Card.CardOrigin.SpecialDeck:
-			player.specialdeck_cell.insert_card(card)
-	card.card_owner.cards.append(card)
-	return card
 
 ### Option Structure getters
 
@@ -213,15 +175,15 @@ func get_turn_option():
 
 func get_turn_action():
 	var turn_player : Player = game.current_turn.turn_player
-	if game.current_turn.current_phase == Game.TurnPhase.Draw1 and not game.current_turn.draw1_drawn:
+	if game.current_turn.current_phase == Turn.TurnPhase.Draw1 and not game.current_turn.draw1_drawn:
 		return Action.Draw.new(turn_player, Card.CardOrigin.ResourceDeck)
-	elif game.current_turn.current_phase == Game.TurnPhase.Draw2 and not game.current_turn.draw2_drawn:
+	elif game.current_turn.current_phase == Turn.TurnPhase.Draw2 and not game.current_turn.draw2_drawn:
 		return Action.Draw.new(turn_player, Card.CardOrigin.MainDeck)
-	elif game.current_turn.current_phase == Game.TurnPhase.Recovery:
+	elif game.current_turn.current_phase == Turn.TurnPhase.Recovery:
 		
 		if not game.current_turn.recovery_done:
 			return null
-	elif game.current_turn.current_phase == Game.TurnPhase.End:
+	elif game.current_turn.current_phase == Turn.TurnPhase.End:
 		return Action.EndTurn.new(turn_player, game.current_turn)
 	return Action.AdvancePhase.new(turn_player, game.current_turn.current_phase)
 

@@ -116,21 +116,21 @@ func player_background_click(_player : Player, click_event: InputEventMouseButto
 func update_turndisplay():
 	var turn_phase_text = ""
 	match game_manager.game.current_turn.current_phase:
-		Game.TurnPhase.Start:
+		Turn.TurnPhase.Start:
 			turn_phase_text = "Start Phase"
-		Game.TurnPhase.Recovery:
+		Turn.TurnPhase.Recovery:
 			turn_phase_text = "Recovery Phase"
-		Game.TurnPhase.Draw1:
+		Turn.TurnPhase.Draw1:
 			turn_phase_text = "Draw Phase 1"
-		Game.TurnPhase.Main1:
+		Turn.TurnPhase.Main1:
 			turn_phase_text = "Main Phase 1"
-		Game.TurnPhase.Battle:
+		Turn.TurnPhase.Battle:
 			turn_phase_text = "Battle Phase"
-		Game.TurnPhase.Draw2:
+		Turn.TurnPhase.Draw2:
 			turn_phase_text = "Draw Phase 2"
-		Game.TurnPhase.Main2:
+		Turn.TurnPhase.Main2:
 			turn_phase_text = "Main Phase 2"
-		Game.TurnPhase.End:
+		Turn.TurnPhase.End:
 			turn_phase_text = "End Phase"
 	turn_phase_display.text = turn_phase_text
 

@@ -1,0 +1,63 @@
+class_name ResourceList
+
+enum ResourceKind { Mana, Nutrition }
+
+var elements : Array[ResourceElement]
+
+func _init(resourceList : Array[ResourceElement] = []):
+	elements = resourceList
+
+func add(resource : ResourceElement):
+	var match_resource = match_element(resource)
+	if match_resource != null:
+		match_resource.amount += resource.amount
+		return true
+	elements.append(resource)
+	return false
+
+func match_element(resource : ResourceElement):
+	for element in elements: 
+		if element.color == resource.color and element.kind == resource.kind:
+			return element
+	return null
+
+func combine(other : ResourceList):
+	for element in other.elements:
+		add(element)
+		
+func subtract(resource : ResourceElement):
+	var match_resource = match_element(resource)
+	if match_resource != null:
+		match_resource.amount -= resource.amount
+		if match_resource.amount == 0:
+			elements.erase(match_resource)
+		return true
+	return false
+
+func check_coverage(other : ResourceList, exact := false):
+	for element in other.elements:
+		var own_element = match_element(element)
+		if own_element == null or own_element.amount < element.amount or (exact and own_element.amount > element.amount):
+			return false
+	return true
+
+func total():
+	var total := 0
+	for element in elements:
+		total += element.amount
+	return total
+
+func reduce(resourceList : ResourceList):
+	for element in resourceList.elements:
+		if not subtract(element):
+			print("something went wrong, reduced ResourceList %s by element with kind %s color %s amount %d which didnt exist" % [self.to_string(), element.kind, element.color, element.amount])
+	
+class ResourceElement:
+	var kind : ResourceKind
+	var color : Card.CardColor
+	var amount : int
+	
+	func _init(kind : ResourceKind, color : Card.CardColor, amount : int):
+		self.kind = kind
+		self.color = color
+		self.amount = amount

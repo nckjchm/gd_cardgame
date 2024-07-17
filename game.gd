@@ -1,7 +1,5 @@
 class_name Game
 
-enum TurnPhase { Start, Recovery, Draw1, Main1, Battle, Draw2, Main2, End }
-enum ResourceKind { Mana, Nutrition }
 enum GameState { Preparation, Hot, Cold, Paused, Finished }
 
 var turns := []
@@ -14,11 +12,48 @@ var hot_event : Event = null
 
 func _init(playerList : Array[Player]):
 	players = playerList
+	for player in players:
+		player.hand = Hand.new(player)
+		player.resources = ResourceList.new([])
+
+func init_cards():
+	var card_index := 0
+	var effect_index := 0
+	for player in players:
+		var deck_templates = [player.deck.deck_template.main_deck_keys, player.deck.deck_template.resource_deck_keys, player.deck.deck_template.special_deck_keys]
+		for deck_template in deck_templates:
+			var card_origin : Card.CardOrigin
+			match deck_template:
+				player.deck.deck_template.main_deck_keys:
+					card_origin = Card.CardOrigin.MainDeck
+				player.deck.deck_template.resource_deck_keys:
+					card_origin = Card.CardOrigin.ResourceDeck
+				player.deck.deck_template.special_deck_keys:
+					card_origin = Card.CardOrigin.SpecialDeck
+			var card_list : Array[Card] = []
+			for template_key in deck_template:
+				var card : Card = init_card(template_key, card_index, player, card_origin, effect_index)
+				card_index += 1
+				effect_index += len(card.effects)
+
+func init_card(template_key : String, card_index : int, player : Player, card_origin : Card.CardOrigin, effect_index_start : int):
+	var card : Card = CardTemplates.card_prefab.instantiate()
+	var card_template = CardTemplates.templates[template_key]
+	card.initialize(card_template, card_index, player, card_origin, effect_index_start)
+	match card_origin:
+		Card.CardOrigin.MainDeck:
+			player.maindeck_cell.insert_card(card)
+		Card.CardOrigin.ResourceDeck:
+			player.resourcedeck_cell.insert_card(card)
+		Card.CardOrigin.SpecialDeck:
+			player.specialdeck_cell.insert_card(card)
+	card.card_owner.cards.append(card)
+	return card
 
 func start():
 	new_turn()
 	game_state = GameState.Cold
-	
+
 func new_turn():
 	turnplayer_seat = (turnplayer_seat + 1) % len(players)
 	current_turn = Turn.new(len(turns)+1, players[turnplayer_seat])
@@ -27,9 +62,9 @@ func new_turn():
 func next_player(player : Player):
 	return players[(player.seat + 1) % len(players)]
 
-func enter_phase(phase : TurnPhase):
+func enter_phase(phase : Turn.TurnPhase):
 	current_turn.current_phase = phase
-	if phase == TurnPhase.Recovery:
+	if phase == Turn.TurnPhase.Recovery:
 		mark_recovery_targets()
 
 func mark_recovery_targets():
@@ -46,98 +81,24 @@ func check_recovery_finished():
 			return false
 	return true
 
-static func next_phase(phase : TurnPhase):
+static func next_phase(phase : Turn.TurnPhase):
 	match phase:
-		TurnPhase.Start:
-			return TurnPhase.Recovery
-		TurnPhase.Recovery:
-			return TurnPhase.Draw1
-		TurnPhase.Draw1:
-			return TurnPhase.Main1
-		TurnPhase.Main1:
-			return TurnPhase.Battle
-		TurnPhase.Battle:
-			return TurnPhase.Draw2
-		TurnPhase.Draw2:
-			return TurnPhase.Main2
-		TurnPhase.Main2:
-			return TurnPhase.End
-		TurnPhase.End:
-			return TurnPhase.Start
+		Turn.TurnPhase.Start:
+			return Turn.TurnPhase.Recovery
+		Turn.TurnPhase.Recovery:
+			return Turn.TurnPhase.Draw1
+		Turn.TurnPhase.Draw1:
+			return Turn.TurnPhase.Main1
+		Turn.TurnPhase.Main1:
+			return Turn.TurnPhase.Battle
+		Turn.TurnPhase.Battle:
+			return Turn.TurnPhase.Draw2
+		Turn.TurnPhase.Draw2:
+			return Turn.TurnPhase.Main2
+		Turn.TurnPhase.Main2:
+			return Turn.TurnPhase.End
+		Turn.TurnPhase.End:
+			return Turn.TurnPhase.Start
 	print("couldn't match TurnPhase: %s" % phase)
 
-class Turn:
-	var turn_number : int
-	var turn_player : Player
-	var turn_actions := []
-	var draw1_drawn := false
-	var draw2_drawn := false
-	var recovery_done := false
-	var current_phase := TurnPhase.Start
-	var creature_called := false
-	
-	func _init(turn_number, turn_player):
-		self.turn_number = turn_number
-		self.turn_player = turn_player
-	
 
-class ResourceList:
-	var elements : Array[ResourceElement]
-	
-	func _init(resourceList : Array[ResourceElement] = []):
-		elements = resourceList
-	
-	func add(resource : ResourceElement):
-		var match_resource = match_element(resource)
-		if match_resource != null:
-			match_resource.amount += resource.amount
-			return true
-		elements.append(resource)
-		return false
-	
-	func match_element(resource : ResourceElement):
-		for element in elements: 
-			if element.color == resource.color and element.kind == resource.kind:
-				return element
-		return null
-	
-	func combine(other : ResourceList):
-		for element in other.elements:
-			add(element)
-			
-	func subtract(resource : ResourceElement):
-		var match_resource = match_element(resource)
-		if match_resource != null:
-			match_resource.amount -= resource.amount
-			if match_resource.amount == 0:
-				elements.erase(match_resource)
-			return true
-		return false
-	
-	func check_coverage(other : ResourceList, exact := false):
-		for element in other.elements:
-			var own_element = match_element(element)
-			if own_element == null or own_element.amount < element.amount or (exact and own_element.amount > element.amount):
-				return false
-		return true
-	
-	func total():
-		var total := 0
-		for element in elements:
-			total += element.amount
-		return total
-	
-	func reduce(resourceList : ResourceList):
-		for element in resourceList.elements:
-			if not subtract(element):
-				print("something went wrong, reduced ResourceList %s by element with kind %s color %s amount %d which didnt exist" % [self.to_string(), element.kind, element.color, element.amount])
-	
-class ResourceElement:
-	var kind : ResourceKind
-	var color : Card.CardColor
-	var amount : int
-	
-	func _init(kind : ResourceKind, color : Card.CardColor, amount : int):
-		self.kind = kind
-		self.color = color
-		self.amount = amount

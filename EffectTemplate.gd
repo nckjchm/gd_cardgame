@@ -16,7 +16,7 @@ class ETGain1YellowMana extends EffectTemplate:
 			return false
 		activate = func(gm : GameManager, effect : CardEffect):
 			var tapEvent = Event.TapStateChangeEvent.new(effect.card.controller, effect.card, 1)
-			var resourceEvent = Event.GainResourceEvent.new(effect.card.controller, effect.card.controller, Game.ResourceList.new([Game.ResourceElement.new(Game.ResourceKind.Mana, Card.CardColor.Yellow, 1)]))
+			var resourceEvent = Event.GainResourceEvent.new(effect.card.controller, effect.card.controller, ResourceList.new([ResourceList.ResourceElement.new(ResourceList.ResourceKind.Mana, Card.CardColor.Yellow, 1)]))
 			return [tapEvent, resourceEvent]
 		short_text = "Gain Mana"
 		long_text = "Tap; Gain 1 Yellow Mana."

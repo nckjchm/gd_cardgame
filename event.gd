@@ -98,9 +98,9 @@ class TurnDrawEvent extends DrawEvent:
 	func resolve(gm : GameManager):
 		super.resolve(gm)
 		match gm.game.current_turn.current_phase:
-			Game.TurnPhase.Draw1:
+			Turn.TurnPhase.Draw1:
 				gm.game.current_turn.draw1_drawn = true
-			Game.TurnPhase.Draw2:
+			Turn.TurnPhase.Draw2:
 				gm.game.current_turn.draw2_drawn = true
 			_ :
 				print("Error in TurnDrawEvent.resolve(): Illegal TurnPhase")
@@ -210,22 +210,22 @@ class PlayerEvent extends Event:
 	var affected : Player
 	
 class AdvancePhaseEvent extends PlayerEvent:
-	var exiting_phase : Game.TurnPhase
-	var entering_phase : Game.TurnPhase
+	var exiting_phase : Turn.TurnPhase
+	var entering_phase : Turn.TurnPhase
 	
 	func resolve(gm : GameManager):
 		gm.game.enter_phase(entering_phase)
 	
-	func _init(player : Player, exiting_phase : Game.TurnPhase, entering_phase : Game.TurnPhase):
+	func _init(player : Player, exiting_phase : Turn.TurnPhase, entering_phase : Turn.TurnPhase):
 		self.player = player
 		self.exiting_phase = exiting_phase
 		self.entering_phase = entering_phase
 
 class ResourceEvent extends PlayerEvent:
-	var resources : Game.ResourceList
+	var resources : ResourceList
 	
 class GainResourceEvent extends ResourceEvent:
-	func _init(player : Player, affected : Player, resources : Game.ResourceList):
+	func _init(player : Player, affected : Player, resources : ResourceList):
 		self.player = player
 		self.affected = affected
 		self.resources = resources
@@ -234,7 +234,7 @@ class GainResourceEvent extends ResourceEvent:
 		affected.resources.combine(resources)
 
 class PayResourceEvent extends ResourceEvent:
-	func _init(player : Player, affected : Player, resources : Game.ResourceList):
+	func _init(player : Player, affected : Player, resources : ResourceList):
 		self.player = player
 		self.affected = affected
 		self.resources = resources

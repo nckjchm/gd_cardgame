@@ -2,7 +2,7 @@ class_name CardTemplate
 
 var name : String
 var type : Card.CardType
-var cost : Game.ResourceList
+var cost : ResourceList
 var card_color : Card.CardColor
 var health : int
 var defense : int

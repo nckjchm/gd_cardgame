@@ -61,22 +61,22 @@ class PlayCardFromHand extends Action:
 		events.append_array([resource_payment, cell_choice, play_event])
 
 class AdvancePhase extends Action:
-	var exiting_phase : Game.TurnPhase
-	var entering_phase : Game.TurnPhase
+	var exiting_phase : Turn.TurnPhase
+	var entering_phase : Turn.TurnPhase
 	
-	func _init(player : Player, exiting_phase : Game.TurnPhase):
+	func _init(player : Player, exiting_phase : Turn.TurnPhase):
 		self.player = player
 		self.exiting_phase = exiting_phase
 		self.entering_phase = Game.next_phase(exiting_phase)
 		events.append(Event.AdvancePhaseEvent.new(player, exiting_phase, entering_phase))
 
 class EndTurn extends AdvancePhase:
-	var ending_turn : Game.Turn
+	var ending_turn : Turn
 	
-	func _init(player : Player, ending_turn : Game.Turn):
+	func _init(player : Player, ending_turn : Turn):
 		self.player = player
 		self.ending_turn = ending_turn
-		exiting_phase = Game.TurnPhase.End
+		exiting_phase = Turn.TurnPhase.End
 
 class EffectActivation extends Action:
 	var card : Card
