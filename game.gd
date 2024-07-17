@@ -80,20 +80,6 @@ class Turn:
 		self.turn_number = turn_number
 		self.turn_player = turn_player
 	
-class Deck:
-	var name : String
-	var main_deck : Array[Card]
-	var resource_deck : Array[Card]
-	var special_deck : Array[Card]
-	var main_deck_templates : Array[CardTemplate]
-	var resource_deck_templates : Array[CardTemplate]
-	var special_deck_templates : Array[CardTemplate]
-	
-	func _init(name : String, main : Array[CardTemplate], resource : Array[CardTemplate], special : Array[CardTemplate]):
-		self.name = name
-		self.main_deck_templates = main
-		self.resource_deck_templates = resource
-		self.special_deck_templates = special
 
 class ResourceList:
 	var elements : Array[ResourceElement]

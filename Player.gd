@@ -1,7 +1,7 @@
 class_name Player
 
 var name : String
-var deck : Game.Deck
+var deck : Deck
 var seat : int
 var hand : Hand
 var cards : Array

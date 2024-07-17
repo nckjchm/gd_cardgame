@@ -51,24 +51,25 @@ func init_cards():
 	var card_index := 0
 	var effect_index := 0
 	for player in game.players:
-		var deck_templates = [player.deck.main_deck_templates, player.deck.resource_deck_templates, player.deck.special_deck_templates]
+		var deck_templates = [player.deck.deck_template.main_deck_keys, player.deck.deck_template.resource_deck_keys, player.deck.deck_template.special_deck_keys]
 		for deck_template in deck_templates:
 			var card_origin : Card.CardOrigin
 			match deck_template:
-				player.deck.main_deck_templates:
+				player.deck.deck_template.main_deck_keys:
 					card_origin = Card.CardOrigin.MainDeck
-				player.deck.resource_deck_templates:
+				player.deck.deck_template.resource_deck_keys:
 					card_origin = Card.CardOrigin.ResourceDeck
-				player.deck.special_deck_templates:
+				player.deck.deck_template.special_deck_keys:
 					card_origin = Card.CardOrigin.SpecialDeck
 			var card_list : Array[Card] = []
-			for card_template in deck_template:
-				var card : Card = init_card(card_template, card_index, player, card_origin, effect_index)
+			for template_key in deck_template:
+				var card : Card = init_card(template_key, card_index, player, card_origin, effect_index)
 				card_index += 1
 				effect_index += len(card.effects)
 
-func init_card(card_template : CardTemplate, card_index : int, player : Player, card_origin : Card.CardOrigin, effect_index_start : int):
+func init_card(template_key : String, card_index : int, player : Player, card_origin : Card.CardOrigin, effect_index_start : int):
 	var card : Card = card_prefab.instantiate()
+	var card_template = CardTemplates.templates[template_key]
 	card.initialize(card_template, card_index, player, card_origin, effect_index_start)
 	match card_origin:
 		Card.CardOrigin.MainDeck:
@@ -87,34 +88,9 @@ func _ready():
 	#hand.add_card(handcard)
 	#fieldcard.card_position = Card.CardPosition.Field
 	#handcard.card_position = Card.CardPosition.Hand
-	var deck1 := Game.Deck.new(
-		"Deck 1", 
-		[
-			CardTemplate.YlwCrtFarmer.new(),
-			CardTemplate.YlwCrtFarmer.new(),
-			CardTemplate.YlwCrtFarmer.new(),
-		],
-		[
-			CardTemplate.YlwLndAcre.new(),
-			CardTemplate.YlwLndAcre.new(),
-			CardTemplate.YlwLndAcre.new(),
-		], 
-		[])
-	proxyPlayers[0].deck = deck1
-	var deck2 := Game.Deck.new(
-		"Deck 2", 
-		[
-			CardTemplate.YlwCrtFarmer.new(),
-			CardTemplate.YlwCrtFarmer.new(),
-			CardTemplate.YlwCrtFarmer.new(),
-		],
-		[
-			CardTemplate.YlwLndAcre.new(),
-			CardTemplate.YlwLndAcre.new(),
-			CardTemplate.YlwLndAcre.new(),
-		], 
-		[])
-	proxyPlayers[1].deck = deck2
+	for player in proxyPlayers:
+		player.deck = Deck.new(DeckTemplate.TestDeck.new())
+	
 	initialize_game(proxyPlayers)
 	start_game()
 
