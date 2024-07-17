@@ -51,6 +51,9 @@ func init_card(template_key : String, card_index : int, player : Player, card_or
 	return card
 
 func start():
+	for player in players:
+		for i in range(5):
+			draw(player, player.maindeck_cell)
 	new_turn()
 	game_state = GameState.Cold
 
@@ -74,6 +77,12 @@ func mark_recovery_targets():
 		if card.needs_recovery:
 			targets_available = true
 	current_turn.recovery_done = not targets_available
+
+func draw(player : Player, stack : Cell):
+	var card : Card = stack.cards[-1]
+	stack.remove_card(card)
+	card.card_owner.hand.add_card(card)
+	card.card_position = Card.CardPosition.Hand
 
 func check_recovery_finished():
 	for card in current_turn.turn_player.cards:
