@@ -86,3 +86,4 @@ class EffectActivation extends Action:
 		self.player = player
 		self.effect = effect
 		self.card = effect.card
+		events.append(Event.EffectActivationEvent.new(player, effect))

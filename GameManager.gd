@@ -269,7 +269,9 @@ func get_card_effect_options(card : Card):
 	for effect in card.effects:
 		if effect.condition.call(self, effect):
 			var effect_choice = { type = "activate", label = effect.short_text, card = effect.card, effect = effect}
-			effect_choice.on_click = func(): register_choice(effect_choice)
+			effect_choice.on_click = func():
+				effect_choice.action = Action.EffectActivation.new(card.controller, effect)
+				register_choice(effect_choice)
 			options[str(effect.id)] = effect_choice
 	return options
 

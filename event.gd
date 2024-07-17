@@ -167,6 +167,15 @@ class TapStateChangeEvent extends CardStatusEvent:
 		self.player = player
 		self.amount = amount
 		self.card = card
+		
+	func resolve(gm : GameManager):
+		card.tap_status += amount
+		if card.tap_status > 2:
+			print("Card %s has been overtapped to %d" % [str(card), card.tap_status])
+			card.tap_status = 2
+		if card.tap_status < 0:
+			print("Card %s has been undertapped to %d" % [str(card), card.tap_status])
+			card.tap_status = 0
 	
 class MicroStateChangeEvent extends CardStatusEvent:
 	var microstate_key : String
@@ -193,6 +202,9 @@ class EffectActivationEvent extends EffectEvent:
 	func _init(player, effect):
 		self.player = player
 		self.effect = effect
+		
+	func resolve(gm : GameManager):
+		self.event_stack.append_array(effect.activate.call(gm, effect))
 
 class PlayerEvent extends Event:
 	var affected : Player

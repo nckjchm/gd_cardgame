@@ -1,6 +1,6 @@
 [gd_scene load_steps=11 format=3 uid="uid://dtfcivf7a6ten"]
 
-[ext_resource type="Script" path="res://Card.gd" id="1_vdmro"]
+[ext_resource type="Script" path="res://Card.gd" id="1_v2rnx"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_shm34"]
 
@@ -65,7 +65,7 @@ vertical_alignment = 0
 [node name="Card" type="CanvasGroup"]
 position = Vector2(2.08165e-12, 2.08165e-12)
 scale = Vector2(17, 17)
-script = ExtResource("1_vdmro")
+script = ExtResource("1_v2rnx")
 
 [node name="CardArea" type="Area2D" parent="."]
 scale = Vector2(0.78, 1)
