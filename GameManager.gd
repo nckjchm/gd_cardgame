@@ -10,87 +10,11 @@ var waiting := false
 var last_priority := false
 var gui : GUIController
 
-func initialize_game(playerList : Array[Player]):
-	game = Game.new(playerList)
-	for player in game.players:
-		player.hand = Hand.new(player)
-		player.resources = Game.ResourceList.new([])
-	init_field()
-	init_cards()
-
-func start_game():
-	game.start()
-	current_decider = game.current_turn.turn_player
-	current_options = get_player_options(current_decider)
-	waiting = true
-
-func init_field():
-	for row in field.fieldpreset.dimensions[0]:
-		for column in field.fieldpreset.dimensions[1]:
-			var cell = field.fieldpreset.types[row][column]
-			if cell[2] != -1:
-				var player : Player = game.players[cell[2]]
-				if cell[0] == Cell.CellType.Field:
-					player.home_cells.append(field.cells[row][column])
-				else:
-					match cell[1]:
-						Cell.StackType.MainDeck:
-							player.maindeck_cell = field.cells[row][column]
-						Cell.StackType.ResourceDeck:
-							player.resourcedeck_cell = field.cells[row][column]
-						Cell.StackType.SpecialDeck:
-							player.specialdeck_cell = field.cells[row][column]
-						Cell.StackType.Graveyard:
-							player.graveyard_cell = field.cells[row][column]
-						Cell.StackType.Limbo:
-							player.limbo_cell = field.cells[row][column]
-						Cell.StackType.Banishment:
-							player.banishment_cell = field.cells[row][column]
-
-func init_cards():
-	var card_index := 0
-	var effect_index := 0
-	for player in game.players:
-		var deck_templates = [player.deck.deck_template.main_deck_keys, player.deck.deck_template.resource_deck_keys, player.deck.deck_template.special_deck_keys]
-		for deck_template in deck_templates:
-			var card_origin : Card.CardOrigin
-			match deck_template:
-				player.deck.deck_template.main_deck_keys:
-					card_origin = Card.CardOrigin.MainDeck
-				player.deck.deck_template.resource_deck_keys:
-					card_origin = Card.CardOrigin.ResourceDeck
-				player.deck.deck_template.special_deck_keys:
-					card_origin = Card.CardOrigin.SpecialDeck
-			var card_list : Array[Card] = []
-			for template_key in deck_template:
-				var card : Card = init_card(template_key, card_index, player, card_origin, effect_index)
-				card_index += 1
-				effect_index += len(card.effects)
-
-func init_card(template_key : String, card_index : int, player : Player, card_origin : Card.CardOrigin, effect_index_start : int):
-	var card : Card = card_prefab.instantiate()
-	var card_template = CardTemplates.templates[template_key]
-	card.initialize(card_template, card_index, player, card_origin, effect_index_start)
-	match card_origin:
-		Card.CardOrigin.MainDeck:
-			player.maindeck_cell.insert_card(card)
-		Card.CardOrigin.ResourceDeck:
-			player.resourcedeck_cell.insert_card(card)
-		Card.CardOrigin.SpecialDeck:
-			player.specialdeck_cell.insert_card(card)
-	card.card_owner.cards.append(card)
-	return card
 
 func _ready():
 	var proxyPlayers : Array[Player] = [Player.new("Player1"), Player.new("Player2")]
-	#var handcard : Card = card_prefab.instantiate()
-	#handcard.initialize(CardTemplate.TestCard.new(), 0, proxyPlayers[0])
-	#hand.add_card(handcard)
-	#fieldcard.card_position = Card.CardPosition.Field
-	#handcard.card_position = Card.CardPosition.Hand
 	for player in proxyPlayers:
 		player.deck = Deck.new(DeckTemplate.TestDeck.new())
-	
 	initialize_game(proxyPlayers)
 	start_game()
 
@@ -173,6 +97,79 @@ func finish_action(action : Action):
 	game.hot_action = null
 	game.hot_event = null
 	wait_for_choice(game.current_turn.turn_player, Game.GameState.Cold)
+
+### Game Initializing
+
+func initialize_game(playerList : Array[Player]):
+	game = Game.new(playerList)
+	for player in game.players:
+		player.hand = Hand.new(player)
+		player.resources = Game.ResourceList.new([])
+	init_field()
+	init_cards()
+
+func start_game():
+	game.start()
+	current_decider = game.current_turn.turn_player
+	current_options = get_player_options(current_decider)
+	waiting = true
+
+func init_field():
+	for row in field.fieldpreset.dimensions[0]:
+		for column in field.fieldpreset.dimensions[1]:
+			var cell = field.fieldpreset.types[row][column]
+			if cell[2] != -1:
+				var player : Player = game.players[cell[2]]
+				if cell[0] == Cell.CellType.Field:
+					player.home_cells.append(field.cells[row][column])
+				else:
+					match cell[1]:
+						Cell.StackType.MainDeck:
+							player.maindeck_cell = field.cells[row][column]
+						Cell.StackType.ResourceDeck:
+							player.resourcedeck_cell = field.cells[row][column]
+						Cell.StackType.SpecialDeck:
+							player.specialdeck_cell = field.cells[row][column]
+						Cell.StackType.Graveyard:
+							player.graveyard_cell = field.cells[row][column]
+						Cell.StackType.Limbo:
+							player.limbo_cell = field.cells[row][column]
+						Cell.StackType.Banishment:
+							player.banishment_cell = field.cells[row][column]
+
+func init_cards():
+	var card_index := 0
+	var effect_index := 0
+	for player in game.players:
+		var deck_templates = [player.deck.deck_template.main_deck_keys, player.deck.deck_template.resource_deck_keys, player.deck.deck_template.special_deck_keys]
+		for deck_template in deck_templates:
+			var card_origin : Card.CardOrigin
+			match deck_template:
+				player.deck.deck_template.main_deck_keys:
+					card_origin = Card.CardOrigin.MainDeck
+				player.deck.deck_template.resource_deck_keys:
+					card_origin = Card.CardOrigin.ResourceDeck
+				player.deck.deck_template.special_deck_keys:
+					card_origin = Card.CardOrigin.SpecialDeck
+			var card_list : Array[Card] = []
+			for template_key in deck_template:
+				var card : Card = init_card(template_key, card_index, player, card_origin, effect_index)
+				card_index += 1
+				effect_index += len(card.effects)
+
+func init_card(template_key : String, card_index : int, player : Player, card_origin : Card.CardOrigin, effect_index_start : int):
+	var card : Card = card_prefab.instantiate()
+	var card_template = CardTemplates.templates[template_key]
+	card.initialize(card_template, card_index, player, card_origin, effect_index_start)
+	match card_origin:
+		Card.CardOrigin.MainDeck:
+			player.maindeck_cell.insert_card(card)
+		Card.CardOrigin.ResourceDeck:
+			player.resourcedeck_cell.insert_card(card)
+		Card.CardOrigin.SpecialDeck:
+			player.specialdeck_cell.insert_card(card)
+	card.card_owner.cards.append(card)
+	return card
 
 ### Option Structure getters
 
