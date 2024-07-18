@@ -79,6 +79,17 @@ func parse_choices():
 				effect = null,
 				choose = celloption.on_click
 			})
+	if "end_move" in choices_dict:
+		var optiondict = choices_dict.end_move
+		choices.append({
+			type = optiondict.type,
+			text = null,
+			player = null,
+			card = null,
+			cell = null,
+			effect = null,
+			choose = optiondict.on_click
+		})
 
 func new_row(choice : Dictionary):
 	var row_type : Label = Label.new()

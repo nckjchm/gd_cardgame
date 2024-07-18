@@ -37,7 +37,8 @@ func handle_event(event : Event):
 			return false
 	else:
 		event.handling_finished = true
-	return true
+		return true
+	return false
 
 func register_choice(choice : Dictionary):
 	waiting = false
@@ -95,6 +96,7 @@ func wait_for_choice(decider : Player, gamestate : Game.GameState, options : Dic
 	gui.update()
 
 func finish_action(action : Action):
+	print("finishing action: %s" % action)
 	action.finished = true
 	game.hot_action = null
 	game.hot_event = null
@@ -241,6 +243,9 @@ func get_card_option_list(card : Card):
 			if "effects" in option_dict:
 				for key in option_dict.effects:
 					options.append(option_dict.effects[key])
+	if "end_move" in current_options:
+		if current_options.end_move.card == card:
+			options.append(current_options.end_move)
 	return options
 
 func get_cell_option_list(cell : Cell):

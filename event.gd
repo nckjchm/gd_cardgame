@@ -5,12 +5,9 @@ enum ChainTiming { Before, After, None }
 var player : Player
 var action : Action = null
 var chain_events : Array[Event] = []
-var chain_index : int = 0
-var chain_parent : Event = null
+var parent_event : Event = null
 var chain_timing : ChainTiming = ChainTiming.None
 var event_stack : Array[Event] = []
-var following_events : Array[Event] = []
-var following_event_index := 0
 var deferred_players : Array[Player] = []
 var has_resolved := false
 var unsuccessful := false
@@ -20,17 +17,23 @@ var handling_finished := false
 var event_type : String
 
 func get_active_subevent():
-	var return_event : Event = null
-	if len(following_events) <= following_event_index and len(event_stack) > 0:
-		var next_event : Event = event_stack.pop_front()
-		following_events.append(next_event)
-	if chain_index < len(chain_events):
-		return_event = chain_events[chain_index]
-		chain_index += 1
-	elif following_event_index < len(following_events):
-		return_event = following_events[following_event_index]
-		following_event_index += 1
-	return return_event
+	for event in chain_events:
+		var event_active_subevent = event.get_active_subevent()
+		if event_active_subevent != null:
+			return event_active_subevent
+		else:
+			if not event.handling_finished:
+				return event
+	if not handling_finished:
+		return null
+	for event in event_stack:
+		if not event.handling_finished:
+			return event
+		else:
+			var event_active_subevent = event.get_active_subevent()
+			if event_active_subevent != null:
+				return event_active_subevent
+	return null
 
 func resolve(gm : GameManager):
 	print("You called the resolve function of the Event class, this probably was not supposed to happen.")
@@ -147,15 +150,18 @@ class StepEvent extends SendToFieldEvent:
 		event_type = "Step"
 		self.movement = movement
 		step_choice = CellChoiceEvent.new(self.player, self.card.step_scope)
-		step_choice.alternatives = {end_move = {type = "end_move", movement = movement}}
+		if len(movement.path) > 1:
+			step_choice.alternatives = {end_move = {type = "end_move", movement = movement, card = card, label = "End Move"}}
 		step_choice.on_decision = func(decision : Dictionary, gm : GameManager):
-			viable = true
-			destination_cell = decision.cell
+			if "cell" in decision:
+				viable = true
+				destination_cell = decision.cell
 		
 	func resolve(gm : GameManager):
 		movement.path.append(destination_cell)
-		super.resolve(gm)
-		if len(movement.path) <= card.speed:
+		if viable:
+			super.resolve(gm)
+		if len(movement.path) <= card.speed and not gm.game.hot_event is EndMoveEvent:
 			next_step = StepEvent.new(player, card, movement)
 			event_stack.append_array([next_step.step_choice, next_step])
 		else:
@@ -207,17 +213,22 @@ class StartMoveEvent extends MovementEvent:
 		path.append(card.cell)
 	
 	func resolve(gm : GameManager):
+		card.has_moved = true
 		var step_event := StepEvent.new(player, card, self)
 		event_stack.append_array([step_event.step_choice, step_event])
 		super.resolve(gm)
 
 class EndMoveEvent extends MovementEvent:
-	var start_event : StartMoveEvent = null
+	var movement : StartMoveEvent = null
 	func _init(player, start_event):
-		self.start_event = start_event
+		movement = start_event
 		super._init(player, start_event.card)
 		event_type = "EndMove"
 		ending = true
+	
+	func resolve(gm : GameManager):
+		if not len(movement.path) <= movement.card.speed + 1:
+			event_stack.append(TapStateChangeEvent.new(movement.player, movement.card, 1))
 	
 class StatChangeEvent extends CardStatusEvent:
 	var amount : int
@@ -334,6 +345,8 @@ class ChoiceEvent extends PlayerEvent:
 	func resolve(gm : GameManager):
 		for key in alternatives:
 			choice[key] = alternatives[key]
+			choice[key].on_click = func():
+				gm.register_choice(choice[key])
 		gm.wait_for_choice(player, Game.GameState.Hot, choice)
 
 class CellChoiceEvent extends ChoiceEvent:

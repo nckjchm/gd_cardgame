@@ -6,13 +6,12 @@ var finished := false
 
 func get_active_event():
 	for event in events:
-		if not event.handling_finished:
-			var return_event : Event = null
-			return_event = event
-			var active_subevent = return_event.get_active_subevent()
-			while active_subevent != null:
-				return_event = active_subevent
-				active_subevent = return_event.get_active_subevent()
+		var return_event : Event
+		var active_subevent : Event = event
+		while active_subevent != null:
+			return_event = active_subevent
+			active_subevent = return_event.get_active_subevent()
+		if return_event != event or not event.handling_finished:
 			return return_event
 	return null
 	
