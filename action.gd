@@ -26,7 +26,6 @@ class Draw extends Action:
 	
 class Move extends Action:
 	var card
-	var path
 	
 	func _init(player : Player, card : Card):
 		self.player = player

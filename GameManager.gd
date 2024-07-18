@@ -21,7 +21,7 @@ func _ready():
 #returns true if gamestate advancement can continue
 #returns false if waiting for player input is necessary
 func handle_event(event : Event):
-	print("handling event %s" % event)
+	print("handling event %s" % event.event_type)
 	var last_priority : Player = event.player
 	var player = last_priority
 	for player_iter in len(game.players):
@@ -62,10 +62,13 @@ func handle_cold_choice(decision : Action):
 func handle_hot_choice(choice : Dictionary):
 	if "type" in choice:
 		if choice.type == "activate":
-			var event : Event.EffectActivationEvent = Event.EffectActivationEvent.new(current_decider, choice.effect)
+			var event := Event.EffectActivationEvent.new(current_decider, choice.effect)
 			game.hot_event.chain_events.append(event)
 		if choice.type == "cell":
 			choice.on_click.call(self, choice.cell)
+		if choice.type == "end_move":
+			var event := Event.EndMoveEvent.new(current_decider, choice.movement)
+			game.hot_event.chain_events.append(event)
 	if "defer" in choice:
 		game.hot_event.deferred_players.append(current_decider)
 	handle_action(game.hot_action)

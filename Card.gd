@@ -57,9 +57,6 @@ var can_coexist : bool
 var meshes : Array[MeshInstance2D]
 var step_scope : Callable = func(gm : GameManager):
 	var cells : Array[Cell] = gm.field.get_cells_in_distance([cell], 1)
-	print("viable cells:")
-	for cell in cells:
-		print(cell.short_name)
 	cells.filter(func(cell : Cell):
 		for check_card in cell.cards:
 			if not check_card.can_coexist:
