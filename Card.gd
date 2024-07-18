@@ -41,6 +41,7 @@ var has_moved := false
 var index_in_stack := 0
 var play_condition : Callable
 var play_cell_scope : Callable
+var can_coexist : bool
 #technical
 @onready var card_area : Area2D = $CardArea
 @onready var input_controller : InputController = $/root/Main/InputController
@@ -54,17 +55,38 @@ var play_cell_scope : Callable
 @onready var defense_text_mesh : MeshInstance2D = $DefenseTextMesh
 @onready var background : Polygon2D = $CardArea/Background
 var meshes : Array[MeshInstance2D]
+var step_scope : Callable = func(gm : GameManager):
+	var cells : Array[Cell] = gm.field.get_cells_in_distance([cell], 1)
+	print("viable cells:")
+	for cell in cells:
+		print(cell.short_name)
+	cells.filter(func(cell : Cell):
+		for check_card in cell.cards:
+			if not check_card.can_coexist:
+				return false
+		return true
+	)
+	return cells
 
 func initialize(template : CardTemplate, id : int, card_owner : Player, card_origin : CardOrigin, effect_id_start : int):
 	self.template = template
 	self.id = id
 	self.card_owner = card_owner
 	self.card_origin = card_origin
+	controller = card_owner
+	match card_origin:
+		CardOrigin.MainDeck:
+			cell = card_owner.maindeck_cell
+		CardOrigin.ResourceDeck:
+			cell = card_owner.resourcedeck_cell
+		CardOrigin.SpecialDeck:
+			cell = card_owner.specialdeck_cell
 	card_name = template.name
 	card_type = template.type
 	play_condition = template.play_condition
 	play_cell_scope = func(gm : GameManager): return template.play_cell_scope.call(self, gm)
 	cost = template.cost
+	can_coexist = template.can_coexist
 	var effect_id := effect_id_start
 	for effect_template in template.effects:
 		effects.append(CardEffect.new(effect_template, self, effect_id))

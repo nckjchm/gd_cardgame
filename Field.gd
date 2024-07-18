@@ -96,12 +96,16 @@ func get_neighbors(x_index : int, y_index : int):
 	return neighbors
 
 func get_neighbor_cells(cell : Cell, fieldcells_only = true):
-	var neighbors : Array[Cell] = get_neighbors(cell.grid_row, cell.grid_column)
+	var neighbors : Array[Cell] = get_neighbors(cell.grid_column, cell.grid_row)
 	if fieldcells_only:
 		neighbors = neighbors.filter(func(cell : Cell): cell.cell_type == Cell.CellType.Field)
 	return neighbors
 
 func get_cells_in_distance(search_cells : Array[Cell], distance : int, skip_unwalkable = true):
+	var cellnames = ""
+	for cell in search_cells:
+		cellnames = cellnames + "|%s" % cell.short_name
+	print("getting cells in distance %d from cells %s" % [distance, cellnames])
 	var return_cells : Array[Cell] = search_cells
 	var new_cells = search_cells
 	for step in range(distance):
@@ -111,4 +115,8 @@ func get_cells_in_distance(search_cells : Array[Cell], distance : int, skip_unwa
 		new_cells = step_cells.filter(func(cell : Cell): return cell not in return_cells)
 		return_cells.append_array(new_cells)
 	return_cells = return_cells.filter(func(cell : Cell): return cell.cell_type == Cell.CellType.Field)
+	cellnames = ""
+	for cell in return_cells:
+		cellnames = cellnames + "|%s" % cell.short_name
+	print("returning cells %s" % cellnames)
 	return return_cells

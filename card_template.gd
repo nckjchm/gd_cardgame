@@ -8,6 +8,7 @@ var health : int
 var defense : int
 var attack : int
 var speed : int
+var can_coexist := false
 var play_condition : Callable
 var play_cell_scope : Callable
 var effects : Array[EffectTemplate] = []

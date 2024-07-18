@@ -38,12 +38,31 @@ class CardEvent extends Event:
 	var card : Card
 
 class SendCardEvent extends CardEvent:
-	var origin_cell : Cell
-	var origin_is_hand : bool
-	var origin_index : int
-	var destination_cell : Cell
-	var destination_is_hand : bool
-	var destination_index : int
+	var origin_cell : Cell = null
+	var origin_is_hand : bool = false
+	var origin_index : int = 0
+	var destination_cell : Cell = null
+	var destination_is_hand : bool = false
+	var destination_index : int = 0
+	
+	func resolve(gm : GameManager):
+		origin_index = card.index_in_stack
+		if card.card_position == Card.CardPosition.Hand:
+			origin_is_hand = true
+			card.card_owner.hand.remove_card(card)
+			gm.gui.refresh_hand(card.card_owner)
+		else:
+			origin_cell = card.cell
+			card.cell.remove_card(card)
+		if destination_is_hand:
+			origin_cell.remove_card(card)
+			card.card_owner.hand.add_card(card)
+			card.card_position = Card.CardPosition.Hand
+			card.controller = card.card_owner
+		else:
+			card.cell = destination_cell
+			card.card_position = Card.CardPosition.Field
+			destination_cell.insert_card(card)
 	
 class SendToGraveEvent extends SendCardEvent:
 	pass
@@ -64,10 +83,7 @@ class SendToHandEvent extends SendCardEvent:
 		destination_is_hand = true
 		
 	func resolve(gm : GameManager):
-		origin_cell.remove_card(card)
-		card.card_owner.hand.add_card(card)
-		card.card_position = Card.CardPosition.Hand
-		card.controller = card.card_owner
+		super.resolve(gm)
 	
 class DrawEvent extends SendToHandEvent:
 	var draw_stack : Card.CardOrigin
@@ -110,20 +126,27 @@ class SendToFieldEvent extends SendCardEvent:
 		self.player = player
 		self.card = card
 		self.destination_cell = destination_cell
-
-	func resolve(gm : GameManager):
-		if card.card_position == Card.CardPosition.Hand:
-			origin_is_hand = true
-			card.card_owner.hand.remove_card(card)
-			gm.gui.refresh_hand(card.card_owner)
-		else:
-			origin_is_hand = false
-			origin_cell = card.cell
-			card.cell.remove_card(card)
-		card.cell = destination_cell
-		card.card_position = Card.CardPosition.Field
-		destination_cell.insert_card(card)
 	
+	func resolve(gm : GameManager):
+		super.resolve(gm)
+
+class StepEvent extends SendToFieldEvent:
+	var movement : StartMoveEvent
+	var step_candidates : Array[Cell]
+	var step_choice : CellChoiceEvent
+	var viable := false
+	
+	func _init(player : Player, card : Card, movement : StartMoveEvent):
+		super._init(player, card, destination_cell)
+		self.movement = movement
+		step_choice = CellChoiceEvent.new(self.player, self.card.step_scope)
+		step_choice.on_decision = func(decision : Dictionary, gm : GameManager):
+			viable = true
+			destination_cell = decision.cell
+		
+	func resolve(gm : GameManager):
+		super.resolve(gm)
+
 class PlayCardEvent extends SendToFieldEvent:
 	var resource_payment : PayResourceEvent
 	
@@ -143,7 +166,40 @@ class CallCreatureEvent extends PlayCardEvent:
 		super.resolve(gm)
 
 class CardStatusEvent extends CardEvent:
-	pass
+	
+	func _init(player : Player, card : Card):
+		self.player = player
+		self.card = card
+	
+class MovementEvent extends CardStatusEvent:
+	var ending := false
+	var step_cells : Array[Cell] = []
+	var current_viable_steps : Array[Cell] = []
+	
+	func _init(player, card):
+		self.player = player
+		self.card = card
+		
+	func resolve(gm : GameManager):
+		gm.game.game_state = Game.GameState.Cold if ending else Game.GameState.Hot
+
+class StartMoveEvent extends MovementEvent:
+	var next_step : StepEvent = null
+	
+	func _init(player, card):
+		self.player = player
+		self.card = card
+	
+	func resolve(gm : GameManager):
+		var step_event := StepEvent.new(player, card, self)
+		event_stack.append_array([step_event.step_choice, step_event])
+		super.resolve(gm)
+
+class EndMoveEvent extends MovementEvent:
+	func _init(player, card):
+		self.player = player
+		self.card = card
+		ending = true
 	
 class StatChangeEvent extends CardStatusEvent:
 	var amount : int
@@ -248,7 +304,7 @@ class PayResourceEvent extends ResourceEvent:
 class ChoiceEvent extends PlayerEvent:
 	enum ChoiceType { Cell, Card, Option }
 	var choice_type : ChoiceType
-	var choice : Dictionary
+	var choice : Dictionary = {}
 	var on_decision : Callable
 	
 	func resolve(gm : GameManager):
@@ -263,9 +319,14 @@ class CellChoiceEvent extends ChoiceEvent:
 		choice_type = ChoiceType.Cell
 	
 	func resolve(gm : GameManager):
-		choice = { cells = {}}
 		var cells : Array[Cell] = scope.call(gm)
-		for cell in cells:
-			var cell_dict := {type = "cell", label = "choose cell", cell = cell, on_click = func(): on_decision.call(cell, gm)}
-			choice.cells[cell.short_name] = cell_dict
+		if len(cells) > 0:
+			choice = { cells = {}}
+			for cell in cells:
+				var choicedict := {cell = cell, event = self}
+				var on_click = func():
+					on_decision.call(choicedict, gm)
+					gm.register_choice(choicedict)
+				var cell_dict := {type = "cell", label = "choose cell", cell = cell, on_click = on_click}
+				choice.cells[cell.short_name] = cell_dict
 		super.resolve(gm)

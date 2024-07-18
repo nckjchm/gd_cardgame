@@ -31,6 +31,7 @@ class YlwLndAcre extends CardTemplate:
 		defense = 0
 		attack = 0
 		speed = 0
+		can_coexist = true
 		effects = [
 			EffectTemplate.ETGain1YellowMana.new()
 		]

@@ -31,6 +31,7 @@ class Move extends Action:
 	func _init(player : Player, card : Card):
 		self.player = player
 		self.card = card
+		events.append(Event.StartMoveEvent.new(player, card))
 	
 class Attack extends Action:
 	var attacking
@@ -54,9 +55,10 @@ class PlayCardFromHand extends Action:
 			play_event = Event.CallCreatureEvent.new(card, null)
 		else:
 			play_event = Event.PlayCardEvent.new(card, null)
-		cell_choice.on_decision = (func(cell : Cell, gm : GameManager): 
-			play_event.destination_cell = cell
-			gm.register_choice({cell = cell_choice}))
+		cell_choice.on_decision = (func(choice : Dictionary, gm : GameManager):
+			var choice_cell = choice.cell 
+			play_event.destination_cell = choice_cell
+		)
 		play_event.resource_payment = resource_payment
 		events.append_array([resource_payment, cell_choice, play_event])
 
