@@ -138,6 +138,7 @@ class SendToFieldEvent extends SendCardEvent:
 	
 	func resolve(gm : GameManager):
 		super.resolve(gm)
+		card.card_status = Card.CardStatus.Alive
 		card.card_position = Card.CardPosition.Field
 
 class StepEvent extends SendToFieldEvent:
@@ -212,17 +213,15 @@ class StartAttackEvent extends AttackEvent:
 		self.card = card
 	
 	func resolve(gm : GameManager):
-		var neighboring_cells : Array[Cell] = gm.field.get_neighbor_cells(card.cell)
-		target_choice = CardChoiceEvent.new(card.controller, func(): 
-			return gm.game.all_cards.filter(
-				func(check_target : Card):
-					return card.controller != check_target.controller and check_target.cell in neighboring_cells and check_target.card_status == Card.CardStatus.Alive and check_target.health > 0
-			))
+		var choice_scope := func():
+			return card.attack_scope.call(gm)
+		target_choice = CardChoiceEvent.new(card.controller, choice_scope)
 		attack_execution = ExecuteAttackEvent.new(player, card)
 		target_choice.on_decision = func(choicedict : Dictionary, gm : GameManager):
 			if "card" in choicedict:
 				attack_execution.target = choicedict.card
 				target = choicedict.card
+		event_stack.append_array([target_choice, attack_execution])
 
 class ExecuteAttackEvent extends AttackEvent:
 	func _init(player : Player, card : Card):
@@ -469,7 +468,7 @@ class CardChoiceEvent extends ChoiceEvent:
 		choice_type = ChoiceType.Card
 	
 	func resolve(gm : GameManager):
-		var cards : Array[Card] = scope.call(gm)
+		var cards : Array[Card] = scope.call()
 		if len(cards) > 0:
 			choice = { cards = {}}
 			for card in cards:
@@ -478,6 +477,8 @@ class CardChoiceEvent extends ChoiceEvent:
 					on_decision.call(choicedict, gm)
 					gm.register_choice(choicedict)
 				var card_dict := {type = "card", label = "choose card", card = card, on_click = on_click}
+				choice.cards[str(card.id)] = card_dict
+		super.resolve(gm)
 
 class CellChoiceEvent extends ChoiceEvent:
 	var scope : Callable

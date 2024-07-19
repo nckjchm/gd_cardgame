@@ -100,6 +100,14 @@ var step_scope : Callable = func(gm : GameManager):
 	)
 	return cells
 
+var attack_scope := func(gm : GameManager):
+	var neighboring_cells : Array[Cell] = gm.field.get_neighbor_cells(cell)
+	var cards : Array[Card] = gm.game.all_cards.filter(
+		func(check_target : Card):
+			return controller != check_target.controller and check_target.cell in neighboring_cells and check_target.card_status == Card.CardStatus.Alive and check_target.health > 0
+	)
+	return cards
+
 func initialize(template : CardTemplate, id : int, card_owner : Player, card_origin : CardOrigin, effect_id_start : int):
 	self.template = template
 	self.id = id
@@ -127,7 +135,8 @@ func adjust_rotation():
 func check_attack_viability(gm : GameManager):
 	if tap_status == 0 and not has_attacked and card_position == CardPosition.Field and card_type == CardType.Creature and gm.game.current_turn.current_phase == Turn.TurnPhase.Battle:
 		#Needs additional check for whether there are any viable targets
-		return true
+		var targets : Array[Card] = attack_scope.call(gm)
+		return len(targets) > 0
 	return false
 
 func check_movement_viability(gm : GameManager):

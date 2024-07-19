@@ -79,6 +79,18 @@ func parse_choices():
 				effect = null,
 				choose = celloption.on_click
 			})
+	if "cards" in choices_dict:
+		for card_key in choices_dict.cards:
+			var cardoption = choices_dict.cards[card_key]
+			choices.append({
+				type = cardoption.type,
+				text = cardoption.label,
+				player = null,
+				card = cardoption.card,
+				cell = cardoption.card.cell,
+				effect = null,
+				choose = cardoption.on_click
+			})
 	if "end_move" in choices_dict:
 		var optiondict = choices_dict.end_move
 		choices.append({

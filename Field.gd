@@ -98,7 +98,7 @@ func get_neighbors(x_index : int, y_index : int):
 func get_neighbor_cells(cell : Cell, fieldcells_only = true):
 	var neighbors : Array[Cell] = get_neighbors(cell.grid_column, cell.grid_row)
 	if fieldcells_only:
-		neighbors = neighbors.filter(func(cell : Cell): cell.cell_type == Cell.CellType.Field)
+		neighbors = neighbors.filter(func(cell : Cell): return cell.cell_type == Cell.CellType.Field)
 	return neighbors
 
 func get_cells_in_distance(search_cells : Array[Cell], distance : int, skip_unwalkable = true):
