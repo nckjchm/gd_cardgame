@@ -38,6 +38,7 @@ class Attack extends Action:
 	func _init(player : Player, card : Card):
 		self.player = player
 		attacking = card
+		events.append(Event.StartAttackEvent.new(player, card))
 
 class PlayCardFromHand extends Action:
 	var card : Card
@@ -77,6 +78,7 @@ class EndTurn extends AdvancePhase:
 		self.player = player
 		self.ending_turn = ending_turn
 		exiting_phase = Turn.TurnPhase.End
+		events.append(Event.EndTurnEvent.new(player, ending_turn))
 
 class EffectActivation extends Action:
 	var card : Card
@@ -87,3 +89,11 @@ class EffectActivation extends Action:
 		self.effect = effect
 		self.card = effect.card
 		events.append(Event.EffectActivationEvent.new(player, effect))
+
+class Recover extends Action:
+	var card : Card
+	
+	func _init(player : Player, card : Card):
+		self.player = player
+		self.card = card
+		events.append(Event.RecoveryEvent.new(player, card))

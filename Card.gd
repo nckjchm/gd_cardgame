@@ -19,13 +19,43 @@ var cell : Cell = null
 var card_owner : Player
 var controller : Player
 #card stats
-var health : int
-var defense : int
-var attack : int
-var speed : int
+var health : int :
+	get:
+		return health
+	set(value):
+		health = value
+		health_text_mesh.mesh.text = str(health)
+var defense : int:
+	get:
+		return defense
+	set(value):
+		defense = value
+		defense_text_mesh.mesh.text = str(defense)
+var attack : int:
+	get:
+		return attack
+	set(value):
+		attack = value
+		attack_text_mesh.mesh.text = str(attack)
+var speed : int:
+	get:
+		return speed
+	set(value):
+		speed = value
+		speed_text_mesh.mesh.text = str(speed)
 #card info
-var card_name : String
-var tap_status : int
+var card_name : String:
+	get:
+		return card_name
+	set(value):
+		card_name = value
+		name_text_mesh.mesh.text = card_name
+var tap_status : int:
+	get:
+		return tap_status
+	set(value):
+		tap_status = value
+		adjust_rotation()
 var card_status : CardStatus = CardStatus.Hidden
 var card_position : CardPosition = CardPosition.Deck
 var card_type : CardType
@@ -57,7 +87,7 @@ var can_coexist : bool
 var meshes : Array[MeshInstance2D]
 var step_scope : Callable = func(gm : GameManager):
 	var cells : Array[Cell] = gm.field.get_cells_in_distance([cell], 1)
-	cells.filter(func(cell : Cell):
+	cells = cells.filter(func(cell : Cell):
 		for check_card in cell.cards:
 			if not check_card.can_coexist:
 				return false
@@ -70,25 +100,10 @@ func initialize(template : CardTemplate, id : int, card_owner : Player, card_ori
 	self.id = id
 	self.card_owner = card_owner
 	self.card_origin = card_origin
-	controller = card_owner
-	match card_origin:
-		CardOrigin.MainDeck:
-			cell = card_owner.maindeck_cell
-		CardOrigin.ResourceDeck:
-			cell = card_owner.resourcedeck_cell
-		CardOrigin.SpecialDeck:
-			cell = card_owner.specialdeck_cell
-	card_name = template.name
-	card_type = template.type
-	play_condition = template.play_condition
-	play_cell_scope = func(gm : GameManager): return template.play_cell_scope.call(self, gm)
-	cost = template.cost
-	can_coexist = template.can_coexist
 	var effect_id := effect_id_start
 	for effect_template in template.effects:
 		effects.append(CardEffect.new(effect_template, self, effect_id))
 		effect_id += 1
-	refresh_stats()
 
 func refresh_stats():
 	health = template.health
@@ -96,6 +111,13 @@ func refresh_stats():
 	attack = template.attack
 	speed = template.speed
 	tap_status = 0
+
+func adjust_rotation():
+	if card_position == CardPosition.Hand:
+		rotation = 0
+		return
+	var tap_deg : float = (30 * tap_status)
+	rotation = deg_to_rad(controller.rotation + tap_deg)
 
 func check_attack_viability(gm : GameManager):
 	if tap_status == 0 and not has_attacked and card_position == CardPosition.Field and card_type == CardType.Creature and gm.game.current_turn.current_phase == Turn.TurnPhase.Battle:
@@ -154,6 +176,21 @@ func set_color(card_color : CardColor):
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	card_input_event.connect(input_controller.card_input_event)
+	controller = card_owner
+	match card_origin:
+		CardOrigin.MainDeck:
+			cell = card_owner.maindeck_cell
+		CardOrigin.ResourceDeck:
+			cell = card_owner.resourcedeck_cell
+		CardOrigin.SpecialDeck:
+			cell = card_owner.specialdeck_cell
+	card_name = template.name
+	card_type = template.type
+	play_condition = template.play_condition
+	play_cell_scope = func(gm : GameManager): return template.play_cell_scope.call(self, gm)
+	cost = template.cost
+	can_coexist = template.can_coexist
+	card_color = template.card_color
 	meshes = [name_text_mesh, cost_text_mesh, attribute_text_mesh, card_text_mesh, attack_text_mesh, speed_text_mesh, health_text_mesh, defense_text_mesh]
 	for mesh_obj in meshes:
 		var mesh := TextMesh.new()
@@ -162,12 +199,9 @@ func _ready():
 		mesh.vertical_alignment = VERTICAL_ALIGNMENT_TOP
 		mesh.font_size = 50
 		mesh.autowrap_mode = TextServer.AUTOWRAP_WORD
+	refresh_stats()
 	init_meshes()
 	set_color(template.card_color)
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta):
-	pass
 
 func _on_card_area_input_event(viewport, event, shape_idx):
 	card_input_event.emit(self, viewport, event, shape_idx)

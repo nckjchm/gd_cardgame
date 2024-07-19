@@ -9,12 +9,16 @@ var game_state = GameState.Preparation
 var current_turn : Turn = null
 var hot_action : Action = null
 var hot_event : Event = null
+var all_cards : Array[Card]
 
 func _init(playerList : Array[Player]):
 	players = playerList
-	for player in players:
+	for player_index in range(len(players)):
+		var player : Player = players[player_index]
 		player.hand = Hand.new(player)
 		player.resources = ResourceList.new([])
+		player.seat = player_index
+		player.rotation = int((float(player.seat) / len(players) * 360) + 180) % 360
 
 func init_cards():
 	var card_index := 0
@@ -48,6 +52,7 @@ func init_card(template_key : String, card_index : int, player : Player, card_or
 		Card.CardOrigin.SpecialDeck:
 			player.specialdeck_cell.insert_card(card)
 	card.card_owner.cards.append(card)
+	all_cards.append(card)
 	return card
 
 func start():
@@ -61,6 +66,9 @@ func new_turn():
 	turnplayer_seat = (turnplayer_seat + 1) % len(players)
 	current_turn = Turn.new(len(turns)+1, players[turnplayer_seat])
 	turns.append(current_turn)
+	for card in all_cards:
+		card.has_attacked = false
+		card.has_moved = false
 
 func next_player(player : Player):
 	return players[(player.seat + 1) % len(players)]

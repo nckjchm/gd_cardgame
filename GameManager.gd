@@ -144,8 +144,9 @@ func get_player_options(player : Player):
 	var options = {}
 	match game.game_state:
 		Game.GameState.Cold:
-			if player == game.current_turn.turn_player:
-				options.turn_option = get_turn_option()
+			var turn_option = get_turn_option()
+			if player == game.current_turn.turn_player and turn_option != null:
+				options.turn_option = turn_option
 		Game.GameState.Hot:
 			options.decline = {on_click = func(): register_choice({decline = true}), player = player}
 	var cardoptions = {}
@@ -185,7 +186,6 @@ func get_turn_action():
 	elif game.current_turn.current_phase == Turn.TurnPhase.Draw2 and not game.current_turn.draw2_drawn:
 		return Action.Draw.new(turn_player, Card.CardOrigin.MainDeck)
 	elif game.current_turn.current_phase == Turn.TurnPhase.Recovery:
-		
 		if not game.current_turn.recovery_done:
 			return null
 	elif game.current_turn.current_phase == Turn.TurnPhase.End:
@@ -219,7 +219,7 @@ func get_card_effect_options(card : Card):
 func get_card_action_options(card : Card):
 	var options := {}
 	if card.check_attack_viability(self):
-		var attack_choice = { label = "Attack", card = card, player = card.controller}
+		var attack_choice = { label = "Attack", card = card, player = card.controller, action = Action.Attack.new(card.controller, card)}
 		attack_choice.on_click = func() : register_choice(attack_choice)
 		options.attack = attack_choice
 	if card.check_movement_viability(self):
@@ -230,6 +230,10 @@ func get_card_action_options(card : Card):
 		var play_choice = { label = "Play", card = card, player = card.controller, action = Action.PlayCardFromHand.new(card.card_owner, card) }
 		play_choice.on_click = func(): register_choice(play_choice)
 		options.play = play_choice
+	if card.needs_recovery and game.current_turn.current_phase == Turn.TurnPhase.Recovery:
+		var recovery_choice = { label = "Recover", card = card, player = card.controller, action = Action.Recover.new(card.card_owner, card) }
+		recovery_choice.on_click = func(): register_choice(recovery_choice)
+		options.recover = recovery_choice
 	return options
 
 func get_card_option_list(card : Card):

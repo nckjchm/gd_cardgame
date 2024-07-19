@@ -90,6 +90,7 @@ class SendToHandEvent extends SendCardEvent:
 		
 	func resolve(gm : GameManager):
 		super.resolve(gm)
+		card.card_position = Card.CardPosition.Hand
 	
 class DrawEvent extends SendToHandEvent:
 	var draw_stack : Card.CardOrigin
@@ -137,6 +138,7 @@ class SendToFieldEvent extends SendCardEvent:
 	
 	func resolve(gm : GameManager):
 		super.resolve(gm)
+		card.card_position = Card.CardPosition.Field
 
 class StepEvent extends SendToFieldEvent:
 	var movement : StartMoveEvent
@@ -192,6 +194,66 @@ class CardStatusEvent extends CardEvent:
 		event_type = "CardStatus"
 		self.player = player
 		self.card = card
+
+class AttackEvent extends CardStatusEvent:
+	var target : Card
+
+class StartAttackEvent extends AttackEvent:
+	var target_choice : CardChoiceEvent
+	var attack_execution : ExecuteAttackEvent
+	
+	func _init(player : Player, card : Card):
+		event_type = "Start Attack"
+		self.player = player
+		self.card = card
+	
+	func resolve(gm : GameManager):
+		var neighboring_cells : Array[Cell] = gm.field.get_neighbor_cells(card.cell)
+		target_choice = CardChoiceEvent.new(card.controller, func(): 
+			return gm.game.all_cards.filter(
+				func(check_target : Card):
+					return card.controller != check_target.controller and check_target.cell in neighboring_cells and check_target.card_status == Card.CardStatus.Alive and check_target.health > 0
+			))
+		attack_execution = ExecuteAttackEvent.new(player, card)
+		target_choice.on_decision = func(choicedict : Dictionary, gm : GameManager):
+			if "card" in choicedict:
+				attack_execution.target = choicedict.card
+				target = choicedict.card
+
+class ExecuteAttackEvent extends AttackEvent:
+	func _init(player : Player, card : Card):
+		event_type = "Execute Attack"
+		self.player = player
+		self.card = card
+	
+	func resolve(gm : GameManager):
+		if target != null:
+			var hits_health := false
+			var defense_after_damage : int = target.defense - card.attack
+			var health_after_damage : int = target.health + defense_after_damage
+			if defense_after_damage < 0:
+				hits_health = true
+				defense_after_damage = 0
+			event_stack.append(DefenseChangeEvent.new(player, target, defense_after_damage - target.defense))
+			if hits_health:
+				event_stack.append(HealthChangeEvent.new(player, target, health_after_damage - target.health))
+
+class RecoveryEvent extends CardStatusEvent:
+	func _init(player : Player, card : Card):
+		event_type = "Recovery"
+		self.player = player
+		self.card = card
+	
+	func resolve(gm : GameManager):
+		if card.tap_status > 0:
+			event_stack.append(TapStateChangeEvent.new(player, card, -1))
+		if card.defense < card.template.defense:
+			event_stack.append(DefenseChangeEvent.new(player, card, card.template.defense - card.defense))
+		card.needs_recovery = false
+		for card_i in card.controller.cards:
+			if card.needs_recovery:
+				return
+		gm.game.current_turn.recovery_done = true
 	
 class MovementEvent extends CardStatusEvent:
 	var ending := false
@@ -232,18 +294,51 @@ class EndMoveEvent extends MovementEvent:
 	
 class StatChangeEvent extends CardStatusEvent:
 	var amount : int
+	var stat : String
 	
 class HealthChangeEvent extends StatChangeEvent:
-	pass
+	func _init(player : Player, card : Card, amount : int):
+		event_type = "Health Change"
+		stat = "Health"
+		self.player = player
+		self.card = card
+		self.amount = amount
+	
+	func resolve(gm : GameManager):
+		card.health += amount
 	
 class DefenseChangeEvent extends StatChangeEvent:
-	pass
+	func _init(player : Player, card : Card, amount : int):
+		event_type = "Defense Change"
+		stat = "Defense"
+		self.player = player
+		self.card = card
+		self.amount = amount
+	
+	func resolve(gm : GameManager):
+		card.defense += amount
 	
 class AttackChangeEvent extends StatChangeEvent:
-	pass
+	func _init(player : Player, card : Card, amount : int):
+		event_type = "Attack Change"
+		stat = "Attack"
+		self.player = player
+		self.card = card
+		self.amount = amount
+	
+	func resolve(gm : GameManager):
+		card.attack += amount
 	
 class SpeedChangeEvent extends StatChangeEvent:
-	pass
+	func _init(player : Player, card : Card, amount : int):
+		event_type = "Speed Change"
+		stat = "Speed"
+		self.player = player
+		self.card = card
+		self.amount = amount
+	
+	func resolve(gm : GameManager):
+		card.speed += amount
 	
 class TapStateChangeEvent extends CardStatusEvent:
 	var amount : int
@@ -300,14 +395,24 @@ class AdvancePhaseEvent extends PlayerEvent:
 	var exiting_phase : Turn.TurnPhase
 	var entering_phase : Turn.TurnPhase
 	
-	func resolve(gm : GameManager):
-		gm.game.enter_phase(entering_phase)
-	
 	func _init(player : Player, exiting_phase : Turn.TurnPhase, entering_phase : Turn.TurnPhase):
 		event_type="AdvancePhase"
 		self.player = player
 		self.exiting_phase = exiting_phase
 		self.entering_phase = entering_phase
+	
+	func resolve(gm : GameManager):
+		gm.game.enter_phase(entering_phase)
+
+class EndTurnEvent extends PlayerEvent:
+	var ending_turn
+	
+	func _init(player : Player, turn : Turn):
+		self.player = player
+		self.ending_turn = turn
+	
+	func resolve(gm : GameManager):
+		gm.game.new_turn()
 
 class ResourceEvent extends PlayerEvent:
 	var resources : ResourceList
@@ -348,6 +453,26 @@ class ChoiceEvent extends PlayerEvent:
 			choice[key].on_click = func():
 				gm.register_choice(choice[key])
 		gm.wait_for_choice(player, Game.GameState.Hot, choice)
+
+class CardChoiceEvent extends ChoiceEvent:
+	var scope : Callable
+	
+	func _init(player : Player, scope : Callable):
+		event_type = "CardChoice"
+		self.player = player
+		self.scope = scope
+		choice_type = ChoiceType.Card
+	
+	func resolve(gm : GameManager):
+		var cards : Array[Card] = scope.call(gm)
+		if len(cards) > 0:
+			choice = { cards = {}}
+			for card in cards:
+				var choicedict := {card = card, event = self}
+				var on_click = func():
+					on_decision.call(choicedict, gm)
+					gm.register_choice(choicedict)
+				var card_dict := {type = "card", label = "choose card", card = card, on_click = on_click}
 
 class CellChoiceEvent extends ChoiceEvent:
 	var scope : Callable
