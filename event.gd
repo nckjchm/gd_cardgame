@@ -227,7 +227,7 @@ class EndMoveEvent extends MovementEvent:
 		ending = true
 	
 	func resolve(gm : GameManager):
-		if not len(movement.path) <= movement.card.speed + 1:
+		if not len(movement.path) <= movement.card.speed:
 			event_stack.append(TapStateChangeEvent.new(movement.player, movement.card, 1))
 	
 class StatChangeEvent extends CardStatusEvent:
