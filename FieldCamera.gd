@@ -14,8 +14,12 @@ func adjust_zoom(factor : float):
 
 func move_camera(movement):
 	movement /= zoom
+	movement = movement.rotated(rotation)
 	position -= movement
 	var bounding_width = field.middle.x * 2
 	var bounding_height = field.middle.y * 2
 	position.x = 0 if position.x < 0 else bounding_width if position.x > bounding_width else position.x
 	position.y = 0 if position.y < 0 else bounding_height if position.y > bounding_height else position.y
+
+func adjust_rotation(rotation_deg : float):
+	rotation = deg_to_rad(rotation_deg)

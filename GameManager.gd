@@ -3,7 +3,12 @@ class_name GameManager extends Node
 @onready var field : Field = $"../GameViewContainer/FieldVPC/FieldVP/Field"
 @onready var input_controller : InputController = $"../InputController"
 var game : Game
-var current_decider : Player
+var current_decider : Player :
+	get:
+		return current_decider
+	set(value):
+		current_decider = value
+		input_controller.camera.adjust_rotation(value.rotation)
 var current_options : Dictionary
 var waiting := false
 var last_priority := false
@@ -66,10 +71,9 @@ func handle_hot_choice(choice : Dictionary):
 			var event := Event.EffectActivationEvent.new(current_decider, choice.effect)
 			game.hot_event.chain_events.append(event)
 		if choice.type == "cell":
-			choice.on_click.call(self, choice.cell)
+			pass
 		if choice.type == "end_move":
-			var event := Event.EndMoveEvent.new(current_decider, choice.movement)
-			game.hot_event.chain_events.append(event)
+			pass
 	if "defer" in choice:
 		game.hot_event.deferred_players.append(current_decider)
 	handle_action(game.hot_action)

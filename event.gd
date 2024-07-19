@@ -154,20 +154,24 @@ class StepEvent extends SendToFieldEvent:
 		step_choice = CellChoiceEvent.new(self.player, self.card.step_scope)
 		if len(movement.path) > 1:
 			step_choice.alternatives = {end_move = {type = "end_move", movement = movement, card = card, label = "End Move"}}
-		step_choice.on_decision = func(decision : Dictionary, gm : GameManager):
+		var on_decision := func(decision : Dictionary, gm : GameManager):
 			if "cell" in decision:
 				viable = true
 				destination_cell = decision.cell
+			else:
+				event_stack.append(EndMoveEvent.new(player, movement))
+		step_choice.on_decision = on_decision
+		
 		
 	func resolve(gm : GameManager):
-		movement.path.append(destination_cell)
 		if viable:
+			movement.path.append(destination_cell)
 			super.resolve(gm)
-		if len(movement.path) <= card.speed and not gm.game.hot_event is EndMoveEvent:
-			next_step = StepEvent.new(player, card, movement)
-			event_stack.append_array([next_step.step_choice, next_step])
-		else:
-			event_stack.append(EndMoveEvent.new(player, movement))
+			if len(movement.path) <= card.speed and not gm.game.hot_event is EndMoveEvent:
+				next_step = StepEvent.new(player, card, movement)
+				event_stack.append_array([next_step.step_choice, next_step])
+			else:
+				event_stack.append(EndMoveEvent.new(player, movement))
 
 class PlayCardEvent extends SendToFieldEvent:
 	var resource_payment : PayResourceEvent
@@ -289,7 +293,7 @@ class EndMoveEvent extends MovementEvent:
 		ending = true
 	
 	func resolve(gm : GameManager):
-		if not len(movement.path) <= movement.card.speed:
+		if len(movement.path) > movement.card.speed:
 			event_stack.append(TapStateChangeEvent.new(movement.player, movement.card, 1))
 	
 class StatChangeEvent extends CardStatusEvent:
@@ -451,6 +455,7 @@ class ChoiceEvent extends PlayerEvent:
 		for key in alternatives:
 			choice[key] = alternatives[key]
 			choice[key].on_click = func():
+				on_decision.call(choice[key], gm)
 				gm.register_choice(choice[key])
 		gm.wait_for_choice(player, Game.GameState.Hot, choice)
 

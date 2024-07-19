@@ -57,7 +57,12 @@ var tap_status : int:
 		tap_status = value
 		adjust_rotation()
 var card_status : CardStatus = CardStatus.Hidden
-var card_position : CardPosition = CardPosition.Deck
+var card_position : CardPosition = CardPosition.Deck :
+	get:
+		return card_position
+	set(value):
+		card_position = value
+		adjust_rotation()
 var card_type : CardType
 var card_color : CardColor
 var card_aspects : Array[CardAspect]
