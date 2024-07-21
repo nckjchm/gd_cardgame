@@ -69,16 +69,48 @@ class SendCardEvent extends CardEvent:
 			destination_cell.insert_card(card)
 	
 class SendToGraveEvent extends SendCardEvent:
-	pass
+	func _init(player, card):
+		self.player = player
+		self.card = card
+		destination_cell = card.card_owner.graveyard_cell
+		
+	func resolve(gm : GameManager):
+		super.resolve(gm)
+		card.card_position = Card.CardPosition.Graveyard
+		card.card_status = Card.CardStatus.Dead
 	
 class SendToLimboEvent extends SendCardEvent:
-	pass
+	func _init(player, card):
+		self.player = player
+		self.card = card
+		destination_cell = card.card_owner.limbo_cell
+		
+	func resolve(gm : GameManager):
+		super.resolve(gm)
+		card.card_position = Card.CardPosition.Limbo
+		card.card_status = Card.CardStatus.Limbo
 	
 class SendToBanishmentEvent extends SendCardEvent:
-	pass
+	func _init(player, card):
+		self.player = player
+		self.card = card
+		destination_cell = card.card_owner.banishment_cell
+		
+	func resolve(gm : GameManager):
+		super.resolve(gm)
+		card.card_position = Card.CardPosition.Banishment
+		card.card_status = Card.CardStatus.Banished
 	
 class SendToDeckEvent extends SendCardEvent:
-	pass
+	func _init(player, card):
+		self.player = player
+		self.card = card
+		destination_cell = card.card_owner.maindeck_cell
+		
+	func resolve(gm : GameManager):
+		super.resolve(gm)
+		card.card_position = Card.CardPosition.Limbo
+		card.card_status = Card.CardStatus.Limbo
 	
 class SendToHandEvent extends SendCardEvent:
 	var drawn := false
@@ -91,6 +123,7 @@ class SendToHandEvent extends SendCardEvent:
 	func resolve(gm : GameManager):
 		super.resolve(gm)
 		card.card_position = Card.CardPosition.Hand
+		card.card_status = Card.CardStatus.Hidden
 	
 class DrawEvent extends SendToHandEvent:
 	var draw_stack : Card.CardOrigin

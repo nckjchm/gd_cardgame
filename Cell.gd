@@ -67,6 +67,7 @@ func set_according_color():
 			change_color(Color.LAWN_GREEN)
 		Cell.CellType.Inactive:
 			change_color(Color.SLATE_GRAY)
+			hide()
 		Cell.CellType.Stack:
 			change_color(Color.MEDIUM_PURPLE)
 
