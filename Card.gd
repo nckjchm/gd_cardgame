@@ -87,7 +87,7 @@ var play_cell_scope : Callable
 var can_coexist : bool
 #technical
 @onready var card_area : Area2D = $CardArea
-@onready var input_controller : InputController = $/root/Main/InputController
+@onready var input_controller : InputController = $"../../../../../../InputController"
 @onready var name_text_mesh : MeshInstance2D = $NameTextMesh
 @onready var cost_text_mesh : MeshInstance2D = $CostTextMesh
 @onready var attribute_text_mesh : MeshInstance2D = $AttributeTextMesh
@@ -198,6 +198,7 @@ func init_meshes():
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	print(input_controller)
 	card_input_event.connect(input_controller.card_input_event)
 	controller = card_owner
 	match card_origin:

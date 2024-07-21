@@ -15,7 +15,7 @@ var all_choices_menu_prefab = preload("res://all_choices_menu.tscn")
 @onready var btn_decline : Button = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/DeclineButton"
 @onready var btn_recover : Button = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/RecoverButton"
 @onready var btn_all_choices : Button = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/AllChoicesButton"
-@onready var main_control : Control = $"/root/Main"
+@onready var main_control : Control = $".."
 @onready var turn_phase_display : Label = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/HBoxContainer/TurnPhaseText"
 @onready var hand : HandDisplay = $"../GameViewContainer/FieldVPC/FieldVP/HandCanvas/HandPanel"
 

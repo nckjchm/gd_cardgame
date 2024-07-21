@@ -7,7 +7,7 @@
 [ext_resource type="Script" path="res://GameManager.gd" id="4_f0wwg"]
 [ext_resource type="Script" path="res://GUIController.gd" id="6_f6m72"]
 
-[node name="Main" type="Control"]
+[node name="Game" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
