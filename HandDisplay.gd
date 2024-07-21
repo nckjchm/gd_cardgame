@@ -12,6 +12,7 @@ func refresh_cards(cards : Array[Card]):
 	empty()
 	var cardwidth := 300
 	for card in cards:
+		card.adjust_presentation()
 		var card_container := MarginContainer.new()
 		card_container.custom_minimum_size = Vector2(cardwidth, 0)
 		card_container.add_child(card)

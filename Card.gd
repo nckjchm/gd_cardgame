@@ -17,54 +17,62 @@ var template : CardTemplate
 var id : int
 var cell : Cell = null
 var card_owner : Player
-var controller : Player
+var controller : Player:
+	get : return controller
+	set(value):
+		controller = value
+		adjust_rotation()
 #card stats
 var health : int :
-	get:
-		return health
+	get: return health
 	set(value):
 		health = value
 		health_text_mesh.mesh.text = str(health)
 var defense : int:
-	get:
-		return defense
+	get: return defense
 	set(value):
 		defense = value
 		defense_text_mesh.mesh.text = str(defense)
 var attack : int:
-	get:
-		return attack
+	get: return attack
 	set(value):
 		attack = value
 		attack_text_mesh.mesh.text = str(attack)
 var speed : int:
-	get:
-		return speed
+	get: return speed
 	set(value):
 		speed = value
 		speed_text_mesh.mesh.text = str(speed)
 #card info
 var card_name : String:
-	get:
-		return card_name
+	get: return card_name
 	set(value):
 		card_name = value
 		name_text_mesh.mesh.text = card_name
 var tap_status : int:
-	get:
-		return tap_status
+	get: return tap_status
 	set(value):
 		tap_status = value
 		adjust_rotation()
-var card_status : CardStatus = CardStatus.Hidden
+var card_status : CardStatus = CardStatus.Hidden:
+	get: return card_status
+	set(value):
+		card_status = value
+		adjust_presentation()
 var card_position : CardPosition = CardPosition.Deck :
-	get:
-		return card_position
+	get: return card_position
 	set(value):
 		card_position = value
 		adjust_rotation()
 var card_type : CardType
-var card_color : CardColor
+var card_color : CardColor:
+	get: return card_color
+	set(value):
+		card_color = value
+		adjust_color()
+		var text_color = Color.WHITE if not card_color in [CardColor.Yellow, CardColor.White] else Color.BLACK
+		for mesh in meshes:
+			mesh.modulate = text_color
 var card_aspects : Array[CardAspect]
 var card_origin : CardOrigin
 var microstates : Dictionary = {}
@@ -132,6 +140,18 @@ func adjust_rotation():
 	var tap_deg : float = (30 * tap_status)
 	rotation = deg_to_rad(controller.rotation + tap_deg)
 
+func adjust_presentation():
+	var front_visible := card_status != CardStatus.Hidden or card_position == CardPosition.Hand
+	set_content_visibility(front_visible)
+	adjust_color(front_visible)
+
+func adjust_color(front_visible := true):
+	background.color = card_color_presets[card_color] if front_visible else Color.SADDLE_BROWN
+
+func set_content_visibility(front_visible := true):
+	for mesh in meshes:
+		mesh.visible = front_visible
+
 func check_attack_viability(gm : GameManager):
 	if tap_status == 0 and not has_attacked and card_position == CardPosition.Field and card_type == CardType.Creature and gm.game.current_turn.current_phase == Turn.TurnPhase.Battle:
 		#Needs additional check for whether there are any viable targets
@@ -175,17 +195,6 @@ func init_meshes():
 	attribute_text_mesh.mesh.text = "[Attribute]"
 	card_text_mesh.mesh.text = "Card Text"
 	
-func set_color(card_color : CardColor):
-	self.card_color = card_color
-	var black_text := false
-	background.color = card_color_presets[card_color]
-	if card_color in [CardColor.Yellow, CardColor.White]:
-		black_text = true
-	var text_color = Color.WHITE
-	if black_text:
-		text_color = Color.BLACK
-	for mesh in meshes:
-		mesh.modulate = text_color
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -204,7 +213,6 @@ func _ready():
 	play_cell_scope = func(gm : GameManager): return template.play_cell_scope.call(self, gm)
 	cost = template.cost
 	can_coexist = template.can_coexist
-	card_color = template.card_color
 	meshes = [name_text_mesh, cost_text_mesh, attribute_text_mesh, card_text_mesh, attack_text_mesh, speed_text_mesh, health_text_mesh, defense_text_mesh]
 	for mesh_obj in meshes:
 		var mesh := TextMesh.new()
@@ -215,7 +223,8 @@ func _ready():
 		mesh.autowrap_mode = TextServer.AUTOWRAP_WORD
 	refresh_stats()
 	init_meshes()
-	set_color(template.card_color)
+	card_color = template.card_color
+	adjust_presentation()
 
 func _on_card_area_input_event(viewport, event, shape_idx):
 	card_input_event.emit(self, viewport, event, shape_idx)
