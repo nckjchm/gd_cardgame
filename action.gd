@@ -64,12 +64,14 @@ class PlayCardFromHand extends Action:
 class AdvancePhase extends Action:
 	var exiting_phase : Turn.TurnPhase
 	var entering_phase : Turn.TurnPhase
+	var advancement_event : Event.AdvancePhaseEvent
 	
 	func _init(player : Player, exiting_phase : Turn.TurnPhase):
 		self.player = player
 		self.exiting_phase = exiting_phase
-		self.entering_phase = Game.next_phase(exiting_phase)
-		events.append(Event.AdvancePhaseEvent.new(player, exiting_phase, entering_phase))
+		advancement_event = Event.AdvancePhaseEvent.new(player, exiting_phase)
+		events.append(advancement_event)
+		entering_phase = advancement_event.entering_phase
 
 class EndTurn extends AdvancePhase:
 	var ending_turn : Turn

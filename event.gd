@@ -69,20 +69,22 @@ class SendCardEvent extends CardEvent:
 			destination_cell.insert_card(card)
 	
 class SendToGraveEvent extends SendCardEvent:
-	func _init(player, card):
+	func _init(player, card, parent_event : Event = null):
 		self.player = player
 		self.card = card
+		self.parent_event = parent_event
 		destination_cell = card.card_owner.graveyard_cell
-		
+	
 	func resolve(gm : GameManager):
 		super.resolve(gm)
 		card.card_position = Card.CardPosition.Graveyard
 		card.card_status = Card.CardStatus.Dead
 	
 class SendToLimboEvent extends SendCardEvent:
-	func _init(player, card):
+	func _init(player, card, parent_event : Event = null):
 		self.player = player
 		self.card = card
+		self.parent_event = parent_event
 		destination_cell = card.card_owner.limbo_cell
 		
 	func resolve(gm : GameManager):
@@ -91,9 +93,10 @@ class SendToLimboEvent extends SendCardEvent:
 		card.card_status = Card.CardStatus.Limbo
 	
 class SendToBanishmentEvent extends SendCardEvent:
-	func _init(player, card):
+	func _init(player, card, parent_event : Event = null):
 		self.player = player
 		self.card = card
+		self.parent_event = parent_event
 		destination_cell = card.card_owner.banishment_cell
 		
 	func resolve(gm : GameManager):
@@ -102,9 +105,10 @@ class SendToBanishmentEvent extends SendCardEvent:
 		card.card_status = Card.CardStatus.Banished
 	
 class SendToDeckEvent extends SendCardEvent:
-	func _init(player, card):
+	func _init(player, card, parent_event : Event = null):
 		self.player = player
 		self.card = card
+		self.parent_event = parent_event
 		destination_cell = card.card_owner.maindeck_cell
 		
 	func resolve(gm : GameManager):
@@ -115,21 +119,24 @@ class SendToDeckEvent extends SendCardEvent:
 class SendToHandEvent extends SendCardEvent:
 	var drawn := false
 	
-	func _init(player):
+	func _init(player, card : Card, parent_event : Event = null):
 		self.player = player
+		self.card = card
+		self.parent_event = parent_event
 		event_type = "SendToHand"
 		destination_is_hand = true
 		
 	func resolve(gm : GameManager):
-		super.resolve(gm)
-		card.card_position = Card.CardPosition.Hand
-		card.card_status = Card.CardStatus.Hidden
+		if card != null:
+			super.resolve(gm)
+			card.card_position = Card.CardPosition.Hand
+			card.card_status = Card.CardStatus.Hidden
 	
 class DrawEvent extends SendToHandEvent:
 	var draw_stack : Card.CardOrigin
 	
-	func _init(player : Player, draw_stack : Card.CardOrigin):
-		super._init(player)
+	func _init(player : Player, draw_stack : Card.CardOrigin, parent_event : Event = null):
+		super._init(player, null, parent_event)
 		event_type = "Draw"
 		self.draw_stack = draw_stack
 		drawn = true
@@ -141,15 +148,13 @@ class DrawEvent extends SendToHandEvent:
 		origin_is_hand = false
 	
 	func resolve(gm : GameManager):
-		if len(origin_cell.cards) == 0:
-			print("cant draw from cell %s because it is empty" % origin_cell.to_string())
-			return
-		card = origin_cell.cards[-1]
-		super.resolve(gm)
+		if origin_cell != null and len(origin_cell.cards) > 0:
+			card = origin_cell.cards[-1]
+			super.resolve(gm)
 
 class TurnDrawEvent extends DrawEvent:
-	func _init(player : Player, draw_stack : Card.CardOrigin):
-		super._init(player, draw_stack)
+	func _init(player : Player, draw_stack : Card.CardOrigin, parent_event : Event = null):
+		super._init(player, draw_stack, parent_event)
 		event_type = "TurnDraw"
 	
 	func resolve(gm : GameManager):
@@ -163,16 +168,17 @@ class TurnDrawEvent extends DrawEvent:
 				print("Error in TurnDrawEvent.resolve(): Illegal TurnPhase")
 
 class SendToFieldEvent extends SendCardEvent:
-	func _init(player : Player, card : Card, destination_cell : Cell):
+	func _init(player : Player, card : Card, destination_cell : Cell, parent_event : Event = null):
 		event_type = "SendToField"
 		self.player = player
 		self.card = card
 		self.destination_cell = destination_cell
 	
 	func resolve(gm : GameManager):
-		super.resolve(gm)
-		card.card_status = Card.CardStatus.Alive
-		card.card_position = Card.CardPosition.Field
+		if card != null and destination_cell != null:
+			super.resolve(gm)
+			card.card_status = Card.CardStatus.Alive
+			card.card_position = Card.CardPosition.Field
 
 class StepEvent extends SendToFieldEvent:
 	var movement : StartMoveEvent
@@ -185,33 +191,32 @@ class StepEvent extends SendToFieldEvent:
 		super._init(player, card, destination_cell)
 		event_type = "Step"
 		self.movement = movement
-		step_choice = CellChoiceEvent.new(self.player, self.card.step_scope)
+		self.parent_event = movement
+		step_choice = CellChoiceEvent.new(self.player, self.card.step_scope, self)
 		if len(movement.path) > 1:
 			step_choice.alternatives = {end_move = {type = "end_move", movement = movement, card = card, label = "End Move"}}
-		var on_decision := func(decision : Dictionary, gm : GameManager):
+		step_choice.on_decision = func(decision : Dictionary, gm : GameManager):
 			if "cell" in decision:
 				viable = true
 				destination_cell = decision.cell
 			else:
 				event_stack.append(EndMoveEvent.new(player, movement))
-		step_choice.on_decision = on_decision
-		
-		
+
 	func resolve(gm : GameManager):
 		if viable:
 			movement.path.append(destination_cell)
 			super.resolve(gm)
 			if len(movement.path) <= card.speed and not gm.game.hot_event is EndMoveEvent:
 				next_step = StepEvent.new(player, card, movement)
-				event_stack.append_array([next_step.step_choice, next_step])
+				movement.event_stack.append_array([next_step.step_choice, next_step])
 			else:
-				event_stack.append(EndMoveEvent.new(player, movement))
+				movement.event_stack.append(EndMoveEvent.new(player, movement))
 
 class PlayCardEvent extends SendToFieldEvent:
 	var resource_payment : PayResourceEvent
 	
-	func _init(card : Card, destination_cell : Cell):
-		super._init(card.card_owner, card, destination_cell)
+	func _init(card : Card, destination_cell : Cell, parent_event : Event = null):
+		super._init(card.card_owner, card, destination_cell, parent_event)
 		event_type = "PlayCard"
 	
 	func resolve(gm : GameManager):
@@ -219,8 +224,8 @@ class PlayCardEvent extends SendToFieldEvent:
 			super.resolve(gm)
 
 class CallCreatureEvent extends PlayCardEvent:
-	func _init(card : Card, destination_cell : Cell):
-		super._init(card, destination_cell)
+	func _init(card : Card, destination_cell : Cell, parent_event : Event = null):
+		super._init(card, destination_cell, parent_event)
 		event_type = "CallCreature"
 	
 	func resolve(gm : GameManager):
@@ -228,28 +233,31 @@ class CallCreatureEvent extends PlayCardEvent:
 		super.resolve(gm)
 
 class CardStatusEvent extends CardEvent:
-	func _init(player : Player, card : Card):
+	func _init(player : Player, card : Card, parent_event : Event = null):
 		event_type = "CardStatus"
 		self.player = player
 		self.card = card
+		self.parent_event = parent_event
 
 class AttackEvent extends CardStatusEvent:
 	var target : Card
+	
+	func _init(player : Player, card : Card, parent_event : Event = null):
+		super._init(player, card, parent_event)
 
 class StartAttackEvent extends AttackEvent:
 	var target_choice : CardChoiceEvent
 	var attack_execution : ExecuteAttackEvent
 	
-	func _init(player : Player, card : Card):
-		event_type = "Start Attack"
-		self.player = player
-		self.card = card
+	func _init(player : Player, card : Card, parent_event : Event = null):
+		event_type = "StartAttack"
+		super._init(player, card, parent_event)
 	
 	func resolve(gm : GameManager):
 		var choice_scope := func():
 			return card.attack_scope.call(gm)
-		target_choice = CardChoiceEvent.new(card.controller, choice_scope)
-		attack_execution = ExecuteAttackEvent.new(player, card)
+		target_choice = CardChoiceEvent.new(card.controller, choice_scope, self)
+		attack_execution = ExecuteAttackEvent.new(player, card, self)
 		target_choice.on_decision = func(choicedict : Dictionary, gm : GameManager):
 			if "card" in choicedict:
 				attack_execution.target = choicedict.card
@@ -257,10 +265,9 @@ class StartAttackEvent extends AttackEvent:
 		event_stack.append_array([target_choice, attack_execution])
 
 class ExecuteAttackEvent extends AttackEvent:
-	func _init(player : Player, card : Card):
-		event_type = "Execute Attack"
-		self.player = player
-		self.card = card
+	func _init(player : Player, card : Card, parent_event : Event = null):
+		event_type = "ExecuteAttack"
+		super._init(player, card, parent_event)
 	
 	func resolve(gm : GameManager):
 		if target != null:
@@ -275,10 +282,9 @@ class ExecuteAttackEvent extends AttackEvent:
 				event_stack.append(HealthChangeEvent.new(player, target, health_after_damage - target.health))
 
 class RecoveryEvent extends CardStatusEvent:
-	func _init(player : Player, card : Card):
+	func _init(player : Player, card : Card, parent_event : Event = null):
 		event_type = "Recovery"
-		self.player = player
-		self.card = card
+		super._init(player, card, parent_event)
 	
 	func resolve(gm : GameManager):
 		if card.tap_status > 0:
@@ -296,8 +302,8 @@ class MovementEvent extends CardStatusEvent:
 	var step_cells : Array[Cell] = []
 	var current_viable_steps : Array[Cell] = []
 	
-	func _init(player, card):
-		super._init(player, card)
+	func _init(player, card, parent_event : Event = null):
+		super._init(player, card, parent_event)
 		
 	func resolve(gm : GameManager):
 		gm.game.game_state = Game.GameState.Cold if ending else Game.GameState.Hot
@@ -305,8 +311,8 @@ class MovementEvent extends CardStatusEvent:
 class StartMoveEvent extends MovementEvent:
 	var path : Array[Cell] = []
 	
-	func _init(player, card):
-		super._init(player, card)
+	func _init(player, card, parent_event : Event = null):
+		super._init(player, card, parent_event)
 		event_type = "StartMove"
 		path.append(card.cell)
 	
@@ -320,7 +326,8 @@ class EndMoveEvent extends MovementEvent:
 	var movement : StartMoveEvent = null
 	func _init(player, start_event):
 		movement = start_event
-		super._init(player, start_event.card)
+		parent_event = start_event
+		super._init(player, start_event.card, parent_event)
 		event_type = "EndMove"
 		ending = true
 	
@@ -332,46 +339,39 @@ class StatChangeEvent extends CardStatusEvent:
 	var amount : int
 	var stat : String
 	
-class HealthChangeEvent extends StatChangeEvent:
-	func _init(player : Player, card : Card, amount : int):
-		event_type = "Health Change"
-		stat = "Health"
-		self.player = player
-		self.card = card
+	func _init(player : Player, card : Card, stat : String, amount : int, parent_event : Event = null):
+		super._init(player, card, parent_event)
+		self.stat = stat
 		self.amount = amount
+	
+class HealthChangeEvent extends StatChangeEvent:
+	func _init(player : Player, card : Card, amount : int, parent_event : Event = null):
+		event_type = "HealthChange"
+		super._init(player, card, "Health", amount, parent_event)
 	
 	func resolve(gm : GameManager):
 		card.health += amount
 	
 class DefenseChangeEvent extends StatChangeEvent:
-	func _init(player : Player, card : Card, amount : int):
-		event_type = "Defense Change"
-		stat = "Defense"
-		self.player = player
-		self.card = card
-		self.amount = amount
+	func _init(player : Player, card : Card, amount : int, parent_event : Event = null):
+		event_type = "DefenseChange"
+		super._init(player, card, "Defense", amount, parent_event)
 	
 	func resolve(gm : GameManager):
 		card.defense += amount
 	
 class AttackChangeEvent extends StatChangeEvent:
-	func _init(player : Player, card : Card, amount : int):
-		event_type = "Attack Change"
-		stat = "Attack"
-		self.player = player
-		self.card = card
-		self.amount = amount
+	func _init(player : Player, card : Card, amount : int, parent_event : Event = null):
+		event_type = "AttackChange"
+		super._init(player, card, "Attack", amount, parent_event)
 	
 	func resolve(gm : GameManager):
 		card.attack += amount
 	
 class SpeedChangeEvent extends StatChangeEvent:
-	func _init(player : Player, card : Card, amount : int):
-		event_type = "Speed Change"
-		stat = "Speed"
-		self.player = player
-		self.card = card
-		self.amount = amount
+	func _init(player : Player, card : Card, amount : int, parent_event : Event = null):
+		event_type = "SpeedChange"
+		super._init(player, card, "Speed", amount, parent_event)
 	
 	func resolve(gm : GameManager):
 		card.speed += amount
@@ -379,10 +379,9 @@ class SpeedChangeEvent extends StatChangeEvent:
 class TapStateChangeEvent extends CardStatusEvent:
 	var amount : int
 	
-	func _init(player : Player, card : Card, amount : int):
-		self.player = player
+	func _init(player : Player, card : Card, amount : int, parent_event : Event = null):
+		super._init(player, card, parent_event)
 		self.amount = amount
-		self.card = card
 		event_type="TapStateChange"
 		
 	func resolve(gm : GameManager):
@@ -415,11 +414,16 @@ class CardAspectChangeEvent extends CardStatusEvent:
 class EffectEvent extends CardEvent:
 	var effect : CardEffect
 	
-class EffectActivationEvent extends EffectEvent:
-	func _init(player, effect):
-		event_type="EffectActivation"
+	func _init(player, effect, parent_event : Event = null):
 		self.player = player
+		self.card = effect.card
 		self.effect = effect
+		self.parent_event = parent_event
+	
+class EffectActivationEvent extends EffectEvent:
+	func _init(player, effect, parent_event : Event = null):
+		super._init(player, effect, parent_event)
+		event_type="EffectActivation"
 		
 	func resolve(gm : GameManager):
 		self.event_stack.append_array(effect.activate.call(gm, effect))
@@ -427,15 +431,20 @@ class EffectActivationEvent extends EffectEvent:
 class PlayerEvent extends Event:
 	var affected : Player
 	
+	func _init(player : Player, affected : Player, parent_event : Event = null):
+		self.player = player
+		self.affected = affected
+		self.parent_event = parent_event
+	
 class AdvancePhaseEvent extends PlayerEvent:
 	var exiting_phase : Turn.TurnPhase
 	var entering_phase : Turn.TurnPhase
 	
-	func _init(player : Player, exiting_phase : Turn.TurnPhase, entering_phase : Turn.TurnPhase):
+	func _init(player : Player, exiting_phase : Turn.TurnPhase, parent_event : Event = null):
+		super._init(player, player, parent_event)
 		event_type="AdvancePhase"
-		self.player = player
 		self.exiting_phase = exiting_phase
-		self.entering_phase = entering_phase
+		entering_phase = Game.next_phase(exiting_phase)
 	
 	func resolve(gm : GameManager):
 		gm.game.enter_phase(entering_phase)
@@ -443,8 +452,9 @@ class AdvancePhaseEvent extends PlayerEvent:
 class EndTurnEvent extends PlayerEvent:
 	var ending_turn
 	
-	func _init(player : Player, turn : Turn):
-		self.player = player
+	func _init(player : Player, turn : Turn, parent_event : Event = null):
+		super._init(player, player, parent_event)
+		event_type = "EndTurn"
 		self.ending_turn = turn
 	
 	func resolve(gm : GameManager):
@@ -453,22 +463,23 @@ class EndTurnEvent extends PlayerEvent:
 class ResourceEvent extends PlayerEvent:
 	var resources : ResourceList
 	
-class GainResourceEvent extends ResourceEvent:
-	func _init(player : Player, affected : Player, resources : ResourceList):
-		event_type="GainResource"
-		self.player = player
-		self.affected = affected
+	func _init(player : Player, affected: Player, resources : ResourceList, parent_event : Event = null):
+		super._init(player, player, parent_event)
 		self.resources = resources
+		
+	
+class GainResourceEvent extends ResourceEvent:
+	func _init(player : Player, affected : Player, resources : ResourceList, parent_event : Event = null):
+		super._init(player, player, resources, parent_event)
+		event_type="GainResource"
 	
 	func resolve(gm : GameManager):
 		affected.resources.combine(resources)
 
 class PayResourceEvent extends ResourceEvent:
-	func _init(player : Player, affected : Player, resources : ResourceList):
+	func _init(player : Player, affected : Player, resources : ResourceList, parent_event : Event = null):
 		event_type="PayResource"
-		self.player = player
-		self.affected = affected
-		self.resources = resources
+		super._init(player, player, resources, parent_event)
 	
 	func resolve(gm : GameManager):
 		if affected.resources.check_coverage(resources):
@@ -494,10 +505,11 @@ class ChoiceEvent extends PlayerEvent:
 class CardChoiceEvent extends ChoiceEvent:
 	var scope : Callable
 	
-	func _init(player : Player, scope : Callable):
+	func _init(player : Player, scope : Callable, parent_event : Event = null):
 		event_type = "CardChoice"
 		self.player = player
 		self.scope = scope
+		self.parent_event = parent_event
 		choice_type = ChoiceType.Card
 	
 	func resolve(gm : GameManager):
@@ -516,10 +528,11 @@ class CardChoiceEvent extends ChoiceEvent:
 class CellChoiceEvent extends ChoiceEvent:
 	var scope : Callable
 	
-	func _init(player : Player, scope : Callable):
+	func _init(player : Player, scope : Callable, parent_event : Event = null):
 		event_type="CellChoice"
 		self.player = player
 		self.scope = scope
+		self.parent_event = parent_event
 		choice_type = ChoiceType.Cell
 	
 	func resolve(gm : GameManager):
