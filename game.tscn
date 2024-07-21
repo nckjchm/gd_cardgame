@@ -92,7 +92,7 @@ stretch = true
 disable_3d = true
 handle_input_locally = false
 physics_object_picking = true
-size = Vector2i(2, 2)
+size = Vector2i(1096, 800)
 render_target_update_mode = 4
 
 [node name="Field" type="Node2D" parent="GameViewContainer/FieldVPC/FieldVP"]

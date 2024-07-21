@@ -254,6 +254,9 @@ func get_card_option_list(card : Card):
 	if "end_move" in current_options:
 		if current_options.end_move.card == card:
 			options.append(current_options.end_move)
+	if "cards" in current_options:
+		if str(card.id) in current_options.cards:
+			options.append(current_options.cards[str(card.id)])
 	return options
 
 func get_cell_option_list(cell : Cell):
