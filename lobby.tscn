@@ -14,15 +14,39 @@ script = ExtResource("1_tjcxe")
 layout_mode = 2
 text = "Multiplayer Lobby"
 
-[node name="PlayersContainer" type="GridContainer" parent="."]
+[node name="ConnectedPlayersLabel" type="Label" parent="."]
+layout_mode = 2
+text = "Connected Players"
+
+[node name="ConnectedPlayers" type="GridContainer" parent="."]
 layout_mode = 2
 columns = 2
 
-[node name="PlayerNameLabel" type="Label" parent="PlayersContainer"]
+[node name="PlayerIDLabel" type="Label" parent="ConnectedPlayers"]
+layout_mode = 2
+text = "Connection ID "
+
+[node name="PlayerNameLabel" type="Label" parent="ConnectedPlayers"]
+layout_mode = 2
+text = "Player Name "
+
+[node name="SeatsLabel" type="Label" parent="."]
+layout_mode = 2
+text = "Seats"
+
+[node name="Seats" type="GridContainer" parent="."]
+layout_mode = 2
+columns = 3
+
+[node name="SeatIDLabel" type="Label" parent="Seats"]
+layout_mode = 2
+text = "Seat"
+
+[node name="PlayerNameLabel" type="Label" parent="Seats"]
 layout_mode = 2
 text = "Player Name"
 
-[node name="PlayerReady" type="CheckButton" parent="PlayersContainer"]
+[node name="PlayerReadyLabel" type="Label" parent="Seats"]
 layout_mode = 2
 text = "Ready"
 

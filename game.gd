@@ -41,8 +41,8 @@ func init_cards():
 				effect_index += len(card.effects)
 
 func init_card(template_key : String, card_index : int, player : Player, card_origin : Card.CardOrigin, effect_index_start : int):
-	var card : Card = CardTemplates.card_prefab.instantiate()
-	var card_template = CardTemplates.templates[template_key]
+	var card : Card = Templates.card_prefab.instantiate()
+	var card_template = Templates.templates[template_key]
 	card.initialize(card_template, card_index, player, card_origin, effect_index_start)
 	match card_origin:
 		Card.CardOrigin.MainDeck:

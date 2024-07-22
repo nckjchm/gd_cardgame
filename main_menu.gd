@@ -15,31 +15,41 @@ var lobby_scene = preload("res://lobby.tscn")
 
 func _ready():
 	btn_host_game.pressed.connect(func():
-		lobby_manager.player_info = {name = player_manager.local_player.name}
+		build_player_info()
 		lobby_manager.create_game()
 	)
 	btn_join_game.pressed.connect(func():
 		open_ip_menu()
 	)
 	btn_ip_connect.pressed.connect(func():
-		lobby_manager.player_info = {name = player_manager.local_player.name}
+		build_player_info()
 		lobby_manager.join_game(ip_field.text)
 		btn_ip_connect.disabled = true
 	)
 	btn_ip_exit.pressed.connect(func():
 		exit_ip_menu()
 	)
-	lobby_manager.player_connected.connect(func(peer_id, player_info):
-		print("connected - peer id: %d local id: %d" % [peer_id, multiplayer.get_unique_id()])
+	lobby_manager.game_joined.connect(func(peer_id, player_info):
 		if peer_id == multiplayer.get_unique_id():
-			print("opening lobby on: %d" %peer_id)
 			open_lobby()
 	)
 	lobby_manager.connection_refused.connect(func():
 		exit_ip_menu()
 	)
 	name_field.text = player_manager.local_player.name
-	name_field.text_changed.connect(func(): player_manager.player.name = name_field.text)
+	name_field.text_changed.connect(func(new_text): player_manager.local_player.name = new_text)
+
+func build_player_info():
+	lobby_manager.player_info = {
+		name = player_manager.local_player.name, 
+		deck = {
+			name = player_manager.local_player.deck.name,
+			maindeck = player_manager.local_player.deck.deck_template.main_deck_keys,
+			resourcedeck = player_manager.local_player.deck.deck_template.resource_deck_keys,
+			specialdeck = player_manager.local_player.deck.deck_template.special_deck_keys
+		},
+		seat = -1
+	}
 
 func open_ip_menu():
 	main_menu_vbox.visible = false
@@ -48,6 +58,8 @@ func open_ip_menu():
 func exit_ip_menu():
 	ip_menu.visible = false
 	main_menu_vbox.visible = true
+	lobby_manager.remove_multiplayer_peer()
+	btn_ip_connect.disabled = false
 
 func open_lobby():
 	ip_menu.visible = false

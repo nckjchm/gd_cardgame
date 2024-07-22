@@ -1,9 +1,11 @@
 class_name LobbyManager extends Node
 
 # These signals can be connected to by a UI lobby scene or the game scene.
-signal player_connected(peer_id, player_info)
+signal player_connected(peer_id)
+signal game_joined(peer_id, player_info)
 signal connection_refused
 signal player_disconnected(peer_id)
+signal player_info_updated
 signal server_disconnected
 
 const PORT = 7000
@@ -13,7 +15,7 @@ const MAX_CONNECTIONS = 20
 @onready var player_manager : PlayerManager = $"../PlayerManager"
 
 var players = {}
-var player_info = {"name": "Name"}
+var player_info = {"-1": {"name": "Name"}}
 var players_loaded = 0
 
 func _ready():
@@ -39,10 +41,12 @@ func create_game():
 	if error:
 		return error
 	multiplayer.multiplayer_peer = peer
-	players[1] = player_info
+	players["1"] = player_info
 	player_connected.emit(1, player_info)
+	game_joined.emit(1, player_info)
 
 func remove_multiplayer_peer():
+	players = {}
 	multiplayer.multiplayer_peer = null
 
 # When the server decides to start the game from a UI scene,
@@ -63,22 +67,32 @@ func player_loaded():
 # When a peer connects, send them my player info.
 # This allows transfer of all desired data for each player, not only the unique ID.
 func _on_player_connected(id):
-	_register_player.rpc_id(id, player_info)
+	player_connected.emit(id)
 
-@rpc("any_peer", "reliable")
-func _register_player(new_player_info):
-	var new_player_id = multiplayer.get_remote_sender_id()
-	players[new_player_id] = new_player_info
-	player_connected.emit(new_player_id, new_player_info)
+@rpc("any_peer", "call_remote", "reliable")
+func transmit_player_data(data):
+	if multiplayer.is_server():
+		for key in data:
+			players[key] = data[key]
+		broadcast_player_data.rpc(players)
+		player_info_updated.emit()
+
+@rpc("authority", "reliable")
+func broadcast_player_data(data):
+	if not multiplayer.is_server():
+		players = data
+		player_info_updated.emit()
 
 func _on_player_disconnected(id):
-	players.erase(id)
+	players.erase(str(id))
 	player_disconnected.emit(id)
+	player_info_updated.emit()
 
 func _on_connected_ok():
 	var peer_id = multiplayer.get_unique_id()
-	players[peer_id] = player_info
-	player_connected.emit(peer_id, player_info)
+	players[str(peer_id)] = player_info
+	transmit_player_data.rpc_id(1, players)
+	game_joined.emit(peer_id, players)
 
 func _on_connected_fail():
 	multiplayer.multiplayer_peer = null

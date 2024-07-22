@@ -17,8 +17,6 @@ var gui : GUIController
 
 func _ready():
 	var proxyPlayers : Array[Player] = [Player.new("Player1"), Player.new("Player2")]
-	for player in proxyPlayers:
-		player.deck = Deck.new(DeckTemplate.TestDeck.new())
 	initialize_game(proxyPlayers)
 	start_game()
 

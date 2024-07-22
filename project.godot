@@ -16,7 +16,7 @@ config/features=PackedStringArray("4.0", "Forward Plus")
 
 [autoload]
 
-CardTemplates="*res://card_templates.gd"
+Templates="*res://templates.gd"
 
 [display]
 
