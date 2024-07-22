@@ -1,0 +1,35 @@
+[gd_scene load_steps=2 format=3 uid="uid://bl5dt7grwrfki"]
+
+[ext_resource type="Script" path="res://lobby.gd" id="1_tjcxe"]
+
+[node name="Lobby" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_tjcxe")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 2
+text = "Multiplayer Lobby"
+
+[node name="PlayersContainer" type="GridContainer" parent="."]
+layout_mode = 2
+columns = 2
+
+[node name="PlayerNameLabel" type="Label" parent="PlayersContainer"]
+layout_mode = 2
+text = "Player Name"
+
+[node name="PlayerReady" type="CheckButton" parent="PlayersContainer"]
+layout_mode = 2
+text = "Ready"
+
+[node name="StartGame" type="Button" parent="."]
+layout_mode = 2
+text = "Start"
+
+[node name="Exit" type="Button" parent="."]
+layout_mode = 2
+text = "Exit"

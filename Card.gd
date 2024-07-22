@@ -180,7 +180,7 @@ func player_enters_round():
 	has_moved = false
 
 func die():
-	print(to_string() + " died")
+	print("Card with id %d died" % id)
 	card_status = CardStatus.Dead
 
 func init_meshes():
@@ -198,7 +198,6 @@ func init_meshes():
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	print(input_controller)
 	card_input_event.connect(input_controller.card_input_event)
 	controller = card_owner
 	match card_origin:

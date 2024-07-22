@@ -14,6 +14,7 @@ var banishment_cell : Cell
 var home_cells : Array[Cell] = []
 var resources : ResourceList
 var rotation : float
+var session_id : int
 
 func _init(name : String):
 	self.name = name

@@ -1,8 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://cmp54l304kv21"]
+[gd_scene load_steps=4 format=3 uid="uid://cmp54l304kv21"]
 
 [ext_resource type="Script" path="res://main_menu.gd" id="1_wxso4"]
+[ext_resource type="Script" path="res://PlayerManager.gd" id="2_xjr04"]
+[ext_resource type="Script" path="res://LobbyManager.gd" id="3_0qg7y"]
 
-[node name="Menu" type="Control"]
+[node name="Main" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -26,20 +28,67 @@ offset_bottom = 150.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="MidPanelVBox" type="VBoxContainer" parent="MidPanel"]
+[node name="MainMenuVB" type="VBoxContainer" parent="MidPanel"]
 custom_minimum_size = Vector2(200, 2.08165e-12)
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MidPanel/MidPanelVBox"]
+[node name="Label" type="Label" parent="MidPanel/MainMenuVB"]
 layout_mode = 2
 text = "Sandbox Cardgame"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="NewGame" type="Button" parent="MidPanel/MidPanelVBox"]
+[node name="NameField" type="LineEdit" parent="MidPanel/MainMenuVB"]
+layout_mode = 2
+
+[node name="HostGame" type="Button" parent="MidPanel/MainMenuVB"]
 clip_contents = true
 custom_minimum_size = Vector2(200, 2.08165e-12)
 layout_mode = 2
 size_flags_horizontal = 4
-text = "New Game"
+text = "Host"
 text_overrun_behavior = 3
+
+[node name="JoinGame" type="Button" parent="MidPanel/MainMenuVB"]
+clip_contents = true
+custom_minimum_size = Vector2(200, 2.08165e-12)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Join"
+text_overrun_behavior = 3
+
+[node name="IPMenu" type="VBoxContainer" parent="MidPanel"]
+visible = false
+custom_minimum_size = Vector2(200, 2.08165e-12)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MidPanel/IPMenu"]
+layout_mode = 2
+text = "enter IP"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AdressField" type="LineEdit" parent="MidPanel/IPMenu"]
+layout_mode = 2
+
+[node name="JoinGame" type="Button" parent="MidPanel/IPMenu"]
+clip_contents = true
+custom_minimum_size = Vector2(200, 2.08165e-12)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "connect"
+text_overrun_behavior = 3
+
+[node name="Exit" type="Button" parent="MidPanel/IPMenu"]
+clip_contents = true
+custom_minimum_size = Vector2(200, 2.08165e-12)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "exit"
+text_overrun_behavior = 3
+
+[node name="PlayerManager" type="Node" parent="."]
+script = ExtResource("2_xjr04")
+
+[node name="LobbyManager" type="Node" parent="."]
+script = ExtResource("3_0qg7y")
