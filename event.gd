@@ -517,8 +517,7 @@ class ChoiceEvent extends PlayerEvent:
 		for key in alternatives:
 			choice[key] = alternatives[key]
 			choice[key].on_click = func():
-				on_decision.call(choice[key], gm)
-				gm.register_choice(choice[key])
+				gm.register_choice(["alternatives", key])
 		gm.wait_for_choice(player, Game.GameState.Hot, choice)
 
 class CardChoiceEvent extends ChoiceEvent:
@@ -534,18 +533,16 @@ class CardChoiceEvent extends ChoiceEvent:
 		if len(cards) > 0:
 			choice = { cards = {}}
 			for card in cards:
-				var choicedict := {card = card, event = self}
-				var on_click = func():
-					on_decision.call(choicedict, gm)
-					gm.register_choice(choicedict)
-				var card_dict := {type = "card", label = "choose card", card = card, on_click = on_click}
+				var card_dict := {type = "card", label = "choose card", card = card, event = self, on_decision = on_decision}
+				card_dict.on_click = func():
+					gm.register_choice(["cards", str(card.id)])
 				choice.cards[str(card.id)] = card_dict
 		super.resolve(gm)
 
 class CellChoiceEvent extends ChoiceEvent:
 	var scope : Callable
 	
-	func _init(player : Player, scope : Callable, parent_event : Event = null):
+	func _init(player : Player, scope : Callable, parent_event : Event = null, on_decision = on_decision):
 		event_type="CellChoice"
 		self.player = player
 		self.scope = scope
@@ -557,10 +554,8 @@ class CellChoiceEvent extends ChoiceEvent:
 		if len(cells) > 0:
 			choice = { cells = {}}
 			for cell in cells:
-				var choicedict := {cell = cell, event = self}
-				var on_click = func():
-					on_decision.call(choicedict, gm)
-					gm.register_choice(choicedict)
-				var cell_dict := {type = "cell", label = "choose cell", cell = cell, on_click = on_click}
+				var cell_dict := {type = "cell", label = "choose cell", cell = cell, event = self, on_decision = on_decision}
+				cell_dict.on_click = func():
+					gm.register_choice(["cells", cell.short_name])
 				choice.cells[cell.short_name] = cell_dict
 		super.resolve(gm)

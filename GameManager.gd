@@ -13,10 +13,12 @@ var current_options : Dictionary
 var waiting := false
 var last_priority := false
 var gui : GUIController
+@onready var lobby_manager : LobbyManager = $"../../LobbyManager"
 
 
 func _ready():
 	var proxyPlayers : Array[Player] = [Player.new("Player1"), Player.new("Player2")]
+	lobby_manager.choice_broadcast.connect(handle_choice)
 	initialize_game(proxyPlayers)
 	start_game()
 
@@ -43,8 +45,20 @@ func handle_event(event : Event):
 		return true
 	return false
 
-func register_choice(choice : Dictionary):
+func register_choice(choice_path : Array[String]):
+	lobby_manager.transmit_player_choice.rpc_id(1, choice_path)
+
+func handle_choice(choice_path : Array[String]):
+	var choice : Dictionary = current_options
+	while len(choice_path) > 0:
+		var key = choice_path.pop_front()
+		if key in choice:
+			choice = choice[key]
+		else:
+			print(choice)
 	waiting = false
+	if "on_decision" in choice:
+		choice.on_decision.call(choice, self)
 	match game.game_state:
 		Game.GameState.Cold:
 			handle_cold_choice(choice.action)
@@ -150,7 +164,7 @@ func get_player_options(player : Player):
 			if player == game.current_turn.turn_player and turn_option != null:
 				options.turn_option = turn_option
 		Game.GameState.Hot:
-			options.decline = {on_click = func(): register_choice({decline = true}), player = player}
+			options.decline = {decline = true, player = player, on_click = func(): register_choice(["decline"])}
 	var cardoptions = {}
 	for card in player.cards:
 		var card_options : Dictionary = get_card_options(card)
@@ -170,7 +184,7 @@ func get_turn_option():
 	var turn_action : Action = get_turn_action()
 	if turn_action != null:
 		var turn_option = {action = turn_action, player = game.current_turn.turn_player}
-		turn_option.on_click = func(): register_choice(turn_option)
+		turn_option.on_click = func(): register_choice(["turn_option"])
 		turn_option.label = ""
 		if turn_action is Action.Draw:
 			turn_option.label = "Draw"
@@ -210,10 +224,10 @@ func get_card_effect_options(card : Card):
 	var options := {}
 	for effect in card.effects:
 		if effect.condition.call(self, effect):
-			var effect_choice = { type = "activate", label = effect.short_text, card = effect.card, effect = effect}
+			var activation_action := Action.EffectActivation.new(card.controller, effect)
+			var effect_choice = { type = "activate", label = effect.short_text, card = effect.card, effect = effect, action = activation_action}
 			effect_choice.on_click = func():
-				effect_choice.action = Action.EffectActivation.new(card.controller, effect)
-				register_choice(effect_choice)
+				register_choice(["cardoptions", str(card.id), "effects", str(effect.id)])
 			options[str(effect.id)] = effect_choice
 	return options
 
@@ -222,19 +236,19 @@ func get_card_action_options(card : Card):
 	var options := {}
 	if card.check_attack_viability(self):
 		var attack_choice = { label = "Attack", card = card, player = card.controller, action = Action.Attack.new(card.controller, card)}
-		attack_choice.on_click = func() : register_choice(attack_choice)
+		attack_choice.on_click = func() : register_choice(["cardoptions", str(card.id), "actions", "attack"])
 		options.attack = attack_choice
 	if card.check_movement_viability(self):
 		var move_choice = { label = "Move", card = card, player = card.controller, action = Action.Move.new(card.controller, card)}
-		move_choice.on_click = func() : register_choice(move_choice)
+		move_choice.on_click = func() : register_choice(["cardoptions", str(card.id), "actions", "move"])
 		options.move = move_choice
 	if card.check_play_viability(self):
 		var play_choice = { label = "Play", card = card, player = card.controller, action = Action.PlayCardFromHand.new(card.card_owner, card) }
-		play_choice.on_click = func(): register_choice(play_choice)
+		play_choice.on_click = func(): register_choice(["cardoptions", str(card.id), "actions", "play"])
 		options.play = play_choice
 	if card.needs_recovery and game.current_turn.current_phase == Turn.TurnPhase.Recovery:
 		var recovery_choice = { label = "Recover", card = card, player = card.controller, action = Action.Recover.new(card.card_owner, card) }
-		recovery_choice.on_click = func(): register_choice(recovery_choice)
+		recovery_choice.on_click = func(): register_choice(["cardoptions", str(card.id), "actions", "recover"])
 		options.recover = recovery_choice
 	return options
 

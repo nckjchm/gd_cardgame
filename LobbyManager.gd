@@ -7,16 +7,17 @@ signal connection_refused
 signal player_disconnected(peer_id)
 signal player_info_updated
 signal server_disconnected
+signal choice_broadcast(choice)
 
 const PORT = 7000
 const DEFAULT_SERVER_IP = "127.0.0.1" # IPv4 localhost
 const MAX_CONNECTIONS = 20
-
 @onready var player_manager : PlayerManager = $"../PlayerManager"
-
-var players = {}
-var player_info = {"-1": {"name": "Name"}}
+@onready var menu_root : Control = $"../MidPanel"
+var players := {}
+var player_info := {"-1": {"name": "Name"}}
 var players_loaded = 0
+var game_scene = preload("res://game.tscn")
 
 func _ready():
 	multiplayer.peer_connected.connect(_on_player_connected)
@@ -24,6 +25,12 @@ func _ready():
 	multiplayer.connected_to_server.connect(_on_connected_ok)
 	multiplayer.connection_failed.connect(_on_connected_fail)
 	multiplayer.server_disconnected.connect(_on_server_disconnected)
+	choice_broadcast.connect(choice_broadcast_test)
+
+func choice_broadcast_test(choice):
+	print("received broadcast on %d" % multiplayer.get_unique_id())
+	for key in choice:
+		print(key)
 
 func join_game(address = ""):
 	if address.is_empty():
@@ -53,7 +60,8 @@ func remove_multiplayer_peer():
 # do Lobby.load_game.rpc(filepath)
 @rpc("call_local", "reliable")
 func load_game(game_scene_path):
-	get_tree().change_scene_to_file(game_scene_path)
+	$"../MidPanel".visible = false
+	$"..".add_child(game_scene.instantiate())
 
 # Every peer will call this when they have loaded the game scene.
 @rpc("any_peer", "call_local", "reliable")
@@ -77,11 +85,25 @@ func transmit_player_data(data):
 		broadcast_player_data.rpc(players)
 		player_info_updated.emit()
 
-@rpc("authority", "reliable")
+@rpc("authority", "call_remote", "reliable")
 func broadcast_player_data(data):
-	if not multiplayer.is_server():
-		players = data
-		player_info_updated.emit()
+	players = data
+	player_info_updated.emit()
+
+@rpc("any_peer", "call_local", "reliable")
+func transmit_player_choice(choice):
+	if multiplayer.is_server():
+		broadcast_player_choice.rpc(choice)
+		choice_broadcast.emit(parse_string_array(choice))
+
+@rpc("authority", "call_remote", "reliable")
+func broadcast_player_choice(choice):
+	choice_broadcast.emit(parse_string_array(choice))
+
+static func parse_string_array(in_array : Array) -> Array[String]:
+	var string_array : Array[String]
+	string_array.assign(in_array)
+	return string_array
 
 func _on_player_disconnected(id):
 	players.erase(str(id))
