@@ -2,22 +2,23 @@ class_name LobbyManager extends Node
 
 # These signals can be connected to by a UI lobby scene or the game scene.
 signal player_connected(peer_id)
-signal game_joined(peer_id, player_info)
+signal game_joined(peer_id, local_player_info)
 signal connection_refused
 signal player_disconnected(peer_id)
 signal player_info_updated
 signal server_disconnected
 signal choice_broadcast(choice)
+signal game_command(command)
 
 const PORT = 7000
 const DEFAULT_SERVER_IP = "127.0.0.1" # IPv4 localhost
 const MAX_CONNECTIONS = 20
-@onready var player_manager : PlayerManager = $"../PlayerManager"
 @onready var menu_root : Control = $"../MidPanel"
-var players := {}
-var player_info := {"-1": {"name": "Name"}}
-var players_loaded = 0
+var players_info := {}
+var local_player_info := {"name": "Name", "deck_template" : "TestDeckYellow"}
+var game_info := {"field_template": "small_two_player_field1"}
 var game_scene = preload("res://game.tscn")
+var seats := {}
 
 func _ready():
 	multiplayer.peer_connected.connect(_on_player_connected)
@@ -25,12 +26,6 @@ func _ready():
 	multiplayer.connected_to_server.connect(_on_connected_ok)
 	multiplayer.connection_failed.connect(_on_connected_fail)
 	multiplayer.server_disconnected.connect(_on_server_disconnected)
-	choice_broadcast.connect(choice_broadcast_test)
-
-func choice_broadcast_test(choice):
-	print("received broadcast on %d" % multiplayer.get_unique_id())
-	for key in choice:
-		print(key)
 
 func join_game(address = ""):
 	if address.is_empty():
@@ -48,46 +43,108 @@ func create_game():
 	if error:
 		return error
 	multiplayer.multiplayer_peer = peer
-	players["1"] = player_info
-	player_connected.emit(1, player_info)
-	game_joined.emit(1, player_info)
+	players_info["1"] = local_player_info
+	player_connected.emit(1, local_player_info)
+	game_joined.emit(1, local_player_info)
+	initialize_seats()
+
+func initialize_seats():
+	var seatcount = Templates.field_templates[game_info.field_template].seats.count
+	seats = {}
+	for seat_index in range(seatcount):
+		seats[str(seat_index)] = { player_key = 0 }
 
 func remove_multiplayer_peer():
-	players = {}
+	players_info = {}
+	game_info = {"field_template": "small_two_player_field1"}
 	multiplayer.multiplayer_peer = null
+
+func start_game():
+	if is_start_valid():
+		load_game.rpc()
 
 # When the server decides to start the game from a UI scene,
 # do Lobby.load_game.rpc(filepath)
-@rpc("call_local", "reliable")
-func load_game(game_scene_path):
+@rpc("authority", "call_local", "reliable")
+func load_game():
+	var taken_seats : Dictionary = {}
+	for seat_key in seats:
+		if seats[seat_key].player_key != 0:
+			taken_seats[seat_key] = { player_key = seats[seat_key].player_key, player_loaded = false}
+	game_info.seats = taken_seats
 	$"../MidPanel".visible = false
 	$"..".add_child(game_scene.instantiate())
+
+func is_start_valid() -> bool:
+	var taken_seats := 0
+	for seat in seats:
+		if seats[seat].player_key != 0:
+			taken_seats += 1
+	return taken_seats >= 2
+
+@rpc("authority", "call_remote", "reliable")
+func broadcast_seat_assignment(seats):
+	self.seats = seats
+	player_info_updated.emit()
+	
+
+@rpc("any_peer", "call_local", "reliable")
+func transmit_seat_request(seat_index, leave = false):
+	if multiplayer.is_server():
+		var seat_assignment_successful := false
+		if not leave:
+			if seats[str(seat_index)].player_key == 0:
+				seats[str(seat_index)].player_key = multiplayer.get_remote_sender_id()
+				seat_assignment_successful = true
+		else:
+			if seats[str(seat_index)].player_key == multiplayer.get_remote_sender_id():
+				seats[str(seat_index)].player_key = 0
+				seat_assignment_successful = true
+		if seat_assignment_successful:
+			broadcast_seat_assignment.rpc(seats)
+			player_info_updated.emit()
 
 # Every peer will call this when they have loaded the game scene.
 @rpc("any_peer", "call_local", "reliable")
 func player_loaded():
 	if multiplayer.is_server():
-		players_loaded += 1
-		if players_loaded == players.size():
-			$/root/Game.start_game()
-			players_loaded = 0
+		var seat_key := ""
+		for seat in game_info.seats:
+			if game_info.seats[seat].player_key == multiplayer.get_remote_sender_id():
+				seat_key = seat
+		if seat_key.is_empty():
+			print("Observers don't need to call the player_loaded function, client %d misbehaved." % multiplayer.get_remote_sender_id())
+			return
+		game_info.seats[seat_key].player_loaded = true
+		var can_start = true
+		for seat in game_info.seats:
+			if not game_info.seats[seat].player_loaded:
+				can_start = false
+		if can_start:
+			broadcast_game_command.rpc({type = "start"})
+
+@rpc("authority", "call_local", "reliable")
+func broadcast_game_command(command):
+	game_command.emit(command)
 
 # When a peer connects, send them my player info.
 # This allows transfer of all desired data for each player, not only the unique ID.
 func _on_player_connected(id):
 	player_connected.emit(id)
+	if multiplayer.is_server():
+		broadcast_seat_assignment.rpc_id(id, seats)
 
 @rpc("any_peer", "call_remote", "reliable")
 func transmit_player_data(data):
 	if multiplayer.is_server():
 		for key in data:
-			players[key] = data[key]
-		broadcast_player_data.rpc(players)
+			players_info[key] = data[key]
+		broadcast_player_data.rpc(players_info)
 		player_info_updated.emit()
 
 @rpc("authority", "call_remote", "reliable")
 func broadcast_player_data(data):
-	players = data
+	players_info = data
 	player_info_updated.emit()
 
 @rpc("any_peer", "call_local", "reliable")
@@ -106,15 +163,18 @@ static func parse_string_array(in_array : Array) -> Array[String]:
 	return string_array
 
 func _on_player_disconnected(id):
-	players.erase(str(id))
+	players_info.erase(str(id))
+	for seat in seats:
+		if seats[seat].player_key == id:
+			seats[seat].player_key = 0
 	player_disconnected.emit(id)
 	player_info_updated.emit()
 
 func _on_connected_ok():
 	var peer_id = multiplayer.get_unique_id()
-	players[str(peer_id)] = player_info
-	transmit_player_data.rpc_id(1, players)
-	game_joined.emit(peer_id, players)
+	players_info[str(peer_id)] = local_player_info
+	transmit_player_data.rpc_id(1, players_info)
+	game_joined.emit(peer_id, players_info)
 
 func _on_connected_fail():
 	multiplayer.multiplayer_peer = null
@@ -122,5 +182,5 @@ func _on_connected_fail():
 
 func _on_server_disconnected():
 	multiplayer.multiplayer_peer = null
-	players.clear()
+	players_info.clear()
 	server_disconnected.emit()

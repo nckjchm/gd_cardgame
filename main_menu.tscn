@@ -1,7 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://cmp54l304kv21"]
+[gd_scene load_steps=3 format=3 uid="uid://cmp54l304kv21"]
 
 [ext_resource type="Script" path="res://main_menu.gd" id="1_wxso4"]
-[ext_resource type="Script" path="res://PlayerManager.gd" id="2_xjr04"]
 [ext_resource type="Script" path="res://LobbyManager.gd" id="3_0qg7y"]
 
 [node name="Main" type="Control"]
@@ -87,9 +86,6 @@ layout_mode = 2
 size_flags_horizontal = 4
 text = "exit"
 text_overrun_behavior = 3
-
-[node name="PlayerManager" type="Node" parent="."]
-script = ExtResource("2_xjr04")
 
 [node name="LobbyManager" type="Node" parent="."]
 script = ExtResource("3_0qg7y")

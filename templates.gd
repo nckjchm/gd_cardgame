@@ -1,39 +1,60 @@
 extends Node
 
 var templates = {
-	YlwCrtFarmer = YlwCrtFarmer.new(),
-	YlwLndAcre = YlwLndAcre.new()
+	YlwCrtFarmer = CardTemplate.YlwCrtFarmer.new(),
+	YlwLndAcre = CardTemplate.YlwLndAcre.new()
 }
 var card_prefab = preload("res://card.tscn")
 
-class YlwCrtFarmer extends CardTemplate:
-	func _init():
-		name = "Farmer"
-		card_color = Card.CardColor.Yellow
-		type = Card.CardType.Creature
-		cost = ResourceList.new([
-			ResourceList.ResourceElement.new(ResourceList.ResourceKind.Mana, Card.CardColor.Yellow, 1)
-		])
-		health = 1
-		defense = 0
-		attack = 1
-		speed = 2
-		play_cell_scope= func(card : Card, gm : GameManager): return def_play_cell_scope(card, gm)
-		play_condition = func(card : Card, gm : GameManager): return true
+var deck_templates = { 
+	TestDeckYellow = DeckTemplate.TestDeckYellow.new()
+}
 
-class YlwLndAcre extends CardTemplate:
-	func _init():
-		name = "Acre"
-		card_color = Card.CardColor.Yellow
-		type = Card.CardType.Land
-		cost = ResourceList.new()
-		health = 0
-		defense = 0
-		attack = 0
-		speed = 0
-		can_coexist = true
-		effects = [
-			EffectTemplate.ETGain1YellowMana.new()
+var field_templates = {
+	small_two_player_field1 = small_two_player_field1_template
+}
+
+const fieldcell = [Cell.CellType.Field, Cell.StackType.None, -1]
+const player1_home = [Cell.CellType.Field, Cell.StackType.None, 0]
+const player2_home = [Cell.CellType.Field, Cell.StackType.None, 1]
+const emptycell = [Cell.CellType.Inactive, Cell.StackType.None, -1]
+
+
+const small_two_player_field1_template := {
+	"dimensions" : [9, 9],
+	"seats" : {
+		count = 2,
+		rotations = [ 180.0, 0.0 ]
+	},
+	"types" : [
+		[
+			[Cell.CellType.Stack, Cell.StackType.Graveyard, 0], 
+			[Cell.CellType.Stack, Cell.StackType.MainDeck, 0],
+			player1_home, player1_home, player1_home, player1_home, player1_home, 
+			[Cell.CellType.Stack, Cell.StackType.ResourceDeck, 0],
+			[Cell.CellType.Stack, Cell.StackType.SpecialDeck, 0]
+		],
+		[
+			emptycell, [Cell.CellType.Stack, Cell.StackType.Limbo, 0],
+			fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell,
+			[Cell.CellType.Stack, Cell.StackType.Banishment, 0]
+		],
+		[ emptycell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, emptycell ],
+		[ emptycell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell ],
+		[ fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell ],
+		[ emptycell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell ],
+		[ emptycell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, emptycell ],
+		[
+			emptycell, [Cell.CellType.Stack, Cell.StackType.Banishment, 1],
+			fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell,
+			[Cell.CellType.Stack, Cell.StackType.Limbo, 1]
+		],
+		[
+			[Cell.CellType.Stack, Cell.StackType.SpecialDeck, 1],
+			[Cell.CellType.Stack, Cell.StackType.ResourceDeck, 1],
+			player2_home, player2_home, player2_home, player2_home, player2_home,
+			[Cell.CellType.Stack, Cell.StackType.MainDeck, 1],
+			[Cell.CellType.Stack, Cell.StackType.Graveyard, 1]
 		]
-		play_cell_scope = func(card : Card, gm : GameManager): return def_land_play_cell_scope(card, gm)
-		play_condition = func(card : Card, gm : GameManager): return len(def_land_play_cell_scope(card, gm)) > 0
+	]
+}

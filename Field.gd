@@ -9,50 +9,8 @@ const CELLHEIGHTFACTOR = 3.0 / 4.0
 var fieldpreset : Dictionary
 var middle : Vector2
 
-const fieldcell = [Cell.CellType.Field, Cell.StackType.None, -1]
-const player1_home = [Cell.CellType.Field, Cell.StackType.None, 0]
-const player2_home = [Cell.CellType.Field, Cell.StackType.None, 1]
-const emptycell = [Cell.CellType.Inactive, Cell.StackType.None, -1]
-var fieldpreset1 = {
-	"dimensions" : [9, 9],
-	"types" : [
-		[
-			[Cell.CellType.Stack, Cell.StackType.Graveyard, 0], 
-			[Cell.CellType.Stack, Cell.StackType.MainDeck, 0],
-			player1_home, player1_home, player1_home, player1_home, player1_home, 
-			[Cell.CellType.Stack, Cell.StackType.ResourceDeck, 0],
-			[Cell.CellType.Stack, Cell.StackType.SpecialDeck, 0]
-		],
-		[
-			emptycell, [Cell.CellType.Stack, Cell.StackType.Limbo, 0],
-			fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell,
-			[Cell.CellType.Stack, Cell.StackType.Banishment, 0]
-		],
-		[ emptycell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, emptycell ],
-		[ emptycell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell ],
-		[ fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell ],
-		[ emptycell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell ],
-		[ emptycell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, emptycell ],
-		[
-			emptycell, [Cell.CellType.Stack, Cell.StackType.Banishment, 1],
-			fieldcell, fieldcell, fieldcell, fieldcell, fieldcell, fieldcell,
-			[Cell.CellType.Stack, Cell.StackType.Limbo, 1]
-		],
-		[
-			[Cell.CellType.Stack, Cell.StackType.SpecialDeck, 1],
-			[Cell.CellType.Stack, Cell.StackType.ResourceDeck, 1],
-			player2_home, player2_home, player2_home, player2_home, player2_home,
-			[Cell.CellType.Stack, Cell.StackType.MainDeck, 1],
-			[Cell.CellType.Stack, Cell.StackType.Graveyard, 1]
-		]
-	]
-}
-
-func _ready():
-	initialize()
-
-func initialize():
-	fieldpreset = fieldpreset1
+func initialize(fieldtemplate_key : String):
+	fieldpreset = Templates.field_templates[fieldtemplate_key]
 	rows = fieldpreset.dimensions[1]
 	colums = fieldpreset.dimensions[0]
 	var celldiameter = 2 * cellradius

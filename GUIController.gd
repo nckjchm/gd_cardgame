@@ -51,8 +51,9 @@ func update_buttons():
 func update():
 	print("updating gui")
 	update_buttons()
-	update_turndisplay()
-	hand.refresh_cards(game_manager.game.current_turn.turn_player.hand.cards)
+	if not game_manager.game.game_state in [Game.GameState.Preparation, Game.GameState.Paused]:
+		update_turndisplay()
+		hand.refresh_cards(game_manager.game.current_turn.turn_player.hand.cards)
 
 func _ready():
 	game_manager.gui = self
@@ -115,23 +116,24 @@ func player_background_click(_player : Player, click_event: InputEventMouseButto
 
 func update_turndisplay():
 	var turn_phase_text = ""
-	match game_manager.game.current_turn.current_phase:
-		Turn.TurnPhase.Start:
-			turn_phase_text = "Start Phase"
-		Turn.TurnPhase.Recovery:
-			turn_phase_text = "Recovery Phase"
-		Turn.TurnPhase.Draw1:
-			turn_phase_text = "Draw Phase 1"
-		Turn.TurnPhase.Main1:
-			turn_phase_text = "Main Phase 1"
-		Turn.TurnPhase.Battle:
-			turn_phase_text = "Battle Phase"
-		Turn.TurnPhase.Draw2:
-			turn_phase_text = "Draw Phase 2"
-		Turn.TurnPhase.Main2:
-			turn_phase_text = "Main Phase 2"
-		Turn.TurnPhase.End:
-			turn_phase_text = "End Phase"
+	if not game_manager.game.game_state in [Game.GameState.Paused, Game.GameState.Preparation]:
+		match game_manager.game.current_turn.current_phase:
+			Turn.TurnPhase.Start:
+				turn_phase_text = "Start Phase"
+			Turn.TurnPhase.Recovery:
+				turn_phase_text = "Recovery Phase"
+			Turn.TurnPhase.Draw1:
+				turn_phase_text = "Draw Phase 1"
+			Turn.TurnPhase.Main1:
+				turn_phase_text = "Main Phase 1"
+			Turn.TurnPhase.Battle:
+				turn_phase_text = "Battle Phase"
+			Turn.TurnPhase.Draw2:
+				turn_phase_text = "Draw Phase 2"
+			Turn.TurnPhase.Main2:
+				turn_phase_text = "Main Phase 2"
+			Turn.TurnPhase.End:
+				turn_phase_text = "End Phase"
 	turn_phase_display.text = turn_phase_text
 
 func refresh_hand(player : Player):

@@ -2,7 +2,6 @@ class_name MainMenu extends Control
 
 @onready var name_field : LineEdit = $MidPanel/MainMenuVB/NameField
 @onready var lobby_manager : LobbyManager = $LobbyManager
-@onready var player_manager : PlayerManager = $PlayerManager
 @onready var main_menu_vbox : VBoxContainer = $MidPanel/MainMenuVB
 @onready var ip_menu : VBoxContainer = $MidPanel/IPMenu
 @onready var mid_panel : PanelContainer = $MidPanel
@@ -29,24 +28,26 @@ func _ready():
 	btn_ip_exit.pressed.connect(func():
 		exit_ip_menu()
 	)
-	lobby_manager.game_joined.connect(func(peer_id, player_info):
+	lobby_manager.game_joined.connect(func(peer_id, local_player_info):
 		if peer_id == multiplayer.get_unique_id():
 			open_lobby()
 	)
 	lobby_manager.connection_refused.connect(func():
 		exit_ip_menu()
 	)
-	name_field.text = player_manager.local_player.name
-	name_field.text_changed.connect(func(new_text): player_manager.local_player.name = new_text)
+	name_field.text = lobby_manager.local_player_info.name
+	name_field.text_changed.connect(func(new_text): lobby_manager.local_player_info.name = new_text)
 
 func build_player_info():
-	lobby_manager.player_info = {
-		name = player_manager.local_player.name, 
+	var deck_name = lobby_manager.local_player_info.deck_template
+	lobby_manager.local_player_info = {
+		name = lobby_manager.local_player_info.name,
+		deck_template = deck_name,
 		deck = {
-			name = player_manager.local_player.deck.name,
-			maindeck = player_manager.local_player.deck.deck_template.main_deck_keys,
-			resourcedeck = player_manager.local_player.deck.deck_template.resource_deck_keys,
-			specialdeck = player_manager.local_player.deck.deck_template.special_deck_keys
+			name = deck_name,
+			maindeck = Templates.deck_templates[deck_name].main_deck_keys,
+			resourcedeck = Templates.deck_templates[deck_name].resource_deck_keys,
+			specialdeck = Templates.deck_templates[deck_name].special_deck_keys
 		},
 		seat = -1
 	}

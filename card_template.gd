@@ -13,6 +13,39 @@ var play_condition : Callable
 var play_cell_scope : Callable
 var effects : Array[EffectTemplate] = []
 
+class YlwCrtFarmer extends CardTemplate:
+	func _init():
+		name = "Farmer"
+		card_color = Card.CardColor.Yellow
+		type = Card.CardType.Creature
+		cost = ResourceList.new([
+			ResourceList.ResourceElement.new(ResourceList.ResourceKind.Mana, Card.CardColor.Yellow, 1)
+		])
+		health = 1
+		defense = 0
+		attack = 1
+		speed = 2
+		play_cell_scope= func(card : Card, gm : GameManager): return def_play_cell_scope(card, gm)
+		play_condition = func(card : Card, gm : GameManager): return len(def_play_cell_scope(card, gm)) > 0
+
+class YlwLndAcre extends CardTemplate:
+	func _init():
+		name = "Acre"
+		card_color = Card.CardColor.Yellow
+		type = Card.CardType.Land
+		cost = ResourceList.new()
+		health = 0
+		defense = 0
+		attack = 0
+		speed = 0
+		can_coexist = true
+		effects = [
+			EffectTemplate.ETGain1YellowMana.new()
+		]
+		play_cell_scope = func(card : Card, gm : GameManager): return def_land_play_cell_scope(card, gm)
+		play_condition = func(card : Card, gm : GameManager): return len(def_land_play_cell_scope(card, gm)) > 0
+
+
 func def_land_play_cell_scope(card : Card, gm : GameManager):
 	var cells : Array[Cell] = gm.field.get_cells_in_distance(card.card_owner.home_cells, 1, false)
 	cells.filter(func(cell : Cell):

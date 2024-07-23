@@ -46,9 +46,9 @@ text = "Seat"
 layout_mode = 2
 text = "Player Name"
 
-[node name="PlayerReadyLabel" type="Label" parent="Seats"]
+[node name="ChooseLabel" type="Label" parent="Seats"]
 layout_mode = 2
-text = "Ready"
+text = "Choose"
 
 [node name="StartGame" type="Button" parent="."]
 layout_mode = 2

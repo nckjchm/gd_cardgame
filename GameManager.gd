@@ -13,14 +13,28 @@ var current_options : Dictionary
 var waiting := false
 var last_priority := false
 var gui : GUIController
+var local_player : Player = null
 @onready var lobby_manager : LobbyManager = $"../../LobbyManager"
 
 
 func _ready():
-	var proxyPlayers : Array[Player] = [Player.new("Player1"), Player.new("Player2")]
+	var players : Array[Player] = []
+	for session_id in lobby_manager.players_info:
+		var player_info : Dictionary = lobby_manager.players_info[session_id]
+		var player := Player.new(player_info.name)
+		player.deck = Deck.new(
+			DeckTemplate.new(
+				player_info.deck.name, 
+				LobbyManager.parse_string_array(player_info.deck.maindeck),
+				LobbyManager.parse_string_array(player_info.deck.resourcedeck), 
+				LobbyManager.parse_string_array(player_info.deck.specialdeck)))
+		players.append(player)
+		if int(session_id) == multiplayer.get_unique_id():
+			local_player = player
 	lobby_manager.choice_broadcast.connect(handle_choice)
-	initialize_game(proxyPlayers)
-	start_game()
+	lobby_manager.game_command.connect(handle_game_command)
+	initialize_game(players, lobby_manager.game_info.field_template)
+	lobby_manager.player_loaded.rpc_id(1)
 
 #handles chaining and priority order in reaction to events
 #returns true if gamestate advancement can continue
@@ -44,6 +58,10 @@ func handle_event(event : Event):
 		event.handling_finished = true
 		return true
 	return false
+
+func handle_game_command(command : Dictionary):
+	if command.type == "start":
+		start_game()
 
 func register_choice(choice_path : Array[String]):
 	lobby_manager.transmit_player_choice.rpc_id(1, choice_path)
@@ -120,9 +138,9 @@ func finish_action(action : Action):
 
 ### Game Initializing
 
-func initialize_game(playerList : Array[Player]):
+func initialize_game(playerList : Array[Player], fieldtemplate : String):
 	game = Game.new(playerList)
-	init_field()
+	init_field(fieldtemplate)
 	game.init_cards()
 
 func start_game():
@@ -130,8 +148,10 @@ func start_game():
 	current_decider = game.current_turn.turn_player
 	current_options = get_player_options(current_decider)
 	waiting = true
+	gui.update()
 
-func init_field():
+func init_field(fieldtemplate):
+	field.initialize(fieldtemplate)
 	for row in field.fieldpreset.dimensions[0]:
 		for column in field.fieldpreset.dimensions[1]:
 			var cell = field.fieldpreset.types[row][column]
