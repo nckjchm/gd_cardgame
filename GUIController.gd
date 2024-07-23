@@ -34,6 +34,7 @@ func update_buttons():
 		button.disabled = true
 		for connection in button.pressed.get_connections():
 			button.pressed.disconnect(connection.callable)
+	btn_all_choices.disabled = false
 	if game_manager.local_player != game_manager.current_decider:
 		btn_all_choices.disabled = true
 		return

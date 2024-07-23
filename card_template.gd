@@ -48,9 +48,10 @@ class YlwLndAcre extends CardTemplate:
 
 func def_land_play_cell_scope(card : Card, gm : GameManager):
 	var cells : Array[Cell] = gm.field.get_cells_in_distance(card.card_owner.home_cells, 1, false)
-	cells.filter(func(cell : Cell):
-		if len(cell.cards) > 0:
-			return false
+	cells = cells.filter(func(cell : Cell):
+		for cell_card in cell.cards:
+			if not cell_card.can_coexist:
+				return false
 		if cell not in card.card_owner.home_cells:
 			var has_neighbor_land := false
 			var neighbors = gm.field.get_neighbor_cells(cell)
@@ -65,10 +66,10 @@ func def_land_play_cell_scope(card : Card, gm : GameManager):
 	return cells
 
 func def_play_cell_scope(card : Card, gm : GameManager):
-	var cells : Array[Cell] = gm.field.get_cells_in_distance(card.card_owner.home_cells, 2, false)
+	var cells : Array[Cell] = gm.field.get_cells_in_distance(card.card_owner.home_cells, 0, false)
 	cells = cells.filter(func(cell : Cell):
 		for cell_card in cell.cards:
-			if cell_card.card_type in [Card.CardType.Creature, Card.CardType.Structure]:
+			if not cell_card.can_coexist:
 				return false
 		if cell not in card.card_owner.home_cells:
 			var has_neighbor_land := false

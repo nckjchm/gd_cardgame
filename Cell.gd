@@ -36,6 +36,7 @@ func refresh_cards():
 		var card = cards[card_index]
 		card.z_index = card_index + 1
 		card.position = position
+		card.index_in_stack = card_index
 
 func _init(pos : Vector2, diam : int, row : int, column : int, c_type := CellType.Inactive, s_type := StackType.None, player = -1):
 	diameter = diam 

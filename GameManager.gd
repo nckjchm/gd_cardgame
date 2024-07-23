@@ -162,6 +162,7 @@ func start_game():
 	gui.update()
 
 func init_field(fieldtemplate):
+	print("initializing field")
 	field.initialize(fieldtemplate)
 	for row in field.fieldpreset.dimensions[0]:
 		for column in field.fieldpreset.dimensions[1]:
