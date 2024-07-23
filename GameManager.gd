@@ -16,7 +16,6 @@ var gui : GUIController
 var local_player : Player = null
 @onready var lobby_manager : LobbyManager = $"../../LobbyManager"
 
-
 func _ready():
 	var players : Array[Player] = []
 	for session_id in lobby_manager.players_info:
@@ -28,6 +27,10 @@ func _ready():
 				LobbyManager.parse_string_array(player_info.deck.maindeck),
 				LobbyManager.parse_string_array(player_info.deck.resourcedeck), 
 				LobbyManager.parse_string_array(player_info.deck.specialdeck)))
+		player.session_id = session_id
+		for seat in lobby_manager.game_info.seats:
+			if str(lobby_manager.game_info.seats[seat].player_key) == session_id:
+				player.seat = seat
 		players.append(player)
 		if int(session_id) == multiplayer.get_unique_id():
 			local_player = player
@@ -58,6 +61,16 @@ func handle_event(event : Event):
 		event.handling_finished = true
 		return true
 	return false
+
+func is_current_decider_id(session_id):
+	var is_right_id : bool = current_decider.session_id == session_id
+	if not is_right_id:
+		var player_name := "Player not found"
+		for player in game.players:
+			if player.session_id == session_id:
+				player_name = player.name
+		print("Player %s tried to make a choice when it was not their turn" % player_name)
+	return is_right_id
 
 func handle_game_command(command : Dictionary):
 	if command.type == "start":
@@ -274,25 +287,27 @@ func get_card_action_options(card : Card):
 
 func get_card_option_list(card : Card):
 	var options := []
-	if "cardoptions" in current_options:
-		if str(card.id) in current_options.cardoptions:
-			var option_dict : Dictionary = current_options.cardoptions[str(card.id)]
-			if "actions" in option_dict:
-				for key in option_dict.actions:
-					options.append(option_dict.actions[key])
-			if "effects" in option_dict:
-				for key in option_dict.effects:
-					options.append(option_dict.effects[key])
-	if "end_move" in current_options:
-		if current_options.end_move.card == card:
-			options.append(current_options.end_move)
-	if "cards" in current_options:
-		if str(card.id) in current_options.cards:
-			options.append(current_options.cards[str(card.id)])
+	if local_player == current_decider:
+		if "cardoptions" in current_options:
+			if str(card.id) in current_options.cardoptions:
+				var option_dict : Dictionary = current_options.cardoptions[str(card.id)]
+				if "actions" in option_dict:
+					for key in option_dict.actions:
+						options.append(option_dict.actions[key])
+				if "effects" in option_dict:
+					for key in option_dict.effects:
+						options.append(option_dict.effects[key])
+		if "end_move" in current_options:
+			if current_options.end_move.card == card:
+				options.append(current_options.end_move)
+		if "cards" in current_options:
+			if str(card.id) in current_options.cards:
+				options.append(current_options.cards[str(card.id)])
 	return options
 
 func get_cell_option_list(cell : Cell):
 	var options := []
-	if "cells" in current_options and cell.short_name in current_options.cells:
-		return [current_options.cells[cell.short_name]]
+	if local_player == current_decider:
+		if "cells" in current_options and cell.short_name in current_options.cells:
+			return [current_options.cells[cell.short_name]]
 	return []

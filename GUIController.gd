@@ -30,6 +30,7 @@ func update_buttons():
 	var options = game_manager.current_options
 	var buttons : Array[Button] = [btn_pass_phase, btn_draw, btn_decline, btn_recover]
 	btn_pass_phase.text = "Pass Phase"
+	btn_all_choices.disabled = not game_manager.local_player == game_manager.current_decider
 	for button in buttons:
 		button.disabled = true
 		for connection in button.pressed.get_connections():
@@ -51,9 +52,9 @@ func update_buttons():
 func update():
 	print("updating gui")
 	update_buttons()
+	update_turndisplay()
 	if not game_manager.game.game_state in [Game.GameState.Preparation, Game.GameState.Paused]:
-		update_turndisplay()
-		hand.refresh_cards(game_manager.game.current_turn.turn_player.hand.cards)
+		hand.refresh_cards(game_manager.local_player.hand.cards)
 
 func _ready():
 	game_manager.gui = self

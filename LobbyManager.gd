@@ -14,6 +14,7 @@ const PORT = 7000
 const DEFAULT_SERVER_IP = "127.0.0.1" # IPv4 localhost
 const MAX_CONNECTIONS = 20
 @onready var menu_root : Control = $"../MidPanel"
+var game_manager : GameManager
 var players_info := {}
 var local_player_info := {"name": "Name", "deck_template" : "TestDeckYellow"}
 var game_info := {"field_template": "small_two_player_field1"}
@@ -74,6 +75,7 @@ func load_game():
 	game_info.seats = taken_seats
 	$"../MidPanel".visible = false
 	$"..".add_child(game_scene.instantiate())
+	game_manager=$"../Game/GameManager"
 
 func is_start_valid() -> bool:
 	var taken_seats := 0
@@ -150,8 +152,9 @@ func broadcast_player_data(data):
 @rpc("any_peer", "call_local", "reliable")
 func transmit_player_choice(choice):
 	if multiplayer.is_server():
-		broadcast_player_choice.rpc(choice)
-		choice_broadcast.emit(parse_string_array(choice))
+		if game_manager.is_current_decider_id(multiplayer.get_remote_sender_id()):
+			broadcast_player_choice.rpc(choice)
+			choice_broadcast.emit(parse_string_array(choice))
 
 @rpc("authority", "call_remote", "reliable")
 func broadcast_player_choice(choice):
