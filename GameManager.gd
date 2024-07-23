@@ -3,12 +3,7 @@ class_name GameManager extends Node
 @onready var field : Field = $"../GameViewContainer/FieldVPC/FieldVP/Field"
 @onready var input_controller : InputController = $"../InputController"
 var game : Game
-var current_decider : Player :
-	get:
-		return current_decider
-	set(value):
-		current_decider = value
-		input_controller.camera.adjust_rotation(value.rotation)
+var current_decider : Player
 var current_options : Dictionary
 var waiting := false
 var last_priority := false
@@ -155,6 +150,9 @@ func initialize_game(playerList : Array[Player], fieldtemplate : String):
 	game = Game.new(playerList)
 	init_field(fieldtemplate)
 	game.init_cards()
+	if local_player != null:
+		input_controller.camera.adjust_rotation(local_player.rotation)
+		input_controller.camera.global_position = local_player.home_cells[2].global_position
 
 func start_game():
 	game.start()

@@ -30,11 +30,13 @@ func update_buttons():
 	var options = game_manager.current_options
 	var buttons : Array[Button] = [btn_pass_phase, btn_draw, btn_decline, btn_recover]
 	btn_pass_phase.text = "Pass Phase"
-	btn_all_choices.disabled = not game_manager.local_player == game_manager.current_decider
 	for button in buttons:
 		button.disabled = true
 		for connection in button.pressed.get_connections():
 			button.pressed.disconnect(connection.callable)
+	if game_manager.local_player != game_manager.current_decider:
+		btn_all_choices.disabled = true
+		return
 	if "turn_option" in options:
 		if options.turn_option.action is Action.Draw:
 			btn_draw.disabled = false
@@ -47,6 +49,7 @@ func update_buttons():
 			btn_pass_phase.disabled = false
 			btn_pass_phase.text = "End Turn"
 			btn_pass_phase.pressed.connect(options.turn_option.on_click)
+	
 
 #{ Start, Recovery, Draw1, Main1, Battle, Draw2, Main2, End }
 func update():
