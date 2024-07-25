@@ -108,9 +108,9 @@ func open_cell_menu(cell : Cell, position : Vector2):
 	main_control.add_child(cell_menu)
 	cell_menu.position = position
 
-func player_card_click(card : Card, _player : Player, click_event : InputEventMouseButton):
+func player_card_click(card_display : CardDisplay, _player : Player, click_event : InputEventMouseButton):
 	if not click_to_close():
-		open_card_menu(card, click_event.global_position)
+		open_card_menu(card_display.card, click_event.global_position)
 
 func player_cell_click(cell : Cell, _player : Player, click_event : InputEventMouseButton):
 	if not click_to_close():

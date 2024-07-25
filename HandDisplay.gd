@@ -12,12 +12,11 @@ func refresh_cards(cards : Array[Card]):
 	empty()
 	var cardwidth := 300
 	for card in cards:
-		card.adjust_presentation()
+		var card_display = card.create_card_display()
 		var card_container := MarginContainer.new()
 		card_container.custom_minimum_size = Vector2(cardwidth, 0)
-		card_container.add_child(card)
+		card_container.add_child(card_display)
 		hand_hbox.add_child(card_container)
-		card.position = Vector2(0,0)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():

@@ -56,7 +56,7 @@ func digest_clicked_cards():
 			focused_card = cardclicks[0]
 		focus_type = FocusType.Card
 		for entry in cardclicks:
-			if entry.card.index_in_stack > focused_card.card.index_in_stack:
+			if entry.card.card.index_in_stack > focused_card.card.card.index_in_stack:
 				focused_card = entry
 	cardclicks = []
 

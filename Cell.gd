@@ -22,20 +22,20 @@ var short_name : String
 var full_name : String
 
 func insert_card(card : Card, pos : int = len(cards)):
-	add_child(card)
+	add_child(card.on_field_display)
 	cards.insert(pos, card)
 	refresh_cards()
 	
 func remove_card(card : Card):
 	cards.erase(card)
-	remove_child(card)
+	remove_child(card.on_field_display)
 	refresh_cards()
 	
 func refresh_cards():
 	for card_index in len(cards):
 		var card = cards[card_index]
-		card.z_index = card_index + 1
-		card.position = position
+		card.on_field_display.z_index = card_index + 1
+		card.on_field_display.position = position
 		card.index_in_stack = card_index
 
 func _init(pos : Vector2, diam : int, row : int, column : int, c_type := CellType.Inactive, s_type := StackType.None, player = -1):
