@@ -7,6 +7,8 @@ var cell : Cell
 @onready var menu_container : BoxContainer = $MenuContainer
 @onready var lbl_cell_name : Label = $MenuContainer/NameLabel
 @onready var btn_view_stack : Button = $MenuContainer/ViewStackButton
+@onready var input_controller : InputController = $/root/Main/Game/InputController
+
 
 func _ready():
 	for choice in choices:
@@ -18,6 +20,12 @@ func _ready():
 		menu_container.add_child(new_button)
 		buttons.append(new_button)
 	lbl_cell_name.text = cell.full_name
+	btn_view_stack.pressed.connect(func():
+		gui.open_card_list_menu(self.cell.cards, self.position)
+		gui.close_cell_menu()
+		input_controller.menu_clicked(self)
+	)
+	
 
 func _process(delta):
 	pass

@@ -2,12 +2,13 @@ class_name InputController extends Node
 
 signal screen_dragged(mouse_motion)
 
-enum FocusType { Card, Cell, None }
+enum FocusType { Card, Cell, Menu, None }
 
 var cellclicks : Array[Dictionary] = []
 var cardclicks : Array[Dictionary] = []
 var focused_card : Dictionary = {}
 var focused_cell : Dictionary = {}
+var focused_menu : Dictionary = {}
 var last_focused_card : Dictionary = {}
 var last_click_release : InputEventMouseButton
 var focus_type : FocusType = FocusType.None
@@ -34,11 +35,15 @@ func player_click_release():
 	var player : Player = game_manager.current_decider
 	if distance_from_mouse_down.length() > 30:
 		focus_type = FocusType.None
+	if not focused_menu.is_empty():
+		focus_type = FocusType.Menu
 	match focus_type:
 		FocusType.Card:
 			gui.player_card_click(focused_card.card, player, focused_card.event)
 		FocusType.Cell:
 			gui.player_cell_click(focused_cell.cell, player, focused_cell.event)
+		FocusType.Menu:
+			gui.player_menu_click(focused_menu, player)
 		FocusType.None:
 			gui.player_background_click(player, last_click_release)
 		_ :
@@ -48,7 +53,15 @@ func player_click_release():
 		last_focused_card = focused_card
 	focused_card = {}
 	focused_cell = {}
+	focused_menu = {}
 	distance_from_mouse_down = Vector2(0,0)
+
+func menu_input_event(menu : Control, event : InputEvent, context : Dictionary = {}):
+	if event is InputEventMouseButton:
+		menu_clicked(menu, context)
+
+func menu_clicked(menu : Control, context : Dictionary = {}):
+	focused_menu = {menu = menu, context = context}
 
 func digest_clicked_cards():
 	if len(cardclicks) > 0:

@@ -66,8 +66,6 @@ func get_cells_in_distance(search_cells : Array[Cell], distance : int, skip_unwa
 		var step_cells : Array[Cell] = []
 		for new_cell in new_cells:
 			var new_neighbors : Array[Cell] = get_neighbor_cells(new_cell, skip_unwalkable)
-			for neighbor in new_neighbors:
-				print(neighbor.short_name)
 			step_cells.append_array(new_neighbors.filter(func(cell : Cell): return cell not in step_cells and cell not in new_cells and cell not in return_cells))
 		new_cells = step_cells.filter(func(cell : Cell): return cell not in return_cells and cell not in new_cells)
 		return_cells.append_array(new_cells)

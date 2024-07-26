@@ -9,6 +9,9 @@ var cell_menu_prefab = preload("res://cell_menu.tscn")
 var all_choices_menu_open := false
 var all_choices_menu : AllChoicesMenu = null
 var all_choices_menu_prefab = preload("res://all_choices_menu.tscn")
+var card_list_menu_open := false
+var card_list_menu : CardListMenu = null
+var card_list_menu_prefab = preload("res://card_list_menu.tscn")
 @onready var game_manager : GameManager = $"../GameManager"
 @onready var btn_pass_phase : Button = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/PassPhaseButton"
 @onready var btn_draw : Button = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/DrawButton"
@@ -20,9 +23,10 @@ var all_choices_menu_prefab = preload("res://all_choices_menu.tscn")
 @onready var hand : HandDisplay = $"../GameViewContainer/FieldVPC/FieldVP/HandCanvas/HandPanel"
 
 func click_to_close():
-	if card_menu_open or cell_menu_open:
+	if card_menu_open or cell_menu_open or card_list_menu_open:
 		close_cell_menu()
 		close_card_menu()
+		close_card_list_menu()
 		return true
 	return false
 
@@ -84,6 +88,20 @@ func close_all_choices_menu():
 		all_choices_menu_open = false
 		all_choices_menu = null
 
+func close_card_list_menu():
+	if card_list_menu_open:
+		card_list_menu.queue_free()
+		card_list_menu_open = false
+		card_list_menu = null
+
+func open_card_list_menu(cards : Array[Card], position : Vector2):
+	close_card_list_menu()
+	card_list_menu = card_list_menu_prefab.instantiate()
+	card_list_menu.initialize(cards, self)
+	main_control.add_child(card_list_menu)
+	card_list_menu.position = position
+	card_list_menu_open = true
+
 func open_all_choices_menu(options : Dictionary):
 	close_all_choices_menu()
 	all_choices_menu = all_choices_menu_prefab.instantiate()
@@ -115,6 +133,9 @@ func player_card_click(card_display : CardDisplay, _player : Player, click_event
 func player_cell_click(cell : Cell, _player : Player, click_event : InputEventMouseButton):
 	if not click_to_close():
 		open_cell_menu(cell, click_event.global_position)
+
+func player_menu_click(clicked_menu : Dictionary, _player : Player):
+	pass
 
 func player_background_click(_player : Player, click_event: InputEventMouseButton):
 	click_to_close()
