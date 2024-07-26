@@ -9,6 +9,7 @@ var waiting := false
 var last_priority := false
 var gui : GUIController
 var local_player : Player = null
+var random_seed : int
 @onready var lobby_manager : LobbyManager = $"../../LobbyManager"
 
 func _ready():
@@ -33,6 +34,15 @@ func _ready():
 	lobby_manager.game_command.connect(handle_game_command)
 	initialize_game(players, lobby_manager.game_info.field_template)
 	lobby_manager.player_loaded.rpc_id(1)
+
+func initialize(random_seed : int):
+	self.random_seed = random_seed
+	seed(random_seed)
+
+func shuffle_deck(player : Player):
+	seed(random_seed)
+	player.maindeck_cell.cards.shuffle()
+	player.maindeck_cell.refresh_cards()
 
 #handles chaining and priority order in reaction to events
 #returns true if gamestate advancement can continue
@@ -150,6 +160,8 @@ func initialize_game(playerList : Array[Player], fieldtemplate : String):
 	game = Game.new(playerList)
 	init_field(fieldtemplate)
 	game.init_cards()
+	for player in game.players:
+		shuffle_deck(player)
 	if local_player != null:
 		input_controller.camera.adjust_rotation(local_player.rotation)
 		input_controller.camera.global_position = local_player.home_cells[2].global_position

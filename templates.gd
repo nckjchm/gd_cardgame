@@ -2,7 +2,10 @@ extends Node
 
 var templates = {
 	YlwCrtFarmer = CardTemplate.YlwCrtFarmer.new(),
-	YlwLndAcre = CardTemplate.YlwLndAcre.new()
+	YlwLndAcre = CardTemplate.YlwLndAcre.new(),
+	YlwCrtGuy = CardTemplate.YlwCrtGuy.new(),
+	YlwCrtDude = CardTemplate.YlwCrtDude.new(),
+	YlwCrtAttacker = CardTemplate.YlwCrtAttacker.new(),
 }
 var card_prefab = preload("res://card.tscn")
 

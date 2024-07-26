@@ -62,12 +62,12 @@ func remove_multiplayer_peer():
 
 func start_game():
 	if is_start_valid():
-		load_game.rpc()
+		load_game.rpc(randi())
 
 # When the server decides to start the game from a UI scene,
 # do Lobby.load_game.rpc(filepath)
 @rpc("authority", "call_local", "reliable")
-func load_game():
+func load_game(random_seed : int):
 	var taken_seats : Dictionary = {}
 	for seat_key in seats:
 		if seats[seat_key].player_key != 0:
@@ -76,6 +76,7 @@ func load_game():
 	$"../MidPanel".visible = false
 	$"..".add_child(game_scene.instantiate())
 	game_manager=$"../Game/GameManager"
+	game_manager.initialize(random_seed)
 
 func is_start_valid() -> bool:
 	var taken_seats := 0

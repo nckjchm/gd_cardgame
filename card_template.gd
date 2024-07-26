@@ -21,9 +21,9 @@ class YlwCrtFarmer extends CardTemplate:
 		cost = ResourceList.new([
 			ResourceList.ResourceElement.new(ResourceList.ResourceKind.Mana, Card.CardColor.Yellow, 1)
 		])
-		health = 1
+		health = 2
 		defense = 0
-		attack = 1
+		attack = 3
 		speed = 2
 		play_cell_scope= func(card : Card, gm : GameManager): return def_play_cell_scope(card, gm)
 		play_condition = func(card : Card, gm : GameManager): return len(def_play_cell_scope(card, gm)) > 0
@@ -45,6 +45,50 @@ class YlwLndAcre extends CardTemplate:
 		play_cell_scope = func(card : Card, gm : GameManager): return def_land_play_cell_scope(card, gm)
 		play_condition = func(card : Card, gm : GameManager): return len(def_land_play_cell_scope(card, gm)) > 0
 
+class YlwCrtGuy extends CardTemplate:
+	func _init():
+		name = "Guy"
+		card_color = Card.CardColor.Yellow
+		type = Card.CardType.Creature
+		cost = ResourceList.new([
+			ResourceList.ResourceElement.new(ResourceList.ResourceKind.Mana, Card.CardColor.Yellow, 2)
+		])
+		health = 4
+		defense = 1
+		attack = 3
+		speed = 2
+		play_cell_scope= func(card : Card, gm : GameManager): return def_play_cell_scope(card, gm)
+		play_condition = func(card : Card, gm : GameManager): return len(def_play_cell_scope(card, gm)) > 0
+
+class YlwCrtDude extends CardTemplate:
+	func _init():
+		name = "Dude"
+		card_color = Card.CardColor.Yellow
+		type = Card.CardType.Creature
+		cost = ResourceList.new([
+			ResourceList.ResourceElement.new(ResourceList.ResourceKind.Mana, Card.CardColor.Yellow, 3)
+		])
+		health = 5
+		defense = 1
+		attack = 4
+		speed = 2
+		play_cell_scope= func(card : Card, gm : GameManager): return def_play_cell_scope(card, gm)
+		play_condition = func(card : Card, gm : GameManager): return len(def_play_cell_scope(card, gm)) > 0
+
+class YlwCrtAttacker extends CardTemplate:
+	func _init():
+		name = "Attacker"
+		card_color = Card.CardColor.Yellow
+		type = Card.CardType.Creature
+		cost = ResourceList.new([
+			ResourceList.ResourceElement.new(ResourceList.ResourceKind.Mana, Card.CardColor.Yellow, 4)
+		])
+		health = 7
+		defense = 0
+		attack = 5
+		speed = 3
+		play_cell_scope= func(card : Card, gm : GameManager): return def_play_cell_scope(card, gm)
+		play_condition = func(card : Card, gm : GameManager): return len(def_play_cell_scope(card, gm)) > 0
 
 func def_land_play_cell_scope(card : Card, gm : GameManager):
 	var cells : Array[Cell] = gm.field.get_cells_in_distance(card.card_owner.home_cells, 1, false)

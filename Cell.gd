@@ -32,11 +32,15 @@ func remove_card(card : Card):
 	refresh_cards()
 	
 func refresh_cards():
+	for child in get_children():
+		if child.get_index() > 1:
+			remove_child(child)
 	for card_index in len(cards):
 		var card = cards[card_index]
 		card.on_field_display.z_index = card_index + 1
 		card.on_field_display.position = position
 		card.index_in_stack = card_index
+		add_child(card.on_field_display)
 
 func _init(pos : Vector2, diam : int, row : int, column : int, c_type := CellType.Inactive, s_type := StackType.None, player = -1):
 	diameter = diam 
