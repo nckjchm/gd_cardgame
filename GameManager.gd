@@ -37,7 +37,6 @@ func _ready():
 
 func initialize(random_seed : int):
 	self.random_seed = random_seed
-	seed(random_seed)
 
 func shuffle_deck(player : Player):
 	seed(random_seed)
