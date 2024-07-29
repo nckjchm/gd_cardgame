@@ -78,7 +78,6 @@ func load_game():
 	var game_node = game_scene.instantiate()
 	game_manager=game_node.find_child("GameManager")
 	$"..".add_child(game_node)
-	game_manager.initialize()
 
 func is_start_valid() -> bool:
 	var taken_seats := 0
@@ -98,7 +97,7 @@ func request_random_seed(seed_index):
 @rpc("authority", "call_local", "reliable")
 func return_random_seed(seed : int):
 	game_manager.random_seeds.append(seed)
-	game_manager.waiting_for_transmission.post()
+	game_manager.waiting_for_transmission = false
 
 @rpc("authority", "call_remote", "reliable")
 func broadcast_seat_assignment(seats):

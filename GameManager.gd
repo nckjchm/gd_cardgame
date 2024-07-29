@@ -11,7 +11,7 @@ var gui : GUIController
 var local_player : Player = null
 var random_seeds : Array[int] = []
 var seed_index := 0
-var waiting_for_transmission : Semaphore
+var waiting_for_transmission := false
 @onready var lobby_manager : LobbyManager = $"../../LobbyManager"
 
 func _ready():
@@ -37,16 +37,12 @@ func _ready():
 	await initialize_game(players, lobby_manager.game_info.field_template)
 	lobby_manager.player_loaded.rpc_id(1)
 
-func initialize():
-	pass
-
 func get_next_random_seed():
-	waiting_for_transmission = Semaphore.new()
 	#request seed and wait for transmission
+	waiting_for_transmission = true
 	lobby_manager.request_random_seed.rpc_id(1,seed_index)
-	while not waiting_for_transmission.try_wait():
+	while waiting_for_transmission:
 		await get_tree().create_timer(0.1).timeout
-	waiting_for_transmission = null
 	#transmission done
 	seed_index += 1
 	return random_seeds[-1]
