@@ -28,7 +28,7 @@ func _ready():
 	btn_ip_exit.pressed.connect(func():
 		exit_ip_menu()
 	)
-	lobby_manager.game_joined.connect(func(peer_id, local_player_info):
+	lobby_manager.game_joined.connect(func(peer_id, _local_player_info):
 		if peer_id == multiplayer.get_unique_id():
 			open_lobby()
 	)

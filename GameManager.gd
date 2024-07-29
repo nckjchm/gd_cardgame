@@ -9,7 +9,9 @@ var waiting := false
 var last_priority := false
 var gui : GUIController
 var local_player : Player = null
-var random_seed : int
+var random_seeds : Array[int] = []
+var seed_index := 0
+var waiting_for_transmission : Semaphore
 @onready var lobby_manager : LobbyManager = $"../../LobbyManager"
 
 func _ready():
@@ -32,13 +34,26 @@ func _ready():
 			local_player = player
 	lobby_manager.choice_broadcast.connect(handle_choice)
 	lobby_manager.game_command.connect(handle_game_command)
-	initialize_game(players, lobby_manager.game_info.field_template)
+	await initialize_game(players, lobby_manager.game_info.field_template)
 	lobby_manager.player_loaded.rpc_id(1)
 
-func initialize(random_seed : int):
-	self.random_seed = random_seed
+func initialize():
+	pass
+
+func get_next_random_seed():
+	waiting_for_transmission = Semaphore.new()
+	#request seed and wait for transmission
+	lobby_manager.request_random_seed.rpc_id(1,seed_index)
+	while not waiting_for_transmission.try_wait():
+		await get_tree().create_timer(0.1).timeout
+	waiting_for_transmission = null
+	#transmission done
+	seed_index += 1
+	return random_seeds[-1]
 
 func shuffle_deck(player : Player):
+	print("shuffling deck of player: %s" % player.name)
+	var random_seed = await get_next_random_seed()
 	seed(random_seed)
 	player.maindeck_cell.cards.shuffle()
 	player.maindeck_cell.refresh_cards()
@@ -160,7 +175,7 @@ func initialize_game(playerList : Array[Player], fieldtemplate : String):
 	init_field(fieldtemplate)
 	game.init_cards()
 	for player in game.players:
-		shuffle_deck(player)
+		await shuffle_deck(player)
 	if local_player != null:
 		input_controller.camera.adjust_rotation(local_player.rotation)
 		input_controller.camera.global_position = local_player.home_cells[2].global_position

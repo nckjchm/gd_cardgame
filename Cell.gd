@@ -2,7 +2,7 @@ class_name Cell extends Area2D
 
 signal cell_input_event(cell, viewport, event, shape_idx)
 @onready var input_controller : InputController = $"../../../../../InputController"
-@onready var field : Field = $/root/Main/GameViewContainer/FieldVPC/FieldVP/Field
+@onready var field : Field = $".."
 var rng = RandomNumberGenerator.new()
 
 enum CellType { Inactive, Stack, Field }

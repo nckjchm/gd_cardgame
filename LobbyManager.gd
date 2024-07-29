@@ -20,6 +20,7 @@ var local_player_info := {"name": "Name", "deck_template" : "TestDeckYellow"}
 var game_info := {"field_template": "small_two_player_field1"}
 var game_scene = preload("res://game.tscn")
 var seats := {}
+var seeds : Array[int] = []
 
 func _ready():
 	multiplayer.peer_connected.connect(_on_player_connected)
@@ -62,21 +63,22 @@ func remove_multiplayer_peer():
 
 func start_game():
 	if is_start_valid():
-		load_game.rpc(randi())
+		load_game.rpc()
 
 # When the server decides to start the game from a UI scene,
 # do Lobby.load_game.rpc(filepath)
 @rpc("authority", "call_local", "reliable")
-func load_game(random_seed : int):
+func load_game():
 	var taken_seats : Dictionary = {}
 	for seat_key in seats:
 		if seats[seat_key].player_key != 0:
 			taken_seats[seat_key] = { player_key = seats[seat_key].player_key, player_loaded = false}
 	game_info.seats = taken_seats
 	$"../MidPanel".visible = false
-	$"..".add_child(game_scene.instantiate())
-	game_manager=$"../Game/GameManager"
-	game_manager.initialize(random_seed)
+	var game_node = game_scene.instantiate()
+	game_manager=game_node.find_child("GameManager")
+	$"..".add_child(game_node)
+	game_manager.initialize()
 
 func is_start_valid() -> bool:
 	var taken_seats := 0
@@ -84,6 +86,19 @@ func is_start_valid() -> bool:
 		if seats[seat].player_key != 0:
 			taken_seats += 1
 	return taken_seats >= 2
+
+@rpc("any_peer", "call_local", "reliable")
+func request_random_seed(seed_index):
+	if multiplayer.is_server():
+		if len(seeds) <= seed_index:
+			for i in range(seed_index + 1 - len(seeds)):
+				seeds.append(randi())
+		return_random_seed.rpc_id(multiplayer.get_remote_sender_id(), seeds[seed_index])
+	
+@rpc("authority", "call_local", "reliable")
+func return_random_seed(seed : int):
+	game_manager.random_seeds.append(seed)
+	game_manager.waiting_for_transmission.post()
 
 @rpc("authority", "call_remote", "reliable")
 func broadcast_seat_assignment(seats):
