@@ -13,6 +13,7 @@ class_name MainMenu extends Control
 var lobby_scene = preload("res://lobby.tscn")
 
 func _ready():
+	Engine.max_fps = 60
 	btn_host_game.pressed.connect(func():
 		build_player_info()
 		lobby_manager.create_game()

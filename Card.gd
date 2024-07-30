@@ -5,7 +5,7 @@ enum CardPosition { Deck, Hand, Field, Graveyard, Limbo, Banishment, Unknown}
 enum CardColor { Red, Blue, Green, Yellow, Black, White }
 enum CardType { Creature, Structure, Spell, Land }
 enum CardOrigin { MainDeck, ResourceDeck, SpecialDeck, Token }
-enum CardAspect { Humanoid, Feral, Necro, Pyro, Aquatic, Liquid, Aerial, Astral, Infernal, Herbal, Magicae }
+enum CardAspect { Humanoid, Animalia, Necro, Pyro, Aquatic, Liquid, Aerial, Astral, Sinister, Herbal, Magicae }
 
 signal card_died(card : Card)
 signal health_updated(card : Card)
