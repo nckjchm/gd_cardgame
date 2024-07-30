@@ -293,6 +293,7 @@ class ExecuteAttackEvent extends AttackEvent:
 			event_stack.append(DefenseChangeEvent.new(player, target, defense_after_damage - target.defense))
 			if hits_health:
 				event_stack.append(HealthChangeEvent.new(player, target, health_after_damage - target.health))
+			event_stack.append(TapStateChangeEvent.new(player, card, 1, self))
 
 class RecoveryEvent extends CardStatusEvent:
 	func _init(player : Player, card : Card, parent_event : Event = null):
@@ -305,10 +306,8 @@ class RecoveryEvent extends CardStatusEvent:
 		if card.defense < card.template.defense:
 			event_stack.append(DefenseChangeEvent.new(player, card, card.template.defense - card.defense))
 		card.needs_recovery = false
-		for card_i in card.controller.cards:
-			if card.needs_recovery:
-				return
-		gm.game.current_turn.recovery_done = true
+		if gm.game.check_recovery_finished():
+			gm.game.current_turn.recovery_done = true
 	
 class MovementEvent extends CardStatusEvent:
 	var ending := false

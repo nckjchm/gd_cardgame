@@ -76,6 +76,8 @@ func enter_phase(phase : Turn.TurnPhase):
 	current_turn.current_phase = phase
 	if phase == Turn.TurnPhase.Recovery:
 		mark_recovery_targets()
+	if phase == Turn.TurnPhase.Draw1:
+		current_turn.turn_player.reset_resources()
 
 func mark_recovery_targets():
 	var targets_available := false

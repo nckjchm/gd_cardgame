@@ -26,7 +26,7 @@ class YlwCrtFarmer extends CardTemplate:
 		attack = 3
 		speed = 2
 		play_cell_scope= func(card : Card, gm : GameManager): return def_play_cell_scope(card, gm)
-		play_condition = func(card : Card, gm : GameManager): return len(def_play_cell_scope(card, gm)) > 0
+		play_condition = func(card : Card, gm : GameManager): return def_play_condition(card, gm)
 
 class YlwLndAcre extends CardTemplate:
 	func _init():
@@ -43,7 +43,7 @@ class YlwLndAcre extends CardTemplate:
 			EffectTemplate.ETGain1YellowMana.new()
 		]
 		play_cell_scope = func(card : Card, gm : GameManager): return def_land_play_cell_scope(card, gm)
-		play_condition = func(card : Card, gm : GameManager): return len(def_land_play_cell_scope(card, gm)) > 0
+		play_condition = func(card : Card, gm : GameManager): return def_play_condition(card, gm)
 
 class YlwCrtGuy extends CardTemplate:
 	func _init():
@@ -58,7 +58,7 @@ class YlwCrtGuy extends CardTemplate:
 		attack = 3
 		speed = 2
 		play_cell_scope= func(card : Card, gm : GameManager): return def_play_cell_scope(card, gm)
-		play_condition = func(card : Card, gm : GameManager): return len(def_play_cell_scope(card, gm)) > 0
+		play_condition = func(card : Card, gm : GameManager): return def_play_condition(card, gm)
 
 class YlwCrtDude extends CardTemplate:
 	func _init():
@@ -73,7 +73,7 @@ class YlwCrtDude extends CardTemplate:
 		attack = 4
 		speed = 2
 		play_cell_scope= func(card : Card, gm : GameManager): return def_play_cell_scope(card, gm)
-		play_condition = func(card : Card, gm : GameManager): return len(def_play_cell_scope(card, gm)) > 0
+		play_condition = func(card : Card, gm : GameManager): return def_play_condition(card, gm)
 
 class YlwCrtAttacker extends CardTemplate:
 	func _init():
@@ -88,7 +88,14 @@ class YlwCrtAttacker extends CardTemplate:
 		attack = 5
 		speed = 3
 		play_cell_scope= func(card : Card, gm : GameManager): return def_play_cell_scope(card, gm)
-		play_condition = func(card : Card, gm : GameManager): return len(def_play_cell_scope(card, gm)) > 0
+		play_condition = func(card : Card, gm : GameManager): return def_play_condition(card, gm)
+
+func def_play_condition(card : Card, gm : GameManager):
+	if not gm.game.current_turn.current_phase in [Turn.TurnPhase.Main1, Turn.TurnPhase.Main2]:
+		return false
+	if play_cell_scope.call(card, gm).is_empty():
+		return false
+	return true
 
 func def_land_play_cell_scope(card : Card, gm : GameManager):
 	var cells : Array[Cell] = gm.field.get_cells_in_distance(card.card_owner.home_cells, 1, false)

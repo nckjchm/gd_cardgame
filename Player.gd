@@ -18,3 +18,6 @@ var session_id : int
 
 func _init(name : String):
 	self.name = name
+
+func reset_resources():
+	resources.elements.clear()
