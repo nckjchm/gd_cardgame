@@ -19,8 +19,9 @@ var card_list_menu_prefab = preload("res://card_list_menu.tscn")
 @onready var btn_recover : Button = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/RecoverButton"
 @onready var btn_all_choices : Button = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/AllChoicesButton"
 @onready var main_control : Control = $".."
-@onready var turn_phase_display : Label = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/HBoxContainer/TurnPhaseText"
+@onready var lbl_turn_phase : Label = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/HBoxContainer/TurnPhaseText"
 @onready var hand : HandDisplay = $"../GameViewContainer/FieldVPC/FieldVP/HandCanvas/HandPanel"
+@onready var lbl_resource_text = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/ResourceText"
 
 func click_to_close():
 	if card_menu_open or cell_menu_open or card_list_menu_open:
@@ -60,7 +61,7 @@ func update_buttons():
 func update():
 	print("updating gui")
 	update_buttons()
-	update_turndisplay()
+	update_labels()
 	if not game_manager.game.game_state in [Game.GameState.Preparation, Game.GameState.Paused]:
 		hand.refresh_cards(game_manager.local_player.hand.cards)
 
@@ -140,6 +141,38 @@ func player_menu_click(clicked_menu : Dictionary, _player : Player):
 func player_background_click(_player : Player, click_event: InputEventMouseButton):
 	click_to_close()
 
+func update_labels():
+	update_turndisplay()
+	update_resourcedisplay()
+	
+func update_resourcedisplay():
+	if not game_manager.game.game_state in [Game.GameState.Paused, Game.GameState.Preparation]:
+		var resource_text = "Nothing"
+		var resources : ResourceList = game_manager.local_player.resources
+		if not resources.elements.is_empty():
+			resource_text = ""
+			for resource_element in resources.elements:
+				var resource_kind = "M"
+				if resource_element.kind == ResourceList.ResourceKind.Nutrition:
+					resource_kind = "N"
+				var element_text = "%d%s" % [resource_element.amount, resource_kind]
+				match resource_element.color:
+					Card.CardColor.Yellow:
+						element_text = "[color=yellow]%s[/color]" % element_text
+					Card.CardColor.Blue:
+						element_text = "[color=blue]%s[/color]" % element_text
+					Card.CardColor.Green:
+						element_text = "[color=green]%s[/color]" % element_text
+					Card.CardColor.Red:
+						element_text = "[color=red]%s[/color]" % element_text
+					Card.CardColor.Black:
+						element_text = "[color=black]%s[/color]" % element_text
+					Card.CardColor.White:
+						element_text = "[color=white]%s[/color]" % element_text
+				resource_text = ", ".join([resource_text, element_text])
+			resource_text = resource_text.substr(2)
+		lbl_resource_text.text = resource_text
+
 func update_turndisplay():
 	var turn_phase_text = ""
 	if not game_manager.game.game_state in [Game.GameState.Paused, Game.GameState.Preparation]:
@@ -160,7 +193,7 @@ func update_turndisplay():
 				turn_phase_text = "Main Phase 2"
 			Turn.TurnPhase.End:
 				turn_phase_text = "End Phase"
-	turn_phase_display.text = turn_phase_text
+	lbl_turn_phase.text = turn_phase_text
 
 func refresh_hand(player : Player):
 	hand.refresh_cards(player.hand.cards)

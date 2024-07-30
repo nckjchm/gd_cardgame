@@ -81,6 +81,18 @@ text = "Recover All"
 layout_mode = 2
 text = "Show All Choices"
 
+[node name="ResourceLabel" type="Label" parent="GameViewContainer/SideGUI/SideGUIBoxContainer"]
+layout_mode = 2
+text = "Resources:"
+
+[node name="ResourceText" type="RichTextLabel" parent="GameViewContainer/SideGUI/SideGUIBoxContainer"]
+clip_contents = false
+custom_minimum_size = Vector2(2.08165e-12, 2.08165e-12)
+layout_mode = 2
+bbcode_enabled = true
+text = "Resource Text"
+fit_content = true
+
 [node name="FieldVPC" type="SubViewportContainer" parent="GameViewContainer"]
 custom_minimum_size = Vector2(2.08165e-12, 2.08165e-12)
 layout_mode = 2
