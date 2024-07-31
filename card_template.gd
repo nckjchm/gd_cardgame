@@ -9,6 +9,7 @@ var health : int
 var defense : int
 var attack : int
 var speed : int
+var flavor_text := ""
 var can_coexist := false
 var play_condition : Callable
 var play_cell_scope : Callable
@@ -27,6 +28,7 @@ class YlwCrtFarmer extends CardTemplate:
 		defense = 0
 		attack = 3
 		speed = 2
+		flavor_text = "It's not much but it's honest work."
 		play_cell_scope= func(card : Card, gm : GameManager): return def_play_cell_scope(card, gm)
 		play_condition = func(card : Card, gm : GameManager): return def_play_condition(card, gm)
 

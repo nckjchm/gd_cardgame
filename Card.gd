@@ -77,6 +77,7 @@ var card_color : CardColor:
 	set(value):
 		card_color = value
 		color_updated.emit(self)
+var flavor_text : String
 var card_aspects : Array[CardAspect]
 var card_origin : CardOrigin
 var microstates : Dictionary = {}
@@ -134,6 +135,7 @@ func _init(template : CardTemplate, id : int, card_owner : Player, card_origin :
 	play_cell_scope = func(gm : GameManager): return template.play_cell_scope.call(self, gm)
 	cost = template.cost
 	can_coexist = template.can_coexist
+	flavor_text = template.flavor_text
 	refresh_stats()
 	card_color = template.card_color
 	on_field_display = create_card_display()

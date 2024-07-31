@@ -84,7 +84,12 @@ func init_meshes():
 	for aspect in card.card_aspects:
 		aspects_text = ", ".join([aspects_text, Card.get_aspect_name(aspect)])
 	attribute_text_mesh.mesh.text = "[%s]" % aspects_text.substr(2)
-	card_text_mesh.mesh.text = "Card Text"
+	var card_text = ""
+	if not card.flavor_text.is_empty():
+		card_text = card.flavor_text
+	for effect in card.effects:
+		card_text += effect.long_text + "\n"
+	card_text_mesh.mesh.text = card_text
 
 func _on_health_updated(_card):
 	health_text_mesh.mesh.text = str(card.health)
