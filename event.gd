@@ -231,12 +231,21 @@ class PlayCardEvent extends SendToFieldEvent:
 	var resource_payment : PayResourceEvent
 	
 	func _init(card : Card, destination_cell : Cell, parent_event : Event = null):
-		super._init(card.controller, card, destination_cell, parent_event)
+		super._init(card.controller if card is Card else null, card, destination_cell, parent_event)
 		event_type = "PlayCard"
 	
 	func resolve(gm : GameManager):
 		if resource_payment == null or not resource_payment.unsuccessful:
 			super.resolve(gm)
+
+class CreateCreatureEvent extends PlayCardEvent:
+	func _init(player : Player, card : Card, destination_cell : Cell, parent_event : Event = null):
+		super._init(card, destination_cell, parent_event)
+		self.player = player # This is necessary because Cards can be created by another player than their controller
+		event_type = "CreateCreature"
+	
+	func resolve(gm : GameManager):
+		super.resolve(gm)
 
 class CallCreatureEvent extends PlayCardEvent:
 	func _init(card : Card, destination_cell : Cell, parent_event : Event = null):
@@ -270,8 +279,8 @@ class StartAttackEvent extends AttackEvent:
 		event_type = "StartAttack"
 	
 	func resolve(gm : GameManager):
-		var choice_scope := func():
-			return card.attack_scope.call(gm)
+		var choice_scope := func(game_manager):
+			return card.attack_scope.call(game_manager)
 		target_choice = CardChoiceEvent.new(card.controller, choice_scope, self)
 		attack_execution = ExecuteAttackEvent.new(player, card, self)
 		target_choice.on_decision = func(choicedict : Dictionary, gm : GameManager):
@@ -536,7 +545,7 @@ class CardChoiceEvent extends ChoiceEvent:
 		choice_type = ChoiceType.Card
 	
 	func resolve(gm : GameManager):
-		var cards : Array[Card] = scope.call()
+		var cards : Array[Card] = scope.call(gm)
 		if len(cards) > 0:
 			choice = { cards = {}}
 			for card in cards:

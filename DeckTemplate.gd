@@ -14,6 +14,6 @@ func _init(name : String, main_deck : Array[String], resource_deck : Array[Strin
 class TestDeckYellow extends DeckTemplate:
 	func _init():
 		super._init("Testdeck Yellow",
-			["YlwCrtFarmer", "YlwCrtFarmer", "YlwCrtFarmer", "YlwCrtGuy", "YlwCrtGuy", "YlwCrtGuy", "YlwCrtDude", "YlwCrtDude", "YlwCrtDude", "YlwCrtAttacker"],
+			["YlwCrtFarmer", "YlwCrtFarmer", "YlwCrtFarmer", "YlwCrtGuy", "YlwCrtGuy", "YlwCrtGuy", "YlwCrtDude", "YlwCrtDude", "YlwCrtDude", "YlwCrtAttacker", "YlwCrtAttacker", "YlwStrSchool", "YlwStrSchool"],
 			["YlwLndAcre", "YlwLndOrchard", "YlwLndAcre", "YlwLndAcre", "YlwLndAcre", "YlwLndAcre", "YlwLndAcre"],
 			[])

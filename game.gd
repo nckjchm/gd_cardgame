@@ -45,11 +45,11 @@ func init_card(template_key : String, card_index : int, player : Player, card_or
 	var card = Card.new(card_template, card_index, player, card_origin, effect_index_start)
 	match card_origin:
 		Card.CardOrigin.MainDeck:
-			player.maindeck_cell.insert_card(card)
+			player.maindeck_cell.insert_card(card, 0)
 		Card.CardOrigin.ResourceDeck:
-			player.resourcedeck_cell.insert_card(card)
+			player.resourcedeck_cell.insert_card(card, 0)
 		Card.CardOrigin.SpecialDeck:
-			player.specialdeck_cell.insert_card(card)
+			player.specialdeck_cell.insert_card(card, 0)
 	card.card_owner.cards.append(card)
 	all_cards.append(card)
 	return card
