@@ -257,7 +257,7 @@ func get_turn_action():
 		return Action.Draw.new(turn_player, Card.CardOrigin.MainDeck)
 	elif game.current_turn.current_phase == Turn.TurnPhase.Recovery:
 		if not game.current_turn.recovery_done:
-			return null
+			return Action.RecoverAll.new(turn_player)
 	elif game.current_turn.current_phase == Turn.TurnPhase.End:
 		return Action.EndTurn.new(turn_player, game.current_turn)
 	return Action.AdvancePhase.new(turn_player, game.current_turn.current_phase)

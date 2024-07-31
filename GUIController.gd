@@ -15,15 +15,15 @@ var card_list_menu_prefab = preload("res://card_list_menu.tscn")
 var choice_popup_menu_open := false
 var choice_popup_menu : ChoicePopupMenu = null
 var choice_popup_menu_prefab = preload("res://choice_popup_menu.tscn")
+@onready var main_control : Control = $".."
 @onready var game_manager : GameManager = $"../GameManager"
+@onready var hand : HandDisplay = $"../GameViewContainer/FieldVPC/FieldVP/HandCanvas/HandPanel"
 @onready var btn_pass_phase : Button = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/PassPhaseButton"
 @onready var btn_draw : Button = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/DrawButton"
 @onready var btn_decline : Button = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/DeclineButton"
-@onready var btn_recover : Button = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/RecoverButton"
+@onready var btn_recover_all : Button = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/RecoverButton"
 @onready var btn_all_choices : Button = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/AllChoicesButton"
-@onready var main_control : Control = $".."
 @onready var lbl_turn_phase : Label = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/HBoxContainer/TurnPhaseText"
-@onready var hand : HandDisplay = $"../GameViewContainer/FieldVPC/FieldVP/HandCanvas/HandPanel"
 @onready var lbl_resource_text = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/ResourceText"
 
 func click_to_close():
@@ -36,7 +36,7 @@ func click_to_close():
 
 func update_buttons():
 	var options = game_manager.current_options
-	var buttons : Array[Button] = [btn_pass_phase, btn_draw, btn_decline, btn_recover]
+	var buttons : Array[Button] = [btn_pass_phase, btn_draw, btn_decline, btn_recover_all]
 	btn_pass_phase.text = "Pass Phase"
 	for button in buttons:
 		button.disabled = true
@@ -58,6 +58,9 @@ func update_buttons():
 			btn_pass_phase.disabled = false
 			btn_pass_phase.text = "End Turn"
 			btn_pass_phase.pressed.connect(options.turn_option.on_click)
+		elif options.turn_option.action is Action.RecoverAll:
+			btn_recover_all.disabled = false
+			btn_recover_all.pressed.connect(options.turn_option.on_click)
 
 
 #{ Start, Recovery, Draw1, Main1, Battle, Draw2, Main2, End }

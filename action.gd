@@ -99,3 +99,12 @@ class Recover extends Action:
 		self.player = player
 		self.card = card
 		events.append(Event.RecoveryEvent.new(player, card))
+
+class RecoverAll extends Action:
+	var cards_to_recover : Array[Card]
+	
+	func _init(player : Player):
+		self.player = player
+		cards_to_recover.assign(player.cards.filter(func(card : Card): return card.needs_recovery))
+		for card in cards_to_recover:
+			events.append(Event.RecoveryEvent.new(player, card))
