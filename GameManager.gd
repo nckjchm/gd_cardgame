@@ -318,9 +318,10 @@ func get_card_option_list(card : Card):
 				if "effects" in option_dict:
 					for key in option_dict.effects:
 						options.append(option_dict.effects[key])
-		if "end_move" in current_options:
-			if current_options.end_move.card == card:
-				options.append(current_options.end_move)
+		if "alternatives" in current_options:
+			if "end_move" in current_options.alternatives:
+				if current_options.alternatives.end_move.card == card:
+					options.append(current_options.alternatives.end_move)
 		if "cards" in current_options:
 			if str(card.id) in current_options.cards:
 				options.append(current_options.cards[str(card.id)])

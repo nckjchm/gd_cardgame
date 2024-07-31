@@ -15,5 +15,5 @@ class TestDeckYellow extends DeckTemplate:
 	func _init():
 		super._init("Testdeck Yellow",
 			["YlwCrtFarmer", "YlwCrtFarmer", "YlwCrtFarmer", "YlwCrtGuy", "YlwCrtGuy", "YlwCrtGuy", "YlwCrtDude", "YlwCrtDude", "YlwCrtDude", "YlwCrtAttacker"],
-			["YlwLndAcre", "YlwLndAcre", "YlwLndAcre", "YlwLndAcre", "YlwLndAcre", "YlwLndAcre", "YlwLndAcre"],
+			["YlwLndAcre", "YlwLndOrchard", "YlwLndAcre", "YlwLndAcre", "YlwLndAcre", "YlwLndAcre", "YlwLndAcre"],
 			[])

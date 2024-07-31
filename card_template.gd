@@ -21,7 +21,7 @@ class YlwCrtFarmer extends CardTemplate:
 		card_color = Card.CardColor.Yellow
 		type = Card.CardType.Creature
 		cost = ResourceList.new([
-			ResourceList.ResourceElement.new(ResourceList.ResourceKind.Mana, Card.CardColor.Yellow, 1)
+			ResourceList.ResourceElement.new(ResourceList.ResourceKind.Nutrition, Card.CardColor.Yellow, 1)
 		])
 		card_aspects = [Card.CardAspect.Humanoid]
 		health = 2
@@ -45,7 +45,25 @@ class YlwLndAcre extends CardTemplate:
 		speed = 0
 		can_coexist = true
 		effects = [
-			EffectTemplate.ETGain1YellowMana.new()
+			EffectTemplate.ETGain1YellowNutrition.new()
+		]
+		play_cell_scope = func(card : Card, gm : GameManager): return def_land_play_cell_scope(card, gm)
+		play_condition = func(card : Card, gm : GameManager): return def_play_condition(card, gm)
+
+class YlwLndOrchard extends CardTemplate:
+	func _init():
+		name = "Orchard"
+		card_color = Card.CardColor.Yellow
+		type = Card.CardType.Land
+		cost = ResourceList.new()
+		card_aspects = [Card.CardAspect.Land]
+		health = 0
+		defense = 0
+		attack = 0
+		speed = 0
+		can_coexist = true
+		effects = [
+			EffectTemplate.ETGain1YellowResourceOfChoice.new()
 		]
 		play_cell_scope = func(card : Card, gm : GameManager): return def_land_play_cell_scope(card, gm)
 		play_condition = func(card : Card, gm : GameManager): return def_play_condition(card, gm)
@@ -56,7 +74,7 @@ class YlwCrtGuy extends CardTemplate:
 		card_color = Card.CardColor.Yellow
 		type = Card.CardType.Creature
 		cost = ResourceList.new([
-			ResourceList.ResourceElement.new(ResourceList.ResourceKind.Mana, Card.CardColor.Yellow, 2)
+			ResourceList.ResourceElement.new(ResourceList.ResourceKind.Nutrition, Card.CardColor.Yellow, 2)
 		])
 		card_aspects = [Card.CardAspect.Humanoid]
 		health = 4
@@ -72,7 +90,7 @@ class YlwCrtDude extends CardTemplate:
 		card_color = Card.CardColor.Yellow
 		type = Card.CardType.Creature
 		cost = ResourceList.new([
-			ResourceList.ResourceElement.new(ResourceList.ResourceKind.Mana, Card.CardColor.Yellow, 3)
+			ResourceList.ResourceElement.new(ResourceList.ResourceKind.Nutrition, Card.CardColor.Yellow, 3)
 		])
 		card_aspects = [Card.CardAspect.Humanoid]
 		health = 5
@@ -88,7 +106,8 @@ class YlwCrtAttacker extends CardTemplate:
 		card_color = Card.CardColor.Yellow
 		type = Card.CardType.Creature
 		cost = ResourceList.new([
-			ResourceList.ResourceElement.new(ResourceList.ResourceKind.Mana, Card.CardColor.Yellow, 4)
+			ResourceList.ResourceElement.new(ResourceList.ResourceKind.Nutrition, Card.CardColor.Yellow, 3),
+			ResourceList.ResourceElement.new(ResourceList.ResourceKind.Mana, Card.CardColor.Yellow, 1)
 		])
 		card_aspects = [Card.CardAspect.Humanoid]
 		health = 7

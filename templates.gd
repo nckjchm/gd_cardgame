@@ -6,6 +6,7 @@ var templates = {
 	YlwCrtGuy = CardTemplate.YlwCrtGuy.new(),
 	YlwCrtDude = CardTemplate.YlwCrtDude.new(),
 	YlwCrtAttacker = CardTemplate.YlwCrtAttacker.new(),
+	YlwLndOrchard = CardTemplate.YlwLndOrchard.new()
 }
 var card_prefab = preload("res://card.tscn")
 

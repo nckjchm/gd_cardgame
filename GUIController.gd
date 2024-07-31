@@ -12,6 +12,9 @@ var all_choices_menu_prefab = preload("res://all_choices_menu.tscn")
 var card_list_menu_open := false
 var card_list_menu : CardListMenu = null
 var card_list_menu_prefab = preload("res://card_list_menu.tscn")
+var choice_popup_menu_open := false
+var choice_popup_menu : ChoicePopupMenu = null
+var choice_popup_menu_prefab = preload("res://choice_popup_menu.tscn")
 @onready var game_manager : GameManager = $"../GameManager"
 @onready var btn_pass_phase : Button = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/PassPhaseButton"
 @onready var btn_draw : Button = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/DrawButton"
@@ -94,6 +97,20 @@ func close_card_list_menu():
 		card_list_menu.queue_free()
 		card_list_menu_open = false
 		card_list_menu = null
+
+func close_choice_popup_menu():
+	if choice_popup_menu_open:
+		choice_popup_menu.queue_free()
+		choice_popup_menu_open = false
+		choice_popup_menu = null
+
+func open_choice_popup_menu():
+	if game_manager.current_decider == game_manager.local_player:
+		close_choice_popup_menu()
+		choice_popup_menu = choice_popup_menu_prefab.instantiate()
+		choice_popup_menu.initialize(game_manager.current_options.alternatives, self, game_manager)
+		main_control.add_child(choice_popup_menu)
+		choice_popup_menu_open = true
 
 func open_card_list_menu(cards : Array[Card], position : Vector2):
 	close_card_list_menu()

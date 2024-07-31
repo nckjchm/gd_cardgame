@@ -5,7 +5,6 @@ enum ChainTiming { Before, After, None }
 var player : Player
 var action : Action = null
 var chain_events : Array[Event] = []
-var parent_event : Event = null
 var chain_timing : ChainTiming = ChainTiming.None
 var event_stack : Array[Event] = []
 var deferred_players : Array[Player] = []
@@ -15,12 +14,16 @@ var canceled := false
 var cancelation_event : Event = null
 var handling_finished := false
 var event_type : String
+var parent_event : Event = null:
+	get: return parent_event
+	set(value):
+		parent_event = value
+		if parent_event != null:
+			self.action = self.parent_event.action
 
 func _init(player : Player, parent_event : Event = null):
 	self.player = player
 	self.parent_event = parent_event
-	if parent_event != null:
-		self.action = self.parent_event.action
 
 func get_root_event():
 	var indexed_event : Event = self
@@ -506,25 +509,30 @@ class ChoiceEvent extends PlayerEvent:
 	var choice : Dictionary = {}
 	var alternatives : Dictionary = {}
 	var on_decision : Callable
+	var create_popup := false
 	
-	func _init(player : Player, scope : Callable, parent_event : Event):
+	func _init(player : Player, parent_event : Event):
 		super._init(player, player, parent_event)
 		event_type = "Choice"
-		self.scope = scope
 	
 	func resolve(gm : GameManager):
+		if not alternatives.is_empty():
+			choice.alternatives = {}
 		for key in alternatives:
-			choice[key] = alternatives[key]
-			choice[key].on_click = func():
+			choice.alternatives[key] = alternatives[key]
+			choice.alternatives[key].on_click = func():
 				gm.register_choice(["alternatives", key])
 		gm.wait_for_choice(player, Game.GameState.Hot, choice)
+		if create_popup:
+			gm.gui.open_choice_popup_menu()
 
 class CardChoiceEvent extends ChoiceEvent:
 	var scope : Callable
 	
 	func _init(player : Player, scope : Callable, parent_event : Event = null):
-		super._init(player, scope, parent_event)
+		super._init(player, parent_event)
 		event_type = "CardChoice"
+		self.scope = scope
 		choice_type = ChoiceType.Card
 	
 	func resolve(gm : GameManager):
@@ -542,10 +550,9 @@ class CellChoiceEvent extends ChoiceEvent:
 	var scope : Callable
 	
 	func _init(player : Player, scope : Callable, parent_event : Event = null, on_decision = on_decision):
+		super._init(player, parent_event)
 		event_type="CellChoice"
-		self.player = player
 		self.scope = scope
-		self.parent_event = parent_event
 		choice_type = ChoiceType.Cell
 	
 	func resolve(gm : GameManager):
