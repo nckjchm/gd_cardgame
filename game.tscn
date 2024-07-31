@@ -93,51 +93,49 @@ bbcode_enabled = true
 text = "Resource Text"
 fit_content = true
 
-[node name="FieldVPC" type="SubViewportContainer" parent="GameViewContainer"]
+[node name="MidViewBox" type="VBoxContainer" parent="GameViewContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 2
+
+[node name="FieldVPC" type="SubViewportContainer" parent="GameViewContainer/MidViewBox"]
 custom_minimum_size = Vector2(2.08165e-12, 2.08165e-12)
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
 mouse_filter = 2
 stretch = true
 
-[node name="FieldVP" type="SubViewport" parent="GameViewContainer/FieldVPC"]
+[node name="FieldVP" type="SubViewport" parent="GameViewContainer/MidViewBox/FieldVPC"]
 disable_3d = true
 handle_input_locally = false
 msaa_2d = 1
 screen_space_aa = 1
 physics_object_picking = true
-size = Vector2i(1096, 800)
+size = Vector2i(1096, 396)
 render_target_update_mode = 4
 
-[node name="Field" type="Node2D" parent="GameViewContainer/FieldVPC/FieldVP"]
+[node name="Field" type="Node2D" parent="GameViewContainer/MidViewBox/FieldVPC/FieldVP"]
 script = ExtResource("1_evxwu")
 
-[node name="FieldCamera" type="Camera2D" parent="GameViewContainer/FieldVPC/FieldVP"]
+[node name="FieldCamera" type="Camera2D" parent="GameViewContainer/MidViewBox/FieldVPC/FieldVP"]
 ignore_rotation = false
 script = ExtResource("2_7kr53")
 
-[node name="HandCanvas" type="CanvasLayer" parent="GameViewContainer/FieldVPC/FieldVP"]
-follow_viewport_scale = 2.0
-
-[node name="HandPanel" type="PanelContainer" parent="GameViewContainer/FieldVPC/FieldVP/HandCanvas"]
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 288.0
-offset_top = -400.0
-offset_right = -288.0
-offset_bottom = 0.000854492
-grow_horizontal = 2
-grow_vertical = 0
-mouse_filter = 2
+[node name="HandPanel" type="PanelContainer" parent="GameViewContainer/MidViewBox"]
+custom_minimum_size = Vector2(2.08165e-12, 400)
+layout_mode = 2
 script = ExtResource("3_1f808")
 
-[node name="HandHBox" type="HBoxContainer" parent="GameViewContainer/FieldVPC/FieldVP/HandCanvas/HandPanel"]
+[node name="ScrollContainer" type="ScrollContainer" parent="GameViewContainer/MidViewBox/HandPanel"]
 layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
+vertical_scroll_mode = 0
+
+[node name="HandHBox" type="HBoxContainer" parent="GameViewContainer/MidViewBox/HandPanel/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
 mouse_filter = 2
+alignment = 1
 
 [node name="InputController" type="Node" parent="."]
 script = ExtResource("3_3l6ug")

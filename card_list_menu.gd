@@ -11,7 +11,6 @@ var h_scrollbar : HScrollBar
 func initialize(cards : Array[Card], gui : GUIController):
 	self.cards = cards
 	self.gui = gui
-	print("opening card list menu")
 
 func _ready():
 	btn_exit.pressed.connect(func():
@@ -19,6 +18,7 @@ func _ready():
 	)
 	h_scrollbar = scroll_container.get_h_scroll_bar()
 	h_scrollbar.gui_input.connect(_gui_input)
+	h_scrollbar
 	redraw_cards()
 
 func redraw_cards():
@@ -28,16 +28,16 @@ func redraw_cards():
 		var standin = Label.new()
 		standin.text = "No Cards in this List"
 		var frame := Container.new()
-		frame.custom_minimum_size = Vector2(300, 420)
+		frame.custom_minimum_size = Vector2(300, 400)
 		frame.add_child(standin)
 		content.add_child(frame)
 	for card in cards:
-		var card_display : CardDisplay = card.create_card_display()
+		var card_gui_display : CardGUIDisplay = Templates.card_gui_diplay_prefab.instantiate()
+		card_gui_display.initialize(card, gui)
 		var frame := Container.new()
 		frame.custom_minimum_size = Vector2(300, 400)
-		frame.add_child(card_display)
 		content.add_child(frame)
-		card_display.position = Vector2(150, 200)
+		frame.add_child(card_gui_display)
 
 func _gui_input(event):
 	input_controller.menu_input_event(self, event, {})

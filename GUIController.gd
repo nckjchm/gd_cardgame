@@ -17,7 +17,7 @@ var choice_popup_menu : ChoicePopupMenu = null
 var choice_popup_menu_prefab = preload("res://choice_popup_menu.tscn")
 @onready var main_control : Control = $".."
 @onready var game_manager : GameManager = $"../GameManager"
-@onready var hand : HandDisplay = $"../GameViewContainer/FieldVPC/FieldVP/HandCanvas/HandPanel"
+@onready var hand : HandDisplay = $"../GameViewContainer/MidViewBox/HandPanel"
 @onready var btn_pass_phase : Button = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/PassPhaseButton"
 @onready var btn_draw : Button = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/DrawButton"
 @onready var btn_decline : Button = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/DeclineButton"
@@ -27,9 +27,13 @@ var choice_popup_menu_prefab = preload("res://choice_popup_menu.tscn")
 @onready var lbl_resource_text = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/ResourceText"
 
 func click_to_close():
-	if card_menu_open or cell_menu_open or card_list_menu_open:
-		close_cell_menu()
+	if card_menu_open:
 		close_card_menu()
+		return true
+	elif cell_menu_open:
+		close_cell_menu()
+		return true
+	elif card_list_menu_open:
 		close_card_list_menu()
 		return true
 	return false
@@ -131,9 +135,11 @@ func open_all_choices_menu(options : Dictionary):
 	main_control.add_child(all_choices_menu)
 
 func open_card_menu(card : Card, position : Vector2):
+	close_card_menu()
 	card_menu = card_menu_prefab.instantiate()
 	card_menu.choices = game_manager.get_card_option_list(card)
 	card_menu.card = card
+	card_menu.gui = self
 	card_menu_open = true
 	main_control.add_child(card_menu)
 	card_menu.position = position
@@ -150,6 +156,9 @@ func open_cell_menu(cell : Cell, position : Vector2):
 func player_card_click(card_display : CardDisplay, _player : Player, click_event : InputEventMouseButton):
 	if not click_to_close():
 		open_card_menu(card_display.card, click_event.global_position)
+
+func player_gui_card_click(card_gui_display : CardGUIDisplay, click_event : InputEventMouseButton):
+	open_card_menu(card_gui_display.card_display.card, click_event.global_position)
 
 func player_cell_click(cell : Cell, _player : Player, click_event : InputEventMouseButton):
 	if not click_to_close():

@@ -1,27 +1,29 @@
 class_name HandDisplay extends PanelContainer
 
-@onready var hand_hbox = $HandHBox
+@onready var hand_hbox = $ScrollContainer/HandHBox
+@onready var gui : GUIController = $"../../../GUIController"
+@onready var input_controller : InputController = $"../../../InputController"
+@onready var scroll_container : ScrollContainer = $ScrollContainer
+var h_scrollbar : HScrollBar
+
+func _ready():
+	h_scrollbar = scroll_container.get_h_scroll_bar()
+	h_scrollbar.gui_input.connect(_gui_input)
+	h_scrollbar.custom_minimum_size = Vector2(0,20)
 
 func empty():
 	for child in hand_hbox.get_children():
-		for grandchild in child.get_children():
-			child.remove_child(grandchild)
-		hand_hbox.remove_child(child)
+		child.queue_free()
 
 func refresh_cards(cards : Array[Card]):
 	empty()
-	var cardwidth := 300
 	for card in cards:
-		var card_display = card.create_card_display()
-		var card_container := MarginContainer.new()
-		card_container.custom_minimum_size = Vector2(cardwidth, 0)
-		card_container.add_child(card_display)
-		hand_hbox.add_child(card_container)
+		var card_gui_display = Templates.card_gui_diplay_prefab.instantiate()
+		card_gui_display.initialize(card, gui)
+		var frame := Container.new()
+		frame.custom_minimum_size = Vector2(300, 400)
+		hand_hbox.add_child(frame)
+		frame.add_child(card_gui_display)
 
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	pass # Replace with function body.
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass
+func _gui_input(event):
+	input_controller.menu_input_event(self, event, {})

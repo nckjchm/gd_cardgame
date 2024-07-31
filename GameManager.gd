@@ -1,6 +1,6 @@
 class_name GameManager extends Node
 
-@onready var field : Field = $"../GameViewContainer/FieldVPC/FieldVP/Field"
+@onready var field : Field = $"../GameViewContainer/MidViewBox/FieldVPC/FieldVP/Field"
 @onready var input_controller : InputController = $"../InputController"
 var game : Game
 var current_decider : Player

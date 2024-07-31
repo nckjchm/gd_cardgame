@@ -10,6 +10,7 @@ var templates = {
 	YlwStrSchool = CardTemplate.YlwStrSchool.new()
 }
 var card_prefab = preload("res://card.tscn")
+var card_gui_diplay_prefab = preload("res://card_gui_display.tscn")
 
 var deck_templates = { 
 	TestDeckYellow = DeckTemplate.TestDeckYellow.new()
@@ -23,7 +24,6 @@ const fieldcell = [Cell.CellType.Field, Cell.StackType.None, -1]
 const player1_home = [Cell.CellType.Field, Cell.StackType.None, 0]
 const player2_home = [Cell.CellType.Field, Cell.StackType.None, 1]
 const emptycell = [Cell.CellType.Inactive, Cell.StackType.None, -1]
-
 
 const small_two_player_field1_template := {
 	"dimensions" : [9, 9],

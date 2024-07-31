@@ -15,7 +15,7 @@ var focus_type : FocusType = FocusType.None
 var mouse_relative_motion := Vector2(0,0)
 var mouse1_down := false
 var mouse1_released := false
-@onready var camera : FieldCamera = $"../GameViewContainer/FieldVPC/FieldVP/FieldCamera"
+@onready var camera : FieldCamera = $"../GameViewContainer/MidViewBox/FieldVPC/FieldVP/FieldCamera"
 @onready var game_manager : GameManager = $"../GameManager"
 var gui : GUIController
 var distance_from_mouse_down : Vector2 = Vector2(0,0)
@@ -30,6 +30,10 @@ func cell_input_event(cell, viewport, event, shape_idx):
 func card_input_event(card, viewport, event, shape_idx):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		cardclicks.append({card = card, viewport = viewport, event = event, shape_idx = shape_idx})
+
+func card_gui_input_event(card_gui: CardGUIDisplay, event : InputEvent):
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		gui.player_gui_card_click(card_gui, event)
 
 func player_click_release():
 	var player : Player = game_manager.current_decider
