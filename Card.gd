@@ -5,7 +5,7 @@ enum CardPosition { Deck, Hand, Field, Graveyard, Limbo, Banishment, Unknown}
 enum CardColor { Red, Blue, Green, Yellow, Black, White }
 enum CardType { Creature, Structure, Spell, Land }
 enum CardOrigin { MainDeck, ResourceDeck, SpecialDeck, Token }
-enum CardAspect { Humanoid, Animalia, Necro, Pyro, Aquatic, Liquid, Aerial, Astral, Sinister, Herbal, Magicae }
+enum CardAspect { Land, Humanoid, Animalia, Necro, Pyro, Aquatic, Liquid, Aerial, Astral, Sinister, Herbal, Magicae }
 
 signal card_died(card : Card)
 signal health_updated(card : Card)
@@ -129,6 +129,7 @@ func _init(template : CardTemplate, id : int, card_owner : Player, card_origin :
 			cell = card_owner.specialdeck_cell
 	card_name = template.name
 	card_type = template.type
+	card_aspects = template.card_aspects
 	play_condition = template.play_condition
 	play_cell_scope = func(gm : GameManager): return template.play_cell_scope.call(self, gm)
 	cost = template.cost
@@ -180,3 +181,5 @@ func die():
 	print("Card with id %d died" % id)
 	card_status = CardStatus.Dead
 
+static func get_aspect_name(aspect : CardAspect):
+	return CardAspect.keys()[aspect]

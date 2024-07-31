@@ -87,7 +87,7 @@ func digest_clicked_cells():
 func _process(delta):
 	digest_clicked_cards()
 	digest_clicked_cells()
-	if mouse1_down:
+	if mouse1_down and focused_menu.is_empty():
 		screen_dragged.emit(mouse_relative_motion)
 	if mouse1_released:
 		player_click_release()

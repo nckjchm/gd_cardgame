@@ -16,10 +16,11 @@ width = 620.0
 [sub_resource type="TextMesh" id="TextMesh_ovc5x"]
 text = "Cost"
 font_size = 60
-horizontal_alignment = 0
+horizontal_alignment = 2
 vertical_alignment = 0
 autowrap_mode = 2
 width = 160.0
+text_direction = 1
 
 [sub_resource type="TextMesh" id="TextMesh_u3pra"]
 custom_aabb = AABB(2.08165e-12, 2.08165e-12, 2.08165e-12, 2.08165e-12, 2.08165e-12, 2.08165e-12)
@@ -84,7 +85,7 @@ scale = Vector2(2, -2)
 mesh = SubResource("TextMesh_2ifs4")
 
 [node name="CostTextMesh" type="MeshInstance2D" parent="."]
-position = Vector2(4.876, -9.901)
+position = Vector2(7.2, -9.901)
 scale = Vector2(2, -2)
 mesh = SubResource("TextMesh_ovc5x")
 

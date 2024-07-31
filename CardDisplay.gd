@@ -33,14 +33,6 @@ func _ready():
 	card.color_updated.connect(_on_color_updated)
 	card.card_status_updated.connect(_on_card_status_updated)
 	card_input_event.connect(input_controller.card_input_event)
-	meshes = [name_text_mesh, cost_text_mesh, attribute_text_mesh, card_text_mesh, attack_text_mesh, speed_text_mesh, health_text_mesh, defense_text_mesh]
-	for mesh_obj in meshes:
-		var mesh := TextMesh.new()
-		mesh_obj.mesh = mesh
-		mesh.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-		mesh.vertical_alignment = VERTICAL_ALIGNMENT_TOP
-		mesh.font_size = 50
-		mesh.autowrap_mode = TextServer.AUTOWRAP_WORD
 	init_meshes()
 	adjust_presentation()
 
@@ -67,6 +59,14 @@ func set_content_visibility(front_visible := true):
 		mesh.visible = front_visible
 
 func init_meshes():
+	meshes = [name_text_mesh, cost_text_mesh, attribute_text_mesh, card_text_mesh, attack_text_mesh, speed_text_mesh, health_text_mesh, defense_text_mesh]
+	for mesh_obj in meshes:
+		var mesh := TextMesh.new()
+		mesh_obj.mesh = mesh
+		mesh.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		mesh.vertical_alignment = VERTICAL_ALIGNMENT_TOP
+		mesh.font_size = 50
+		mesh.autowrap_mode = TextServer.AUTOWRAP_WORD
 	name_text_mesh.mesh.text = card.card_name
 	name_text_mesh.mesh.font_size = 76
 	name_text_mesh.mesh.width = 620
@@ -74,8 +74,16 @@ func init_meshes():
 	speed_text_mesh.mesh.text = str(card.speed)
 	health_text_mesh.mesh.text = str(card.health)
 	defense_text_mesh.mesh.text = str(card.defense)
-	cost_text_mesh.mesh.text = "Cost"
-	attribute_text_mesh.mesh.text = "[Attribute]"
+	var cost_text := ""
+	for element in card.cost.elements:
+		cost_text += element.get_text()
+	cost_text_mesh.mesh.text = cost_text
+	cost_text_mesh.mesh.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	cost_text_mesh.mesh.text_direction = TextServer.Direction.DIRECTION_LTR
+	var aspects_text = ""
+	for aspect in card.card_aspects:
+		aspects_text = ", ".join([aspects_text, Card.get_aspect_name(aspect)])
+	attribute_text_mesh.mesh.text = "[%s]" % aspects_text.substr(2)
 	card_text_mesh.mesh.text = "Card Text"
 
 func _on_health_updated(_card):

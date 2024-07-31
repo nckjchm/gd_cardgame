@@ -61,3 +61,26 @@ class ResourceElement:
 		self.kind = kind
 		self.color = color
 		self.amount = amount
+	
+	func get_text():
+		var resource_kind = "M"
+		if kind == ResourceKind.Nutrition:
+			resource_kind = "N"
+		return "%d%s" % [amount, resource_kind]
+	
+	func get_rich_text():
+		var element_text = get_text()
+		match color:
+			Card.CardColor.Yellow:
+				element_text = "[color=yellow]%s[/color]" % element_text
+			Card.CardColor.Blue:
+				element_text = "[color=blue]%s[/color]" % element_text
+			Card.CardColor.Green:
+				element_text = "[color=green]%s[/color]" % element_text
+			Card.CardColor.Red:
+				element_text = "[color=red]%s[/color]" % element_text
+			Card.CardColor.Black:
+				element_text = "[color=black]%s[/color]" % element_text
+			Card.CardColor.White:
+				element_text = "[color=white]%s[/color]" % element_text
+		return element_text

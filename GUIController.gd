@@ -55,7 +55,7 @@ func update_buttons():
 			btn_pass_phase.disabled = false
 			btn_pass_phase.text = "End Turn"
 			btn_pass_phase.pressed.connect(options.turn_option.on_click)
-	
+
 
 #{ Start, Recovery, Draw1, Main1, Battle, Draw2, Main2, End }
 func update():
@@ -152,23 +152,7 @@ func update_resourcedisplay():
 		if not resources.elements.is_empty():
 			resource_text = ""
 			for resource_element in resources.elements:
-				var resource_kind = "M"
-				if resource_element.kind == ResourceList.ResourceKind.Nutrition:
-					resource_kind = "N"
-				var element_text = "%d%s" % [resource_element.amount, resource_kind]
-				match resource_element.color:
-					Card.CardColor.Yellow:
-						element_text = "[color=yellow]%s[/color]" % element_text
-					Card.CardColor.Blue:
-						element_text = "[color=blue]%s[/color]" % element_text
-					Card.CardColor.Green:
-						element_text = "[color=green]%s[/color]" % element_text
-					Card.CardColor.Red:
-						element_text = "[color=red]%s[/color]" % element_text
-					Card.CardColor.Black:
-						element_text = "[color=black]%s[/color]" % element_text
-					Card.CardColor.White:
-						element_text = "[color=white]%s[/color]" % element_text
+				var element_text = resource_element.get_rich_text()
 				resource_text = ", ".join([resource_text, element_text])
 			resource_text = resource_text.substr(2)
 		lbl_resource_text.text = resource_text

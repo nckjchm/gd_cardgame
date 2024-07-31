@@ -4,6 +4,7 @@ var name : String
 var type : Card.CardType
 var cost : ResourceList
 var card_color : Card.CardColor
+var card_aspects : Array[Card.CardAspect]
 var health : int
 var defense : int
 var attack : int
@@ -21,6 +22,7 @@ class YlwCrtFarmer extends CardTemplate:
 		cost = ResourceList.new([
 			ResourceList.ResourceElement.new(ResourceList.ResourceKind.Mana, Card.CardColor.Yellow, 1)
 		])
+		card_aspects = [Card.CardAspect.Humanoid]
 		health = 2
 		defense = 0
 		attack = 3
@@ -34,6 +36,7 @@ class YlwLndAcre extends CardTemplate:
 		card_color = Card.CardColor.Yellow
 		type = Card.CardType.Land
 		cost = ResourceList.new()
+		card_aspects = [Card.CardAspect.Land]
 		health = 0
 		defense = 0
 		attack = 0
@@ -53,6 +56,7 @@ class YlwCrtGuy extends CardTemplate:
 		cost = ResourceList.new([
 			ResourceList.ResourceElement.new(ResourceList.ResourceKind.Mana, Card.CardColor.Yellow, 2)
 		])
+		card_aspects = [Card.CardAspect.Humanoid]
 		health = 4
 		defense = 1
 		attack = 3
@@ -68,6 +72,7 @@ class YlwCrtDude extends CardTemplate:
 		cost = ResourceList.new([
 			ResourceList.ResourceElement.new(ResourceList.ResourceKind.Mana, Card.CardColor.Yellow, 3)
 		])
+		card_aspects = [Card.CardAspect.Humanoid]
 		health = 5
 		defense = 1
 		attack = 4
@@ -83,6 +88,7 @@ class YlwCrtAttacker extends CardTemplate:
 		cost = ResourceList.new([
 			ResourceList.ResourceElement.new(ResourceList.ResourceKind.Mana, Card.CardColor.Yellow, 4)
 		])
+		card_aspects = [Card.CardAspect.Humanoid]
 		health = 7
 		defense = 0
 		attack = 5

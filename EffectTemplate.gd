@@ -12,7 +12,8 @@ class ETGain1YellowMana extends EffectTemplate:
 		condition = func(gm : GameManager, effect : CardEffect):
 			if effect.card.card_position == Card.CardPosition.Field and effect.card.tap_status == 0:
 				if gm.game.game_state == Game.GameState.Cold:
-					return true
+					if gm.game.current_turn.current_phase in [Turn.TurnPhase.Main1, Turn.TurnPhase.Main1]:
+						return true
 			return false
 		activate = func(gm : GameManager, effect : CardEffect):
 			var tapEvent = Event.TapStateChangeEvent.new(effect.card.controller, effect.card, 1)
