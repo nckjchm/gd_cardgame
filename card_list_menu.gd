@@ -1,5 +1,7 @@
 class_name CardListMenu extends PanelContainer
 
+signal card_list_menu_input_event(card_menu : Control, event : InputEvent, context : Dictionary)
+
 var cards : Array[Card]
 var gui : GUIController
 @onready var btn_exit : Button = $Body/Footer/Exit
@@ -13,6 +15,7 @@ func initialize(cards : Array[Card], gui : GUIController):
 	self.gui = gui
 
 func _ready():
+	card_list_menu_input_event.connect(input_controller.menu_input_event)
 	btn_exit.pressed.connect(func():
 		gui.close_card_list_menu()
 	)
@@ -32,7 +35,7 @@ func redraw_cards():
 		frame.add_child(standin)
 		content.add_child(frame)
 	for card in cards:
-		var card_gui_display : CardGUIDisplay = Templates.card_gui_diplay_prefab.instantiate()
+		var card_gui_display : CardGUIDisplay = Templates.card_gui_display_prefab.instantiate()
 		card_gui_display.initialize(card, gui)
 		var frame := Container.new()
 		frame.custom_minimum_size = Vector2(300, 400)
@@ -40,4 +43,4 @@ func redraw_cards():
 		frame.add_child(card_gui_display)
 
 func _gui_input(event):
-	input_controller.menu_input_event(self, event, {})
+	card_list_menu_input_event.emit(self, event, {})

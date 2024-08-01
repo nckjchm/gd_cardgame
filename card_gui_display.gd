@@ -19,6 +19,8 @@ func _ready():
 
 func update():
 	gui_card_input_event.connect(gui.game_manager.input_controller.card_gui_input_event)
+	for connected in card_display.card_input_event.get_connections():
+		card_display.card_input_event.disconnect(connected)
 	if not is_ready or not is_initialized:
 		return
 	add_child(card_display)

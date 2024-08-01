@@ -10,7 +10,7 @@ var templates = {
 	YlwStrSchool = CardTemplate.YlwStrSchool.new()
 }
 var card_prefab = preload("res://card.tscn")
-var card_gui_diplay_prefab = preload("res://card_gui_display.tscn")
+var card_gui_display_prefab = preload("res://card_gui_display.tscn")
 
 var deck_templates = { 
 	TestDeckYellow = DeckTemplate.TestDeckYellow.new()
