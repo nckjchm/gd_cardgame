@@ -106,7 +106,7 @@ class ETTapOneNeighborGainTwoNutrition extends EffectTemplate:
 			var neighbor_cells : Array[Cell] = gm.field.get_cells_in_distance([effect.card.cell], 1)
 			for neighbor_cell in neighbor_cells:
 				for neighbor_card in neighbor_cell.cards:
-					if neighbor_card.controller == effect.card.controller and neighbor_card.card_color == Card.CardColor.Yellow and neighbor_card.card_type == Card.CardType.Creature and Card.CardAspect.Humanoid in neighbor_card.card_aspects:
+					if neighbor_card.controller == effect.card.controller and neighbor_card.card_color == Card.CardColor.Yellow and neighbor_card.card_type == Card.CardType.Creature and neighbor_card.tap_status == 0 and Card.CardAspect.Humanoid in neighbor_card.card_aspects:
 						cards_in_scope.append(neighbor_card)
 			return cards_in_scope
 		condition = func(gm : GameManager, effect : CardEffect):
