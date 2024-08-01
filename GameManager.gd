@@ -32,6 +32,7 @@ func _ready():
 		players.append(player)
 		if int(session_id) == multiplayer.get_unique_id():
 			local_player = player
+	players.sort_custom(func(player1 : Player, player2 : Player): return player1.seat < player2.seat)
 	lobby_manager.choice_broadcast.connect(handle_choice)
 	lobby_manager.game_command.connect(handle_game_command)
 	await initialize_game(players, lobby_manager.game_info.field_template)

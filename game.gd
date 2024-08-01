@@ -4,7 +4,7 @@ enum GameState { Preparation, Hot, Cold, Paused, Finished }
 
 var turns := []
 var players : Array[Player]
-var turnplayer_seat = 0
+var turnplayer_seat = -1
 var game_state = GameState.Preparation
 var current_turn : Turn = null
 var hot_action : Action = null
