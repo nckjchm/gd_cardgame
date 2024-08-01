@@ -19,8 +19,8 @@ var card : Card = null
 var meshes : Array[MeshInstance2D]
 var gui_embedded := false
 
-func initialize(card : Card):
-	self.card = card
+func initialize(_card : Card):
+	card = _card
 
 func _ready():
 	card.health_updated.connect(_on_health_updated)

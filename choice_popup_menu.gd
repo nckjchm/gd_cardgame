@@ -5,10 +5,10 @@ var gui : GUIController
 var game_manager : GameManager
 @onready var menu_container : VBoxContainer = $MenuContainer
 
-func initialize(choices : Dictionary, gui : GUIController, gm : GameManager):
-	self.choices = choices
-	self.gui = gui
-	self.game_manager = gm
+func initialize(_choices : Dictionary, _gui : GUIController, _game_manager : GameManager):
+	choices = _choices
+	gui = _gui
+	game_manager = _game_manager
 
 func _ready():
 	for choice_key in choices:

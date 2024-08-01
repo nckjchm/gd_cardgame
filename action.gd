@@ -18,34 +18,34 @@ func get_active_event():
 class Draw extends Action:
 	var card
 	var stack : Card.CardOrigin
-	func _init(player : Player, stack : Card.CardOrigin):
-		self.player = player
-		self.stack = stack
+	func _init(_player : Player, _stack : Card.CardOrigin):
+		player = _player
+		stack = _stack
 		events.append(Event.TurnDrawEvent.new(player, stack))
 	
 class Move extends Action:
 	var card
 	
-	func _init(player : Player, card : Card):
-		self.player = player
-		self.card = card
+	func _init(_player : Player, _card : Card):
+		player = _player
+		card = _card
 		events.append(Event.StartMoveEvent.new(player, card))
 	
 class Attack extends Action:
 	var attacking
 	var attacked
 	
-	func _init(player : Player, card : Card):
-		self.player = player
-		attacking = card
-		events.append(Event.StartAttackEvent.new(player, card))
+	func _init(_player : Player, _card : Card):
+		player = _player
+		attacking = _card
+		events.append(Event.StartAttackEvent.new(player, attacking))
 
 class PlayCardFromHand extends Action:
 	var card : Card
 	var cell : Cell
-	func _init(player : Player, card : Card):
-		self.player = player
-		self.card = card
+	func _init(_player : Player, _card : Card):
+		player = _player
+		card = _card
 		var resource_payment := Event.PayResourceEvent.new(player, player, card.cost)
 		var play_event : Event.PlayCardEvent
 		var cell_choice := Event.CellChoiceEvent.new(player, card.play_cell_scope)
@@ -54,7 +54,7 @@ class PlayCardFromHand extends Action:
 			play_event = Event.CallCreatureEvent.new(card, null)
 		else:
 			play_event = Event.PlayCardEvent.new(card, null)
-		cell_choice.on_decision = (func(choice : Dictionary, gm : GameManager):
+		cell_choice.on_decision = (func(choice : Dictionary, _gm : GameManager):
 			var choice_cell = choice.cell 
 			play_event.destination_cell = choice_cell
 		)
@@ -66,9 +66,9 @@ class AdvancePhase extends Action:
 	var entering_phase : Turn.TurnPhase
 	var advancement_event : Event.AdvancePhaseEvent
 	
-	func _init(player : Player, exiting_phase : Turn.TurnPhase):
-		self.player = player
-		self.exiting_phase = exiting_phase
+	func _init(_player : Player, _exiting_phase : Turn.TurnPhase):
+		player = _player
+		exiting_phase = _exiting_phase
 		advancement_event = Event.AdvancePhaseEvent.new(player, exiting_phase)
 		events.append(advancement_event)
 		entering_phase = advancement_event.entering_phase
@@ -76,9 +76,9 @@ class AdvancePhase extends Action:
 class EndTurn extends AdvancePhase:
 	var ending_turn : Turn
 	
-	func _init(player : Player, ending_turn : Turn):
-		self.player = player
-		self.ending_turn = ending_turn
+	func _init(_player : Player, _ending_turn : Turn):
+		player = _player
+		ending_turn = _ending_turn
 		exiting_phase = Turn.TurnPhase.End
 		events.append(Event.EndTurnEvent.new(player, ending_turn))
 
@@ -86,25 +86,25 @@ class EffectActivation extends Action:
 	var card : Card
 	var effect : CardEffect
 	
-	func _init(player : Player, effect : CardEffect):
-		self.player = player
-		self.effect = effect
-		self.card = effect.card
+	func _init(_player : Player, _effect : CardEffect):
+		player = _player
+		effect = _effect
+		card = effect.card
 		events.append(Event.EffectActivationEvent.new(player, effect))
 
 class Recover extends Action:
 	var card : Card
 	
-	func _init(player : Player, card : Card):
-		self.player = player
-		self.card = card
+	func _init(_player : Player, _card : Card):
+		player = _player
+		card = _card
 		events.append(Event.RecoveryEvent.new(player, card))
 
 class RecoverAll extends Action:
 	var cards_to_recover : Array[Card]
 	
-	func _init(player : Player):
-		self.player = player
+	func _init(_player : Player):
+		player = _player
 		cards_to_recover.assign(player.cards.filter(func(card : Card): return card.needs_recovery))
 		for card in cards_to_recover:
 			events.append(Event.RecoveryEvent.new(player, card))

@@ -97,13 +97,13 @@ func request_random_seed(seed_index):
 		return_random_seed.rpc_id(multiplayer.get_remote_sender_id(), seeds[seed_index])
 	
 @rpc("authority", "call_local", "reliable")
-func return_random_seed(seed : int):
-	game_manager.random_seeds.append(seed)
+func return_random_seed(random_seed : int):
+	game_manager.random_seeds.append(random_seed)
 	game_manager.waiting_for_transmission = false
 
 @rpc("authority", "call_remote", "reliable")
-func broadcast_seat_assignment(seats):
-	self.seats = seats
+func broadcast_seat_assignment(_seats):
+	seats = _seats
 	player_info_updated.emit()
 
 @rpc("any_peer", "call_local", "reliable")
@@ -170,14 +170,14 @@ func transmit_player_choice(choice):
 	if multiplayer.is_server():
 		if game_manager.is_current_decider_id(multiplayer.get_remote_sender_id()):
 			broadcast_player_choice.rpc(choice)
-			choice_broadcast.emit(parse_string_array(choice))
+			choice_broadcast.emit(LobbyManager.parse_string_array(choice))
 
 @rpc("authority", "call_remote", "reliable")
 func broadcast_player_choice(choice):
-	choice_broadcast.emit(parse_string_array(choice))
+	choice_broadcast.emit(LobbyManager.parse_string_array(choice))
 
 static func parse_string_array(in_array : Array) -> Array[String]:
-	var string_array : Array[String]
+	var string_array : Array[String] = []
 	string_array.assign(in_array)
 	return string_array
 

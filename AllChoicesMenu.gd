@@ -10,9 +10,9 @@ var gui : GUIController
 @onready var exit_button : Button = $MenuVBC/Button
 
 
-func initialize(controller : GUIController, current_choices : Dictionary, exit : Callable):
-	self.exit = exit
-	gui = controller
+func initialize(_gui : GUIController, current_choices : Dictionary, _exit : Callable):
+	exit = _exit
+	gui = _gui
 	choices_dict = current_choices
 	parse_choices()
 	initialized = true
@@ -76,8 +76,8 @@ func new_row(choice : Dictionary):
 		gui.close_all_choices_menu()
 	)
 	row_choose_button.text = "X"
-	var new_row : Array[Control] = [row_type, row_text, row_player, row_card, row_cell, row_effect, row_choose_button]
-	for element in new_row:
+	var row : Array[Control] = [row_type, row_text, row_player, row_card, row_cell, row_effect, row_choose_button]
+	for element in row:
 		option_grid.add_child(element)
 	
 func finish():
@@ -90,6 +90,3 @@ func finish():
 func _ready():
 	readied = true
 	finish()
-
-func _process(delta):
-	pass

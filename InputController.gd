@@ -88,7 +88,7 @@ func digest_clicked_cells():
 				focused_cell = entry
 	cellclicks = []
 
-func _process(delta):
+func _process(_delta):
 	digest_clicked_cards()
 	digest_clicked_cells()
 	if mouse1_down and focused_menu.is_empty():

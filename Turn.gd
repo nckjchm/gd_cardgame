@@ -11,6 +11,6 @@ var recovery_done := false
 var current_phase := TurnPhase.Start
 var creature_called := false
 
-func _init(turn_number, turn_player):
-	self.turn_number = turn_number
-	self.turn_player = turn_player
+func _init(_turn_number, _turn_player):
+	turn_number = _turn_number
+	turn_player = _turn_player

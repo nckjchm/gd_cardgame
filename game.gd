@@ -34,7 +34,6 @@ func init_cards():
 					card_origin = Card.CardOrigin.ResourceDeck
 				player.deck.deck_template.special_deck_keys:
 					card_origin = Card.CardOrigin.SpecialDeck
-			var card_list : Array[Card] = []
 			for template_key in deck_template:
 				var card : Card = init_card(template_key, card_index, player, card_origin, effect_index)
 				card_index += 1
@@ -87,7 +86,7 @@ func mark_recovery_targets():
 			targets_available = true
 	current_turn.recovery_done = not targets_available
 
-func draw(player : Player, stack : Cell):
+func draw(_player : Player, stack : Cell):
 	var card : Card = stack.cards[-1]
 	stack.remove_card(card)
 	card.card_owner.hand.add_card(card)

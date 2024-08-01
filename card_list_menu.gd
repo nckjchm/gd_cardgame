@@ -10,9 +10,9 @@ var gui : GUIController
 @onready var scroll_container : ScrollContainer = $Body/ScrollContainer
 var h_scrollbar : HScrollBar
 
-func initialize(cards : Array[Card], gui : GUIController):
-	self.cards = cards
-	self.gui = gui
+func initialize(_cards : Array[Card], _gui : GUIController):
+	cards = _cards
+	gui = _gui
 
 func _ready():
 	card_list_menu_input_event.connect(input_controller.menu_input_event)
@@ -21,7 +21,6 @@ func _ready():
 	)
 	h_scrollbar = scroll_container.get_h_scroll_bar()
 	h_scrollbar.gui_input.connect(_gui_input)
-	h_scrollbar
 	redraw_cards()
 
 func redraw_cards():

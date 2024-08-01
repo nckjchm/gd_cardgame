@@ -15,7 +15,7 @@ class ETGain1YellowMana extends EffectTemplate:
 					if gm.game.current_turn.current_phase in [Turn.TurnPhase.Main1, Turn.TurnPhase.Main2]:
 						return true
 			return false
-		activate = func(gm : GameManager, effect : CardEffect):
+		activate = func(_gm : GameManager, effect : CardEffect):
 			var tapEvent = Event.TapStateChangeEvent.new(effect.card.controller, effect.card, 1)
 			var resourceEvent = Event.GainResourceEvent.new(effect.card.controller, effect.card.controller, ResourceList.new([ResourceList.ResourceElement.new(ResourceList.ResourceKind.Mana, Card.CardColor.Yellow, 1)]))
 			return [tapEvent, resourceEvent]
@@ -31,7 +31,7 @@ class ETGain1YellowNutrition extends EffectTemplate:
 					if gm.game.current_turn.current_phase in [Turn.TurnPhase.Main1, Turn.TurnPhase.Main2]:
 						return true
 			return false
-		activate = func(gm : GameManager, effect : CardEffect):
+		activate = func(_gm : GameManager, effect : CardEffect):
 			var tapEvent = Event.TapStateChangeEvent.new(effect.card.controller, effect.card, 1)
 			var resourceEvent = Event.GainResourceEvent.new(effect.card.controller, effect.card.controller, ResourceList.new([ResourceList.ResourceElement.new(ResourceList.ResourceKind.Nutrition, Card.CardColor.Yellow, 1)]))
 			return [tapEvent, resourceEvent]
@@ -87,10 +87,10 @@ class ETCreate1YellowCreatureAtCost extends EffectTemplate:
 			var cell_choice = Event.CellChoiceEvent.new(effect.card.controller, func(gm : GameManager): return cell_scope.call(gm, effect))
 			var pay_resources = Event.PayResourceEvent.new(effect.card.controller, effect.card.controller, null)
 			var creation_event = Event.CreateCreatureEvent.new(effect.card.controller, null, null)
-			card_choice.on_decision = func(decision : Dictionary, gm : GameManager):
+			card_choice.on_decision = func(decision : Dictionary, _gm : GameManager):
 				pay_resources.resources = decision.card.cost
 				creation_event.card = decision.card
-			cell_choice.on_decision = func(decision : Dictionary, gm : GameManager):
+			cell_choice.on_decision = func(decision : Dictionary, _gm : GameManager):
 				creation_event.destination_cell = decision.cell
 			return [tap_event, card_choice, cell_choice, pay_resources, creation_event]
 		short_text = "Create from Hand"

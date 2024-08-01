@@ -25,7 +25,3 @@ func _ready():
 		gui.close_cell_menu()
 		input_controller.menu_clicked(self)
 	)
-	
-
-func _process(delta):
-	pass

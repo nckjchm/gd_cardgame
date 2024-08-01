@@ -127,7 +127,7 @@ func open_card_list_menu(cards : Array[Card], position : Vector2):
 	card_list_menu.position = position
 	card_list_menu_open = true
 
-func open_all_choices_menu(options : Dictionary):
+func open_all_choices_menu(_options : Dictionary):
 	close_all_choices_menu()
 	all_choices_menu = all_choices_menu_prefab.instantiate()
 	all_choices_menu.initialize(self, game_manager.current_options, func(): close_all_choices_menu())
@@ -164,10 +164,10 @@ func player_cell_click(cell : Cell, _player : Player, click_event : InputEventMo
 	if not click_to_close():
 		open_cell_menu(cell, click_event.global_position)
 
-func player_menu_click(clicked_menu : Dictionary, _player : Player):
+func player_menu_click(_clicked_menu : Dictionary, _player : Player):
 	pass
 
-func player_background_click(_player : Player, click_event: InputEventMouseButton):
+func player_background_click(_player : Player, _click_event: InputEventMouseButton):
 	click_to_close()
 
 func update_labels():

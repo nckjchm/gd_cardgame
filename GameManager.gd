@@ -60,8 +60,7 @@ func shuffle_deck(player : Player):
 #returns false if waiting for player input is necessary
 func handle_event(event : Event):
 	print("handling event %s" % event.event_type)
-	var last_priority : Player = event.player
-	var player = last_priority
+	var player : Player = event.player
 	for player_iter in len(game.players):
 		player = game.next_player(player)
 		var player_options = get_player_options(player)
@@ -329,7 +328,6 @@ func get_card_option_list(card : Card):
 	return options
 
 func get_cell_option_list(cell : Cell):
-	var options := []
 	if local_player == current_decider:
 		if "cells" in current_options and cell.short_name in current_options.cells:
 			return [current_options.cells[cell.short_name]]

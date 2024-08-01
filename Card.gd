@@ -95,8 +95,8 @@ var on_field_display : CardDisplay
 
 var step_scope : Callable = func(gm : GameManager):
 	var cells : Array[Cell] = gm.field.get_cells_in_distance([cell], 1)
-	cells = cells.filter(func(cell : Cell):
-		for check_card in cell.cards:
+	cells = cells.filter(func(filter_cell : Cell):
+		for check_card in filter_cell.cards:
 			if not check_card.can_coexist:
 				return false
 		return true
@@ -111,11 +111,11 @@ var attack_scope := func(gm : GameManager):
 	)
 	return cards
 
-func _init(template : CardTemplate, id : int, card_owner : Player, card_origin : CardOrigin, effect_id_start : int):
-	self.template = template
-	self.id = id
-	self.card_owner = card_owner
-	self.card_origin = card_origin
+func _init(_template : CardTemplate, _id : int, _card_owner : Player, _card_origin : CardOrigin, effect_id_start : int):
+	template = _template
+	id = _id
+	card_owner = _card_owner
+	card_origin = _card_origin
 	var effect_id := effect_id_start
 	for effect_template in template.effects:
 		effects.append(CardEffect.new(effect_template, self, effect_id))

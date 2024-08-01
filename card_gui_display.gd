@@ -7,10 +7,10 @@ var is_ready := false
 var is_initialized := false
 var gui : GUIController
 
-func initialize(card : Card, gui : GUIController):
+func initialize(card : Card, _gui : GUIController):
 	card_display = card.create_card_display()
 	card_display.gui_embedded = true
-	self.gui = gui
+	gui = _gui
 	is_initialized = true
 	update()
 

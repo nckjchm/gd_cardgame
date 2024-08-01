@@ -42,10 +42,10 @@ func check_coverage(other : ResourceList, exact := false):
 	return true
 
 func total():
-	var total := 0
+	var sum := 0
 	for element in elements:
-		total += element.amount
-	return total
+		sum += element.amount
+	return sum
 
 func reduce(resourceList : ResourceList):
 	for element in resourceList.elements:
@@ -57,10 +57,10 @@ class ResourceElement:
 	var color : Card.CardColor
 	var amount : int
 	
-	func _init(kind : ResourceKind, color : Card.CardColor, amount : int):
-		self.kind = kind
-		self.color = color
-		self.amount = amount
+	func _init(_kind : ResourceKind, _color : Card.CardColor, _amount : int):
+		kind = _kind
+		color = _color
+		amount = _amount
 	
 	func get_text():
 		var resource_kind = "M"

@@ -47,13 +47,11 @@ func reparse_players():
 		var new_player := Player.new(local_player_info.name)
 		new_player.session_id = int(key)
 		new_player.seat = -1
-		var maindeck_keys : Array[String]
-		var resourcedeck_keys : Array[String]
-		var specialdeck_keys : Array[String]
-		maindeck_keys.assign(local_player_info.deck.maindeck)
-		resourcedeck_keys.assign(local_player_info.deck.resourcedeck)
-		specialdeck_keys.assign(local_player_info.deck.specialdeck)
-		var new_player_deck_template = DeckTemplate.new(local_player_info.deck.name, maindeck_keys, resourcedeck_keys, specialdeck_keys)
+		var new_player_deck_template = DeckTemplate.new(
+			local_player_info.deck.name, 
+			LobbyManager.parse_string_array(local_player_info.deck.maindeck), 
+			LobbyManager.parse_string_array(local_player_info.deck.resourcedeck), 
+			LobbyManager.parse_string_array(local_player_info.deck.specialdeck))
 		new_player.deck = Deck.new(new_player_deck_template, local_player_info.deck.name)
 		players_info.append(new_player)
 

@@ -5,11 +5,11 @@ var main_deck_keys : Array[String]
 var resource_deck_keys : Array[String]
 var special_deck_keys : Array[String]
 
-func _init(name : String, main_deck : Array[String], resource_deck : Array[String], special_deck : Array[String]):
-	self.name = name
-	self.main_deck_keys = main_deck
-	self.resource_deck_keys = resource_deck
-	self.special_deck_keys = special_deck
+func _init(_name : String, main_deck : Array[String], resource_deck : Array[String], special_deck : Array[String]):
+	name = name
+	main_deck_keys = main_deck
+	resource_deck_keys = resource_deck
+	special_deck_keys = special_deck
 
 class TestDeckYellow extends DeckTemplate:
 	func _init():

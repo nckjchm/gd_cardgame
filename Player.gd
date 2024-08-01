@@ -16,8 +16,8 @@ var resources : ResourceList
 var rotation : float
 var session_id : int
 
-func _init(name : String):
-	self.name = name
+func _init(_name : String):
+	name = _name
 
 func reset_resources():
 	resources.elements.clear()
