@@ -17,6 +17,7 @@ var card : Card = null
 @onready var defense_text_mesh : MeshInstance2D = $DefenseTextMesh
 @onready var background : Polygon2D = $CardArea/Background
 var meshes : Array[MeshInstance2D]
+var gui_embedded := false
 
 func initialize(card : Card):
 	self.card = card
@@ -37,7 +38,7 @@ func _ready():
 	adjust_presentation()
 
 func adjust_rotation():
-	if card.card_position == Card.CardPosition.Hand:
+	if gui_embedded or card.card_position == Card.CardPosition.Hand:
 		rotation = 0
 		return
 	var tap_deg : float = (30 * card.tap_status)

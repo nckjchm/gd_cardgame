@@ -9,6 +9,7 @@ var gui : GUIController
 
 func initialize(card : Card, gui : GUIController):
 	card_display = card.create_card_display()
+	card_display.gui_embedded = true
 	self.gui = gui
 	is_initialized = true
 	update()

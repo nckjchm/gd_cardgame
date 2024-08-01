@@ -89,9 +89,11 @@ func is_start_valid() -> bool:
 @rpc("any_peer", "call_local", "reliable")
 func request_random_seed(seed_index):
 	if multiplayer.is_server():
-		if len(seeds) <= seed_index:
-			for i in range(seed_index + 1 - len(seeds)):
-				seeds.append(randi())
+		if len(seeds) < seed_index:
+			print("illegal seed index (%d) requested by client %d" % [seed_index, multiplayer.get_remote_sender_id()])
+			return
+		if len(seeds) == seed_index:
+			seeds.append(randi())
 		return_random_seed.rpc_id(multiplayer.get_remote_sender_id(), seeds[seed_index])
 	
 @rpc("authority", "call_local", "reliable")
@@ -103,7 +105,6 @@ func return_random_seed(seed : int):
 func broadcast_seat_assignment(seats):
 	self.seats = seats
 	player_info_updated.emit()
-	
 
 @rpc("any_peer", "call_local", "reliable")
 func transmit_seat_request(seat_index, leave = false):
