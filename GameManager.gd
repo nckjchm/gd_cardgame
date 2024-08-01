@@ -92,6 +92,7 @@ func handle_game_command(command : Dictionary):
 		start_game()
 
 func register_choice(choice_path : Array[String]):
+	gui.close_choice_popup_menu()
 	lobby_manager.transmit_player_choice.rpc_id(1, choice_path)
 
 func handle_choice(choice_path : Array[String]):

@@ -39,8 +39,9 @@ func parse_choices():
 	if "cards" in choices_dict:
 		for card_key in choices_dict.cards:
 			choice_array.append(choices_dict.cards[card_key])
-	if "end_move" in choices_dict:
-		choice_array.append(choices_dict.end_move)
+	if "alternatives" in choices_dict:
+		for alternative_key in choices_dict.alternatives:
+			choice_array.append(choices_dict.alternatives[alternative_key])
 	for choice in choice_array:
 		choices.append({
 			type = choice.type,
