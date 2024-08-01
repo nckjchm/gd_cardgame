@@ -96,6 +96,37 @@ class ETCreate1YellowCreatureAtCost extends EffectTemplate:
 		short_text = "Create from Hand"
 		long_text = "Tap; Create 1 Yellow Creature from your Hand at Cost."
 
+class ETTapOneNeighborGainTwoNutrition extends EffectTemplate:
+	var card_scope : Callable
+				
+	func _init():
+		id = 5
+		card_scope = func(gm : GameManager, effect : CardEffect):
+			var cards_in_scope : Array[Card] = []
+			var neighbor_cells : Array[Cell] = gm.field.get_cells_in_distance([effect.card.cell], 1)
+			for neighbor_cell in neighbor_cells:
+				for neighbor_card in neighbor_cell.cards:
+					if neighbor_card.controller == effect.card.controller and neighbor_card.card_color == Card.CardColor.Yellow and neighbor_card.card_type == Card.CardType.Creature and Card.CardAspect.Humanoid in neighbor_card.card_aspects:
+						cards_in_scope.append(neighbor_card)
+			return cards_in_scope
+		condition = func(gm : GameManager, effect : CardEffect):
+			if effect.card.card_position == Card.CardPosition.Field and effect.card.tap_status == 0:
+				if gm.game.game_state == Game.GameState.Cold:
+					if gm.game.current_turn.current_phase in [Turn.TurnPhase.Main1, Turn.TurnPhase.Main2]:
+						return len(card_scope.call(gm, effect)) > 0
+			return false
+		activate = func(_gm : GameManager, effect : CardEffect):
+			var tap_event = Event.TapStateChangeEvent.new(effect.card.controller, effect.card, 1)
+			var choice_event := Event.CardChoiceEvent.new(effect.card.controller, func(game_manager): return card_scope.call(game_manager, effect))
+			var neighbor_tap_event := Event.TapStateChangeEvent.new(effect.card.controller, null, 1)
+			choice_event.on_decision = func(choicedict : Dictionary, _gm : GameManager):
+				if "card" in choicedict:
+					neighbor_tap_event.card = choicedict.card
+			var resource_event = Event.GainResourceEvent.new(effect.card.controller, effect.card.controller, ResourceList.new([ResourceList.ResourceElement.new(ResourceList.ResourceKind.Nutrition, Card.CardColor.Yellow, 2)]))
+			return [tap_event, choice_event, neighbor_tap_event, resource_event]
+		short_text = "Gain 2 Nutrition"
+		long_text = "Tap this Card, Tap one adjacent Yellow Humanoid Creature; Gain 2 Nutrition."
+
 static func def_yellow_humanoid_target_scope(gm : GameManager, effect : CardEffect):
 	return gm.game.all_cards.filter(func(card : Card): return card.controller == effect.card.controller and card.card_color == Card.CardColor.Yellow and Card.CardAspect.Humanoid in card.card_aspects)
 

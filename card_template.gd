@@ -45,7 +45,8 @@ class YlwLndAcre extends CardTemplate:
 		speed = 0
 		can_coexist = true
 		effects = [
-			EffectTemplate.ETGain1YellowNutrition.new()
+			EffectTemplate.ETGain1YellowNutrition.new(),
+			EffectTemplate.ETTapOneNeighborGainTwoNutrition.new()
 		]
 		play_cell_scope = func(card : Card, gm : GameManager): return def_land_play_cell_scope(card, gm)
 		play_condition = func(card : Card, gm : GameManager): return def_play_condition(card, gm)
