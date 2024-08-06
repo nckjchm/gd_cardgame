@@ -58,6 +58,12 @@ func adjust_presentation():
 func set_content_visibility(front_visible := true):
 	for mesh in meshes:
 		mesh.visible = front_visible
+	if card.card_type in [Card.CardType.Land, Card.CardType.Spell, Card.CardType.Structure]:
+		attack_text_mesh.hide()
+		speed_text_mesh.hide()
+		if card.card_type != Card.CardType.Structure:
+			health_text_mesh.hide()
+			defense_text_mesh.hide()
 
 func init_meshes():
 	meshes = [name_text_mesh, cost_text_mesh, attribute_text_mesh, card_text_mesh, attack_text_mesh, speed_text_mesh, health_text_mesh, defense_text_mesh]
