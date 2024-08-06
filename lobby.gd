@@ -21,7 +21,7 @@ func _ready():
 		redraw()
 	)
 	lobby_manager.server_disconnected.connect(close)
-	btn_start.disabled = not multiplayer.is_server()
+	btn_start.disabled = true
 	redraw()
 
 func redraw():
@@ -31,6 +31,13 @@ func redraw():
 		add_connected_player_row(player)
 	for seat_key in lobby_manager.seats:
 		draw_seat_info(seat_key)
+	check_start_viability()
+
+func check_start_viability():
+	if multiplayer.is_server() and lobby_manager.is_start_valid():
+		btn_start.disabled = false
+	else:
+		btn_start.disabled = true
 
 func empty():
 	for child in players_container.get_children():
@@ -71,7 +78,7 @@ func draw_seat_info(seat_index):
 	seat_id_label.text = seat_key
 	var player_name_label := Label.new()
 	var player_key = str(lobby_manager.seats[seat_key].player_key)
-	player_name_label.text = lobby_manager.players_info[player_key].name if player_key != "0" else "Empty"
+	player_name_label.text = lobby_manager.players_info[player_key].name if player_key != "0" and player_key in lobby_manager.players_info else "Empty"
 	var choose_button = Button.new()
 	choose_button.text = "Choose"
 	if player_key != "0":
@@ -81,8 +88,9 @@ func draw_seat_info(seat_index):
 	if player_key == str(multiplayer.get_unique_id()):
 		choose_button.text = "Leave"
 		choose_button.pressed.connect(func(): lobby_manager.transmit_seat_request.rpc_id(1, seat_key, true))
+		choose_button.disabled = false
 	for other_seat_index in lobby_manager.seats:
-		if str(lobby_manager.seats[str(other_seat_index)].player_key) == str(multiplayer.get_unique_id()):
+		if str(lobby_manager.seats[str(other_seat_index)].player_key) == str(multiplayer.get_unique_id()) and other_seat_index != seat_index:
 			choose_button.text = ""
 			choose_button.disabled = true
 	seats_container.add_child(seat_id_label)

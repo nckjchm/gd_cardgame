@@ -66,4 +66,6 @@ func exit_ip_menu():
 func open_lobby():
 	ip_menu.visible = false
 	main_menu_vbox.visible = false
-	mid_panel.add_child(lobby_scene.instantiate())
+	var lobby_menu = lobby_scene.instantiate()
+	mid_panel.add_child(lobby_menu)
+	lobby_manager.lobby_menu = lobby_menu

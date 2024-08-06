@@ -14,6 +14,7 @@ const PORT = 7000
 const DEFAULT_SERVER_IP = "127.0.0.1" # IPv4 localhost
 const MAX_CONNECTIONS = 20
 @onready var menu_root : Control = $"../MidPanel"
+var lobby_menu : Lobby
 var game_manager : GameManager
 var players_info := {}
 var local_player_info := {"name": "Name", "deck_template" : "TestDeckYellow"}
@@ -49,6 +50,7 @@ func create_game():
 	player_connected.emit(1, local_player_info)
 	game_joined.emit(1, local_player_info)
 	initialize_seats()
+	lobby_menu.redraw()
 
 func initialize_seats():
 	var seatcount = Templates.field_templates[game_info.field_template].seats.count

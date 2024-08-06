@@ -9,7 +9,7 @@ var card : Card = null
 @onready var input_controller : InputController = $"/root/Main/Game/InputController"
 @onready var name_text_mesh : MeshInstance2D = $NameTextMesh
 @onready var cost_text_mesh : MeshInstance2D = $CostTextMesh
-@onready var attribute_text_mesh : MeshInstance2D = $AttributeTextMesh
+@onready var aspect_text_mesh : MeshInstance2D = $AttributeTextMesh
 @onready var card_text_mesh : MeshInstance2D = $CardTextMesh
 @onready var attack_text_mesh : MeshInstance2D = $AttackTextMesh
 @onready var speed_text_mesh : MeshInstance2D = $SpeedTextMesh
@@ -66,7 +66,7 @@ func set_content_visibility(front_visible := true):
 			defense_text_mesh.hide()
 
 func init_meshes():
-	meshes = [name_text_mesh, cost_text_mesh, attribute_text_mesh, card_text_mesh, attack_text_mesh, speed_text_mesh, health_text_mesh, defense_text_mesh]
+	meshes = [name_text_mesh, cost_text_mesh, aspect_text_mesh, card_text_mesh, attack_text_mesh, speed_text_mesh, health_text_mesh, defense_text_mesh]
 	for mesh_obj in meshes:
 		var mesh := TextMesh.new()
 		mesh_obj.mesh = mesh
@@ -90,13 +90,15 @@ func init_meshes():
 	var aspects_text = ""
 	for aspect in card.card_aspects:
 		aspects_text = ", ".join([aspects_text, Card.get_aspect_name(aspect)])
-	attribute_text_mesh.mesh.text = "[%s]" % aspects_text.substr(2)
+	aspect_text_mesh.mesh.text = "[%s]" % aspects_text.substr(2)
+	aspect_text_mesh.mesh.width = 760
 	var card_text = ""
 	if not card.flavor_text.is_empty():
 		card_text = card.flavor_text
 	for effect in card.effects:
 		card_text += effect.long_text + "\n"
 	card_text_mesh.mesh.text = card_text
+	card_text_mesh.mesh.width = 770
 
 func _on_health_updated(_card):
 	health_text_mesh.mesh.text = str(card.health)
