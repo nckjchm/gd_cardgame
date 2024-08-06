@@ -69,7 +69,6 @@ func update_buttons():
 
 #{ Start, Recovery, Draw1, Main1, Battle, Draw2, Main2, End }
 func update():
-	print("updating gui")
 	update_buttons()
 	update_labels()
 	if not game_manager.game.game_state in [Game.GameState.Preparation, Game.GameState.Paused]:

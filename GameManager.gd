@@ -49,7 +49,6 @@ func get_next_random_seed():
 	return random_seeds[-1]
 
 func shuffle_deck(player : Player):
-	print("shuffling deck of player: %s" % player.name)
 	var random_seed = await get_next_random_seed()
 	seed(random_seed)
 	player.maindeck_cell.cards.shuffle()
@@ -95,14 +94,21 @@ func register_choice(choice_path : Array[String]):
 	gui.close_choice_popup_menu()
 	lobby_manager.transmit_player_choice.rpc_id(1, choice_path)
 
-func handle_choice(choice_path : Array[String]):
+func get_choice(choice_path : Array[String]):
 	var choice : Dictionary = current_options
+	choice_path = choice_path.duplicate()
 	while len(choice_path) > 0:
 		var key = choice_path.pop_front()
 		if key in choice:
 			choice = choice[key]
 		else:
-			print(choice)
+			print("choice could not be resolved")
+			return {player_choice_valid = false}
+	choice.player_choice_valid = true
+	return choice
+
+func handle_choice(choice_path : Array[String]):
+	var choice = get_choice(choice_path)
 	waiting = false
 	if "on_decision" in choice:
 		choice.on_decision.call(choice, self)
@@ -185,7 +191,6 @@ func start_game():
 	gui.update()
 
 func init_field(fieldtemplate):
-	print("initializing field")
 	field.initialize(fieldtemplate)
 	for row in field.fieldpreset.dimensions[0]:
 		for column in field.fieldpreset.dimensions[1]:

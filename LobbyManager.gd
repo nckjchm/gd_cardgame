@@ -169,8 +169,13 @@ func broadcast_player_data(data):
 func transmit_player_choice(choice):
 	if multiplayer.is_server():
 		if game_manager.is_current_decider_id(multiplayer.get_remote_sender_id()):
-			broadcast_player_choice.rpc(choice)
-			choice_broadcast.emit(LobbyManager.parse_string_array(choice))
+			if game_manager.get_choice(parse_string_array(choice)).player_choice_valid:
+				broadcast_player_choice.rpc(choice)
+				choice_broadcast.emit(LobbyManager.parse_string_array(choice))
+			else:
+				print("player with id %d tried to make illegal choice" % multiplayer.get_remote_sender_id())
+		else:
+			print("player with id %d tried to make a choice while it wasnt their turn" % multiplayer.get_remote_sender_id())
 
 @rpc("authority", "call_remote", "reliable")
 func broadcast_player_choice(choice):
