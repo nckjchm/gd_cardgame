@@ -11,7 +11,6 @@ var gui : GUIController
 var local_player : Player = null
 var random_seeds : Array[int] = []
 var seed_index := 0
-var waiting_for_transmission := false
 @onready var lobby_manager : LobbyManager = $"../../LobbyManager"
 
 func _ready():
@@ -40,10 +39,11 @@ func _ready():
 
 func get_next_random_seed():
 	#request seed and wait for transmission
-	waiting_for_transmission = true
 	lobby_manager.request_random_seed.rpc_id(1,seed_index)
-	while waiting_for_transmission:
-		await get_tree().create_timer(0.1).timeout
+	print("awaiting seed on %d" % multiplayer.get_unique_id())
+	if not multiplayer.is_server():
+		await lobby_manager.transmission_received
+	print("received seed on %d" % multiplayer.get_unique_id())
 	#transmission done
 	seed_index += 1
 	return random_seeds[-1]

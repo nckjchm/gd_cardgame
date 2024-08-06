@@ -9,6 +9,7 @@ signal player_info_updated
 signal server_disconnected
 signal choice_broadcast(choice)
 signal game_command(command)
+signal transmission_received
 
 const PORT = 7000
 const DEFAULT_SERVER_IP = "127.0.0.1" # IPv4 localhost
@@ -96,12 +97,20 @@ func request_random_seed(seed_index):
 			return
 		if len(seeds) == seed_index:
 			seeds.append(randi())
-		return_random_seed.rpc_id(multiplayer.get_remote_sender_id(), seeds[seed_index])
+		if multiplayer.get_remote_sender_id() == multiplayer.get_unique_id():
+			print("returning seed to host")
+			return_random_seed(seeds[seed_index])
+		else:
+			print("returning seed to client")
+			remote_return_random_seed.rpc_id(multiplayer.get_remote_sender_id(), seeds[seed_index])
 	
-@rpc("authority", "call_local", "reliable")
+@rpc("authority", "call_remote", "reliable")
+func remote_return_random_seed(random_seed : int):
+	return_random_seed(random_seed)
+
 func return_random_seed(random_seed : int):
 	game_manager.random_seeds.append(random_seed)
-	game_manager.waiting_for_transmission = false
+	transmission_received.emit()
 
 @rpc("authority", "call_remote", "reliable")
 func broadcast_seat_assignment(_seats):
