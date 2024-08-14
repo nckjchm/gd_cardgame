@@ -57,6 +57,14 @@ size_flags_horizontal = 4
 text = "Join"
 text_overrun_behavior = 3
 
+[node name="DeckEditor" type="Button" parent="MidPanel/MainMenuVB"]
+clip_contents = true
+custom_minimum_size = Vector2(200, 2.08165e-12)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Deck Editor"
+text_overrun_behavior = 3
+
 [node name="IPMenu" type="VBoxContainer" parent="MidPanel"]
 visible = false
 custom_minimum_size = Vector2(200, 2.08165e-12)

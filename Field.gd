@@ -3,6 +3,7 @@ class_name Field extends Node2D
 var rows := 0
 var colums := 0
 var cells : Array[Array]
+var field_cells : Array[Cell]
 const CELLWIDTHFACTOR = sqrt(12) / 4.0
 const CELLHEIGHTFACTOR = 3.0 / 4.0
 @export var cellradius := 130.0
@@ -22,6 +23,8 @@ func initialize(fieldtemplate_key : String):
 		for column in range(colums):
 			var celltype = fieldpreset.types[row][column]
 			var cell = Cell.new(row_offset + column_offset, celldiameter * 0.99, row, column, celltype[0], celltype[1], celltype[2])
+			if celltype[0] == Cell.CellType.Field:
+				field_cells.append(cell)
 			row_array.append(cell)
 			add_child(cell)
 			column_offset += Vector2(CELLWIDTHFACTOR * celldiameter, 0)

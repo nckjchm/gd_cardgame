@@ -1,0 +1,117 @@
+[gd_scene load_steps=2 format=3 uid="uid://d05f5j3ucq4qj"]
+
+[ext_resource type="Script" path="res://deck_editor.gd" id="1_tip60"]
+
+[node name="Editor" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_tip60")
+
+[node name="HLayout" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LeftSideMenu" type="PanelContainer" parent="HLayout"]
+custom_minimum_size = Vector2(200, 2.08165e-12)
+layout_mode = 2
+
+[node name="VLayout" type="VBoxContainer" parent="HLayout/LeftSideMenu"]
+layout_mode = 2
+
+[node name="DeckEditorLabel" type="Label" parent="HLayout/LeftSideMenu/VLayout"]
+layout_mode = 2
+text = "Deck Editor"
+
+[node name="DeckName" type="LineEdit" parent="HLayout/LeftSideMenu/VLayout"]
+layout_mode = 2
+placeholder_text = "Deck Name"
+
+[node name="Save" type="Button" parent="HLayout/LeftSideMenu/VLayout"]
+layout_mode = 2
+text = "Save Deck"
+
+[node name="Load" type="Button" parent="HLayout/LeftSideMenu/VLayout"]
+layout_mode = 2
+text = "Load Deck"
+
+[node name="Delete" type="Button" parent="HLayout/LeftSideMenu/VLayout"]
+layout_mode = 2
+text = "Delete Deck"
+
+[node name="Exit" type="Button" parent="HLayout/LeftSideMenu/VLayout"]
+layout_mode = 2
+text = "Back to Main Menu"
+
+[node name="MidContent" type="VBoxContainer" parent="HLayout"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MainDeck" type="PanelContainer" parent="HLayout/MidContent"]
+layout_mode = 2
+
+[node name="VLayout" type="VBoxContainer" parent="HLayout/MidContent/MainDeck"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HLayout/MidContent/MainDeck/VLayout"]
+layout_mode = 2
+text = "Main Deck"
+
+[node name="CardContainer" type="HFlowContainer" parent="HLayout/MidContent/MainDeck/VLayout"]
+layout_mode = 2
+
+[node name="ResourceDeck" type="PanelContainer" parent="HLayout/MidContent"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HLayout/MidContent/ResourceDeck"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HLayout/MidContent/ResourceDeck/VBoxContainer"]
+layout_mode = 2
+text = "Resource Deck"
+
+[node name="CardContainer" type="HFlowContainer" parent="HLayout/MidContent/ResourceDeck/VBoxContainer"]
+layout_mode = 2
+
+[node name="SpecialDeck" type="PanelContainer" parent="HLayout/MidContent"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HLayout/MidContent/SpecialDeck"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HLayout/MidContent/SpecialDeck/VBoxContainer"]
+layout_mode = 2
+text = "Special Deck"
+
+[node name="CardContainer" type="HFlowContainer" parent="HLayout/MidContent/SpecialDeck/VBoxContainer"]
+layout_mode = 2
+
+[node name="RightSideMenu" type="PanelContainer" parent="HLayout"]
+custom_minimum_size = Vector2(200, 2.08165e-12)
+layout_mode = 2
+
+[node name="VLayout" type="VBoxContainer" parent="HLayout/RightSideMenu"]
+layout_mode = 2
+
+[node name="CardSelectionLabel" type="Label" parent="HLayout/RightSideMenu/VLayout"]
+layout_mode = 2
+text = "Card Selection"
+
+[node name="NameFilter" type="LineEdit" parent="HLayout/RightSideMenu/VLayout"]
+layout_mode = 2
+placeholder_text = "Card Name"
+
+[node name="CardScrollContonainer" type="ScrollContainer" parent="HLayout/RightSideMenu/VLayout"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="CardVLayout" type="VBoxContainer" parent="HLayout/RightSideMenu/VLayout/CardScrollContonainer"]
+layout_mode = 2
+size_flags_horizontal = 3

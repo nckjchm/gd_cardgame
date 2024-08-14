@@ -9,8 +9,11 @@ class_name MainMenu extends Control
 @onready var btn_host_game : Button = $MidPanel/MainMenuVB/HostGame
 @onready var btn_ip_connect : Button = $MidPanel/IPMenu/JoinGame
 @onready var btn_ip_exit : Button = $MidPanel/IPMenu/Exit
+@onready var btn_deck_editor : Button = $MidPanel/MainMenuVB/DeckEditor
 @onready var ip_field : LineEdit = $MidPanel/IPMenu/AdressField
 var lobby_scene = preload("res://lobby.tscn")
+var deck_editor_scene = preload("res://deck_editor.tscn")
+var deck_editor : DeckEditor = null
 
 func _ready():
 	Engine.max_fps = 60
@@ -28,6 +31,9 @@ func _ready():
 	)
 	btn_ip_exit.pressed.connect(func():
 		exit_ip_menu()
+	)
+	btn_deck_editor.pressed.connect(func():
+		open_deck_editor()
 	)
 	lobby_manager.game_joined.connect(func(peer_id, _local_player_info):
 		if peer_id == multiplayer.get_unique_id():
@@ -69,3 +75,13 @@ func open_lobby():
 	var lobby_menu = lobby_scene.instantiate()
 	mid_panel.add_child(lobby_menu)
 	lobby_manager.lobby_menu = lobby_menu
+
+func open_deck_editor():
+	mid_panel.hide()
+	deck_editor = deck_editor_scene.instantiate()
+	add_child(deck_editor)
+
+func close_deck_editor():
+	if deck_editor != null:
+		deck_editor.queue_free()
+		mid_panel.show()
