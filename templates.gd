@@ -20,6 +20,12 @@ var field_templates = {
 	small_two_player_field1 = small_two_player_field1_template
 }
 
+func save_deck_template(deck_template : DeckTemplate):
+	deck_templates[deck_template.name] = deck_template
+
+func remove_deck_template(deck_name : String):
+	return deck_templates.erase(deck_name)
+
 const fieldcell = [Cell.CellType.Field, Cell.StackType.None, -1]
 const player1_home = [Cell.CellType.Field, Cell.StackType.None, 0]
 const player2_home = [Cell.CellType.Field, Cell.StackType.None, 1]

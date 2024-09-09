@@ -98,10 +98,8 @@ func request_random_seed(seed_index):
 		if len(seeds) == seed_index:
 			seeds.append(randi())
 		if multiplayer.get_remote_sender_id() == multiplayer.get_unique_id():
-			print("returning seed to host")
 			return_random_seed(seeds[seed_index])
 		else:
-			print("returning seed to client")
 			remote_return_random_seed.rpc_id(multiplayer.get_remote_sender_id(), seeds[seed_index])
 	
 @rpc("authority", "call_remote", "reliable")
@@ -163,10 +161,16 @@ func _on_player_connected(id):
 	if multiplayer.is_server():
 		broadcast_seat_assignment.rpc_id(id, seats)
 
-@rpc("any_peer", "call_remote", "reliable")
+func update_player_data():
+	var player_data = { str(multiplayer.get_unique_id()) : local_player_info }
+	transmit_player_data.rpc_id(1, player_data)
+
+@rpc("any_peer", "call_local", "reliable")
 func transmit_player_data(data):
 	if multiplayer.is_server():
 		for key in data:
+			if key != str(multiplayer.get_remote_sender_id()):
+				return
 			players_info[key] = data[key]
 		broadcast_player_data.rpc(players_info)
 		player_info_updated.emit()
@@ -180,9 +184,9 @@ func broadcast_player_data(data):
 func transmit_player_choice(choice):
 	if multiplayer.is_server():
 		if game_manager.is_current_decider_id(multiplayer.get_remote_sender_id()):
-			if game_manager.get_choice(parse_string_array(choice)).player_choice_valid:
+			if game_manager.get_choice(GameUtil.parse_string_array(choice)).player_choice_valid:
 				broadcast_player_choice.rpc(choice)
-				choice_broadcast.emit(LobbyManager.parse_string_array(choice))
+				choice_broadcast.emit(GameUtil.parse_string_array(choice))
 			else:
 				print("player with id %d tried to make illegal choice" % multiplayer.get_remote_sender_id())
 		else:
@@ -190,12 +194,7 @@ func transmit_player_choice(choice):
 
 @rpc("authority", "call_remote", "reliable")
 func broadcast_player_choice(choice):
-	choice_broadcast.emit(LobbyManager.parse_string_array(choice))
-
-static func parse_string_array(in_array : Array) -> Array[String]:
-	var string_array : Array[String] = []
-	string_array.assign(in_array)
-	return string_array
+	choice_broadcast.emit(GameUtil.parse_string_array(choice))
 
 func _on_player_disconnected(id):
 	players_info.erase(str(id))
@@ -219,3 +218,16 @@ func _on_server_disconnected():
 	multiplayer.multiplayer_peer = null
 	players_info.clear()
 	server_disconnected.emit()
+
+func build_player_info():
+	local_player_info.seat = -1
+	build_player_deck_info()
+
+func build_player_deck_info():
+	var deck_name = local_player_info.deck_template
+	local_player_info.deck = {
+		name = deck_name,
+		maindeck = Templates.deck_templates[deck_name].main_deck_keys,
+		resourcedeck = Templates.deck_templates[deck_name].resource_deck_keys,
+		specialdeck = Templates.deck_templates[deck_name].special_deck_keys
+	}

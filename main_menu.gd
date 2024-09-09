@@ -16,16 +16,16 @@ var deck_editor_scene = preload("res://deck_editor.tscn")
 var deck_editor : DeckEditor = null
 
 func _ready():
-	Engine.max_fps = 60
+	setup()
 	btn_host_game.pressed.connect(func():
-		build_player_info()
+		lobby_manager.build_player_info()
 		lobby_manager.create_game()
 	)
 	btn_join_game.pressed.connect(func():
 		open_ip_menu()
 	)
 	btn_ip_connect.pressed.connect(func():
-		build_player_info()
+		lobby_manager.build_player_info()
 		lobby_manager.join_game(ip_field.text)
 		btn_ip_connect.disabled = true
 	)
@@ -45,19 +45,16 @@ func _ready():
 	name_field.text = lobby_manager.local_player_info.name
 	name_field.text_changed.connect(func(new_text): lobby_manager.local_player_info.name = new_text)
 
-func build_player_info():
-	var deck_name = lobby_manager.local_player_info.deck_template
-	lobby_manager.local_player_info = {
-		name = lobby_manager.local_player_info.name,
-		deck_template = deck_name,
-		deck = {
-			name = deck_name,
-			maindeck = Templates.deck_templates[deck_name].main_deck_keys,
-			resourcedeck = Templates.deck_templates[deck_name].resource_deck_keys,
-			specialdeck = Templates.deck_templates[deck_name].special_deck_keys
-		},
-		seat = -1
-	}
+func setup():
+	var decks_dir = "user://decks/"
+	Engine.max_fps = 60
+	DirAccess.make_dir_recursive_absolute(decks_dir)
+	var deck_files = DirAccess.get_files_at(decks_dir)
+	for deck_file_path in deck_files:
+		if deck_file_path.ends_with(".tcgdeck"):
+			var deck_file = FileAccess.open("%s%s" % [decks_dir, deck_file_path], FileAccess.READ)
+			var deck_data = JSON.parse_string(deck_file.get_line())
+			Templates.save_deck_template(DeckTemplate.from_serialized(deck_data))
 
 func open_ip_menu():
 	main_menu_vbox.visible = false

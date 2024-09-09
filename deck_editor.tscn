@@ -20,7 +20,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="LeftSideMenu" type="PanelContainer" parent="HLayout"]
-custom_minimum_size = Vector2(200, 2.08165e-12)
+custom_minimum_size = Vector2(300, 2.08165e-12)
 layout_mode = 2
 
 [node name="VLayout" type="VBoxContainer" parent="HLayout/LeftSideMenu"]
@@ -50,51 +50,56 @@ text = "Delete Deck"
 layout_mode = 2
 text = "Back to Main Menu"
 
-[node name="MidContent" type="VBoxContainer" parent="HLayout"]
+[node name="ScrollContainer" type="ScrollContainer" parent="HLayout"]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_scroll_mode = 0
+
+[node name="MidContent" type="VBoxContainer" parent="HLayout/ScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="MainDeck" type="PanelContainer" parent="HLayout/MidContent"]
+[node name="MainDeck" type="PanelContainer" parent="HLayout/ScrollContainer/MidContent"]
 layout_mode = 2
 
-[node name="VLayout" type="VBoxContainer" parent="HLayout/MidContent/MainDeck"]
+[node name="VLayout" type="VBoxContainer" parent="HLayout/ScrollContainer/MidContent/MainDeck"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HLayout/MidContent/MainDeck/VLayout"]
+[node name="Label" type="Label" parent="HLayout/ScrollContainer/MidContent/MainDeck/VLayout"]
 layout_mode = 2
 text = "Main Deck"
 
-[node name="CardContainer" type="HFlowContainer" parent="HLayout/MidContent/MainDeck/VLayout"]
+[node name="CardContainer" type="HFlowContainer" parent="HLayout/ScrollContainer/MidContent/MainDeck/VLayout"]
 layout_mode = 2
 
-[node name="ResourceDeck" type="PanelContainer" parent="HLayout/MidContent"]
+[node name="ResourceDeck" type="PanelContainer" parent="HLayout/ScrollContainer/MidContent"]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HLayout/MidContent/ResourceDeck"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HLayout/ScrollContainer/MidContent/ResourceDeck"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HLayout/MidContent/ResourceDeck/VBoxContainer"]
+[node name="Label" type="Label" parent="HLayout/ScrollContainer/MidContent/ResourceDeck/VBoxContainer"]
 layout_mode = 2
 text = "Resource Deck"
 
-[node name="CardContainer" type="HFlowContainer" parent="HLayout/MidContent/ResourceDeck/VBoxContainer"]
+[node name="CardContainer" type="HFlowContainer" parent="HLayout/ScrollContainer/MidContent/ResourceDeck/VBoxContainer"]
 layout_mode = 2
 
-[node name="SpecialDeck" type="PanelContainer" parent="HLayout/MidContent"]
+[node name="SpecialDeck" type="PanelContainer" parent="HLayout/ScrollContainer/MidContent"]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HLayout/MidContent/SpecialDeck"]
+[node name="VBoxContainer" type="VBoxContainer" parent="HLayout/ScrollContainer/MidContent/SpecialDeck"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HLayout/MidContent/SpecialDeck/VBoxContainer"]
+[node name="Label" type="Label" parent="HLayout/ScrollContainer/MidContent/SpecialDeck/VBoxContainer"]
 layout_mode = 2
 text = "Special Deck"
 
-[node name="CardContainer" type="HFlowContainer" parent="HLayout/MidContent/SpecialDeck/VBoxContainer"]
+[node name="CardContainer" type="HFlowContainer" parent="HLayout/ScrollContainer/MidContent/SpecialDeck/VBoxContainer"]
 layout_mode = 2
 
 [node name="RightSideMenu" type="PanelContainer" parent="HLayout"]
-custom_minimum_size = Vector2(200, 2.08165e-12)
+custom_minimum_size = Vector2(300, 2.08165e-12)
 layout_mode = 2
 
 [node name="VLayout" type="VBoxContainer" parent="HLayout/RightSideMenu"]
@@ -108,8 +113,13 @@ text = "Card Selection"
 layout_mode = 2
 placeholder_text = "Card Name"
 
+[node name="SearchButton" type="Button" parent="HLayout/RightSideMenu/VLayout"]
+layout_mode = 2
+text = "Search"
+
 [node name="CardScrollContonainer" type="ScrollContainer" parent="HLayout/RightSideMenu/VLayout"]
 layout_mode = 2
+size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
 [node name="CardVLayout" type="VBoxContainer" parent="HLayout/RightSideMenu/VLayout/CardScrollContonainer"]

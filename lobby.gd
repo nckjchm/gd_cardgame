@@ -5,6 +5,7 @@ class_name Lobby extends Control
 @onready var btn_start : Button = $StartGame
 @onready var btn_exit : Button = $Exit
 @onready var lobby_manager : LobbyManager = $"../../LobbyManager"
+@onready var btn_deck_select : OptionButton = $DeckSelect
 var players_info : Array[Player]
 var player_name_labels : Array[Label]
 var player_id_labels : Array[Label]
@@ -20,6 +21,13 @@ func _ready():
 	lobby_manager.player_info_updated.connect(func():
 		redraw()
 	)
+	btn_deck_select.get_popup().index_pressed.connect(func(index : int):
+		lobby_manager.local_player_info.deck_template = btn_deck_select.get_item_text(index)
+		lobby_manager.build_player_deck_info()
+		lobby_manager.update_player_data()
+	)
+	for deck_template in Templates.deck_templates:
+		btn_deck_select.add_item(deck_template)
 	lobby_manager.server_disconnected.connect(close)
 	btn_start.disabled = true
 	redraw()
@@ -56,9 +64,9 @@ func reparse_players():
 		new_player.seat = -1
 		var new_player_deck_template = DeckTemplate.new(
 			local_player_info.deck.name, 
-			LobbyManager.parse_string_array(local_player_info.deck.maindeck), 
-			LobbyManager.parse_string_array(local_player_info.deck.resourcedeck), 
-			LobbyManager.parse_string_array(local_player_info.deck.specialdeck))
+			GameUtil.parse_string_array(local_player_info.deck.maindeck), 
+			GameUtil.parse_string_array(local_player_info.deck.resourcedeck), 
+			GameUtil.parse_string_array(local_player_info.deck.specialdeck))
 		new_player.deck = Deck.new(new_player_deck_template, local_player_info.deck.name)
 		players_info.append(new_player)
 

@@ -21,9 +21,9 @@ func _ready():
 		player.deck = Deck.new(
 			DeckTemplate.new(
 				player_info.deck.name, 
-				LobbyManager.parse_string_array(player_info.deck.maindeck),
-				LobbyManager.parse_string_array(player_info.deck.resourcedeck), 
-				LobbyManager.parse_string_array(player_info.deck.specialdeck)))
+				GameUtil.parse_string_array(player_info.deck.maindeck),
+				GameUtil.parse_string_array(player_info.deck.resourcedeck), 
+				GameUtil.parse_string_array(player_info.deck.specialdeck)))
 		player.session_id = session_id
 		for seat in lobby_manager.game_info.seats:
 			if str(lobby_manager.game_info.seats[seat].player_key) == session_id:
@@ -40,10 +40,8 @@ func _ready():
 func get_next_random_seed():
 	#request seed and wait for transmission
 	lobby_manager.request_random_seed.rpc_id(1,seed_index)
-	print("awaiting seed on %d" % multiplayer.get_unique_id())
 	if not multiplayer.is_server():
 		await lobby_manager.transmission_received
-	print("received seed on %d" % multiplayer.get_unique_id())
 	#transmission done
 	seed_index += 1
 	return random_seeds[-1]

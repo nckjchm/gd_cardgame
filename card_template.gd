@@ -1,6 +1,7 @@
 class_name CardTemplate
 
 var name : String
+var key : String
 var type : Card.CardType
 var cost : ResourceList
 var card_color : Card.CardColor
@@ -18,6 +19,7 @@ var effects : Array[EffectTemplate] = []
 class YlwCrtFarmer extends CardTemplate:
 	func _init():
 		name = "Farmer"
+		key = "YlwCrtFarmer"
 		card_color = Card.CardColor.Yellow
 		type = Card.CardType.Creature
 		cost = ResourceList.new([
@@ -35,6 +37,7 @@ class YlwCrtFarmer extends CardTemplate:
 class YlwLndAcre extends CardTemplate:
 	func _init():
 		name = "Acre"
+		key = "YlwLndAcre"
 		card_color = Card.CardColor.Yellow
 		type = Card.CardType.Land
 		cost = ResourceList.new()
@@ -54,6 +57,7 @@ class YlwLndAcre extends CardTemplate:
 class YlwLndOrchard extends CardTemplate:
 	func _init():
 		name = "Orchard"
+		key = "YlwLndOrchard"
 		card_color = Card.CardColor.Yellow
 		type = Card.CardType.Land
 		cost = ResourceList.new()
@@ -72,6 +76,7 @@ class YlwLndOrchard extends CardTemplate:
 class YlwCrtGuy extends CardTemplate:
 	func _init():
 		name = "Guy"
+		key = "YlwCrtGuy"
 		card_color = Card.CardColor.Yellow
 		type = Card.CardType.Creature
 		cost = ResourceList.new([
@@ -88,6 +93,7 @@ class YlwCrtGuy extends CardTemplate:
 class YlwCrtDude extends CardTemplate:
 	func _init():
 		name = "Dude"
+		key = "YlwCrtDude"
 		card_color = Card.CardColor.Yellow
 		type = Card.CardType.Creature
 		cost = ResourceList.new([
@@ -104,6 +110,7 @@ class YlwCrtDude extends CardTemplate:
 class YlwCrtAttacker extends CardTemplate:
 	func _init():
 		name = "Attacker"
+		key = "YlwCrtAttacker"
 		card_color = Card.CardColor.Yellow
 		type = Card.CardType.Creature
 		cost = ResourceList.new([
@@ -121,6 +128,7 @@ class YlwCrtAttacker extends CardTemplate:
 class YlwStrSchool extends CardTemplate:
 	func _init():
 		name = "School"
+		key = "YlwStrSchool"
 		card_color = Card.CardColor.Yellow
 		type = Card.CardType.Structure
 		cost = ResourceList.new([
