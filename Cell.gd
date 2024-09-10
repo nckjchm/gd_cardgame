@@ -3,7 +3,6 @@ class_name Cell extends Area2D
 signal cell_input_event(cell, viewport, event, shape_idx)
 @onready var input_controller : InputController = $"../../../../../../InputController"
 @onready var field : Field = $".."
-var rng = RandomNumberGenerator.new()
 
 enum CellType { Inactive, Stack, Field }
 enum StackType { MainDeck, ResourceDeck, SpecialDeck, Graveyard, Limbo, Banishment, None }
@@ -81,9 +80,6 @@ func player_activation():
 		
 func change_color(color: Color):
 	cell_view_hex.modulate = color
-
-func random_color():
-	return Color.hex(rng.randi_range(0, 0xffffff) + 0xff000000)
 
 func _ready():
 	cell_input_event.connect(input_controller.cell_input_event)

@@ -125,5 +125,3 @@ func _input(event):
 				if event.pressed: scroll(1.1111111)
 			KEY_MINUS:
 				if event.pressed: scroll(0.9)
-		
-

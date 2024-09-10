@@ -86,10 +86,10 @@ func mark_recovery_targets():
 			targets_available = true
 	current_turn.recovery_done = not targets_available
 
-func draw(_player : Player, stack : Cell):
+func draw(player : Player, stack : Cell):
 	var card : Card = stack.cards[-1]
 	stack.remove_card(card)
-	card.card_owner.hand.add_card(card)
+	player.hand.add_card(card)
 	card.card_position = Card.CardPosition.Hand
 
 func check_recovery_finished():
@@ -117,5 +117,3 @@ static func next_phase(phase : Turn.TurnPhase):
 		Turn.TurnPhase.End:
 			return Turn.TurnPhase.Start
 	print("couldn't match TurnPhase: %s" % phase)
-
-

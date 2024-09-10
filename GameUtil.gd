@@ -1,5 +1,7 @@
 extends Node
 
+var rng = RandomNumberGenerator.new()
+
 static func parse_string_array(in_array : Array) -> Array[String]:
 	var string_array : Array[String] = []
 	string_array.assign(in_array)
@@ -30,3 +32,6 @@ func flatten_choices(choices_dict : Dictionary) -> Array[Dictionary]:
 		for alternative_key in choices_dict.alternatives:
 			choice_array.append(choices_dict.alternatives[alternative_key])
 	return choice_array
+
+func random_color():
+	return Color.hex(rng.randi_range(0, 0xffffff) + 0xff000000)
