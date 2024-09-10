@@ -79,10 +79,9 @@ func init_meshes():
 	var card_defense : int = card.defense if card != null else card_template.defense
 	var card_health : int = card.health if card != null else card_template.health
 	var card_speed : int = card.speed if card != null else card_template.speed
-	var card_aspects : Array[Card.CardAspect] = card.card_aspects if card != null else card_template.card_aspects
-	var card_cost : ResourceList = card.cost if card != null else card_template.cost
-	var card_flavor_text : String = card.flavor_text if card != null else card_template.flavor_text
-	var card_effect_texts = card.effects.map(func(effect : CardEffect): return effect.long_text) if card != null else card_template.effects.map(func(effect_template : EffectTemplate): return effect_template.long_text)
+	var card_text = get_card_text()
+	var cost_text = get_cost_text()
+	var aspects_text = get_aspects_text()
 	meshes = [name_text_mesh, cost_text_mesh, aspect_text_mesh, card_text_mesh, attack_text_mesh, speed_text_mesh, health_text_mesh, defense_text_mesh]
 	for mesh_obj in meshes:
 		var mesh := TextMesh.new()
@@ -98,24 +97,37 @@ func init_meshes():
 	speed_text_mesh.mesh.text = str(card_speed)
 	health_text_mesh.mesh.text = str(card_health)
 	defense_text_mesh.mesh.text = str(card_defense)
-	var cost_text := ""
-	for element in card_cost.elements:
-		cost_text += element.get_text()
 	cost_text_mesh.mesh.text = cost_text
 	cost_text_mesh.mesh.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	cost_text_mesh.mesh.text_direction = TextServer.Direction.DIRECTION_LTR
+	aspect_text_mesh.mesh.text = "[%s]" % aspects_text
+	aspect_text_mesh.mesh.width = 760
+	card_text_mesh.mesh.text = card_text
+	card_text_mesh.mesh.width = 770
+
+func get_aspects_text():
+	var card_aspects : Array[Card.CardAspect] = card.card_aspects if card != null else card_template.card_aspects
 	var aspects_text = ""
 	for aspect in card_aspects:
 		aspects_text = ", ".join([aspects_text, Card.get_aspect_name(aspect)])
-	aspect_text_mesh.mesh.text = "[%s]" % aspects_text.substr(2)
-	aspect_text_mesh.mesh.width = 760
+	return aspects_text.substr(2)
+
+func get_cost_text():
+	var card_cost : ResourceList = card.cost if card != null else card_template.cost
+	var cost_text := ""
+	for element in card_cost.elements:
+		cost_text += element.get_text()
+	return cost_text
+
+func get_card_text():
+	var card_flavor_text : String = card.flavor_text if card != null else card_template.flavor_text
+	var card_effect_texts = card.effects.map(func(effect : CardEffect): return effect.long_text) if card != null else card_template.effects.map(func(effect_template : EffectTemplate): return effect_template.long_text)
 	var card_text = ""
 	if not card_flavor_text.is_empty():
-		card_text = card_flavor_text
+		card_text = card_flavor_text + "\n"
 	for effect_text in card_effect_texts:
 		card_text += effect_text + "\n"
-	card_text_mesh.mesh.text = card_text
-	card_text_mesh.mesh.width = 770
+	return card_text
 
 func _on_health_updated(_card):
 	health_text_mesh.mesh.text = str(card.health)

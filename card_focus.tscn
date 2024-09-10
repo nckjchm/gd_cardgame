@@ -13,31 +13,69 @@ layout_mode = 2
 [node name="CardName" type="Label" parent="."]
 layout_mode = 2
 text = "Name"
+autowrap_mode = 3
+
+[node name="CardCost" type="Label" parent="."]
+layout_mode = 2
+text = "Cost"
+autowrap_mode = 3
+
+[node name="CardController" type="Label" parent="."]
+layout_mode = 2
+text = "Controller"
+autowrap_mode = 3
+
+[node name="CardStatus" type="Label" parent="."]
+layout_mode = 2
+text = "Status"
+autowrap_mode = 3
+
+[node name="CardPosition" type="Label" parent="."]
+layout_mode = 2
+text = "Position"
+autowrap_mode = 3
+
+[node name="CardCell" type="Label" parent="."]
+layout_mode = 2
+text = "Cell"
+autowrap_mode = 3
 
 [node name="CardType" type="Label" parent="."]
 layout_mode = 2
 text = "Type"
+autowrap_mode = 3
 
 [node name="CardAspects" type="Label" parent="."]
 layout_mode = 2
 text = "Aspects"
+autowrap_mode = 3
 
 [node name="CardHealth" type="Label" parent="."]
 layout_mode = 2
 text = "Health"
+autowrap_mode = 3
 
 [node name="CardDefense" type="Label" parent="."]
 layout_mode = 2
 text = "Defense"
+autowrap_mode = 3
 
 [node name="CardAttack" type="Label" parent="."]
 layout_mode = 2
 text = "Attack"
+autowrap_mode = 3
 
 [node name="CardSpeed" type="Label" parent="."]
 layout_mode = 2
 text = "Speed"
+autowrap_mode = 3
+
+[node name="CardTapStatus" type="Label" parent="."]
+layout_mode = 2
+text = "Tap Status"
+autowrap_mode = 3
 
 [node name="CardText" type="Label" parent="."]
 layout_mode = 2
 text = "Text"
+autowrap_mode = 3

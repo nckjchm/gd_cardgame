@@ -18,11 +18,16 @@ signal name_updated(card : Card)
 signal position_updated(card : Card)
 signal color_updated(card : Card)
 signal card_status_updated(card : Card)
+signal cell_updated(card : Card)
 
 #base data
 var template : CardTemplate
 var id : int
-var cell : Cell = null
+var cell : Cell:
+	get : return cell
+	set(value):
+		cell = value
+		cell_updated.emit(self)
 var card_owner : Player
 var controller : Player:
 	get : return controller
@@ -116,6 +121,7 @@ func _init(_template : CardTemplate, _id : int, _card_owner : Player, _card_orig
 	id = _id
 	card_owner = _card_owner
 	card_origin = _card_origin
+	cell = null
 	var effect_id := effect_id_start
 	for effect_template in template.effects:
 		effects.append(CardEffect.new(effect_template, self, effect_id))
@@ -185,3 +191,12 @@ func die():
 
 static func get_aspect_name(aspect : CardAspect):
 	return CardAspect.keys()[aspect]
+
+static func get_status_name(status : CardStatus):
+	return CardStatus.keys()[status]
+
+static func get_type_name(type : CardType):
+	return CardType.keys()[type]
+
+static func get_position_name(position : CardPosition):
+	return CardPosition.keys()[position]

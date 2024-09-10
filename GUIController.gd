@@ -164,10 +164,12 @@ func open_cell_menu(cell : Cell, position : Vector2):
 	cell_menu.position = position
 
 func player_card_click(card_display : CardDisplay, _player : Player, click_event : InputEventMouseButton):
+	card_focus.focus_card(card_display.card)
 	if not click_to_close():
 		open_card_menu(card_display.card, click_event.global_position)
 
 func player_gui_card_click(card_gui_display : CardGUIDisplay, click_event : InputEventMouseButton):
+	card_focus.focus_card(card_gui_display.card_display.card)
 	open_card_menu(card_gui_display.card_display.card, click_event.global_position)
 
 func player_cell_click(cell : Cell, _player : Player, click_event : InputEventMouseButton):
