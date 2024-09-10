@@ -297,7 +297,7 @@ func get_card_action_options(card : Card):
 		attack_choice.on_click = func() : register_choice(["cardoptions", str(card.id), "actions", "attack"])
 		options.attack = attack_choice
 	if card.check_movement_viability(self):
-		var move_choice = { type = "moce", label = "Move", card = card, player = card.controller, action = Action.Move.new(card.controller, card)}
+		var move_choice = { type = "move", label = "Move", card = card, player = card.controller, action = Action.Move.new(card.controller, card)}
 		move_choice.on_click = func() : register_choice(["cardoptions", str(card.id), "actions", "move"])
 		options.move = move_choice
 	if card.check_play_viability(self):

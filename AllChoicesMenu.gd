@@ -1,48 +1,20 @@
 class_name AllChoicesMenu extends PanelContainer
 
 var choices : Array[Dictionary] = []
-var choices_dict : Dictionary = {}
-var initialized := false
-var readied := false
 var exit : Callable
 var gui : GUIController
+@export var close_on_choice := false
+const GRID_ROWS := 7
 @onready var option_grid : GridContainer = $MenuVBC/OptionGrid
 @onready var exit_button : Button = $MenuVBC/Button
 
-
-func initialize(_gui : GUIController, current_choices : Dictionary, _exit : Callable):
+func initialize(_gui : GUIController, _exit : Callable):
 	exit = _exit
 	gui = _gui
-	choices_dict = current_choices
-	parse_choices()
-	initialized = true
-	finish()
 
-func parse_choices():
-	var choice_array := []
-	if "turn_option" in choices_dict:
-		choice_array.append(choices_dict.turn_option)
-	if "decline" in choices_dict:
-		choice_array.append(choices_dict.decline)
-	if "cardoptions" in choices_dict:
-		for card_id_str in choices_dict.cardoptions:
-			var cardoptions = choices_dict.cardoptions[card_id_str]
-			if "actions" in cardoptions:
-				for actionoption_key in cardoptions.actions:
-					choice_array.append(cardoptions.actions[actionoption_key])
-			if "effects" in cardoptions:
-				for effectoption_key in cardoptions.effects:
-					choice_array.append(cardoptions.effects[effectoption_key])
-	if "cells" in choices_dict:
-		for cell_key in choices_dict.cells:
-			choice_array.append(choices_dict.cells[cell_key])
-	if "cards" in choices_dict:
-		for card_key in choices_dict.cards:
-			choice_array.append(choices_dict.cards[card_key])
-	if "alternatives" in choices_dict:
-		for alternative_key in choices_dict.alternatives:
-			choice_array.append(choices_dict.alternatives[alternative_key])
-	for choice in choice_array:
+func update_choices():
+	clear()
+	for choice in GameUtil.flatten_choices(gui.game_manager.current_options):
 		choices.append({
 			type = choice.type,
 			text = choice.label,
@@ -52,6 +24,8 @@ func parse_choices():
 			effect = choice.effect if "effect" in choice else null,
 			choose = choice.on_click
 		})
+	for choice in choices:
+		new_row(choice)
 
 func new_row(choice : Dictionary):
 	var row_type : Label = Label.new()
@@ -74,20 +48,20 @@ func new_row(choice : Dictionary):
 	var row_choose_button : Button = Button.new()
 	row_choose_button.pressed.connect(func():
 		choice.choose.call()
-		gui.close_all_choices_menu()
+		if close_on_choice:
+			gui.close_all_choices_menu()
 	)
 	row_choose_button.text = "X"
 	var row : Array[Control] = [row_type, row_text, row_player, row_card, row_cell, row_effect, row_choose_button]
 	for element in row:
 		option_grid.add_child(element)
-	
-func finish():
-	if not initialized or not readied:
-		return
-	exit_button.pressed.connect(exit)
-	for choice in choices:
-		new_row(choice)
+
+func clear():
+	choices = []
+	for grid_element in option_grid.get_children():
+		if grid_element.get_index() >= GRID_ROWS:
+			grid_element.queue_free()
 
 func _ready():
-	readied = true
-	finish()
+	exit_button.pressed.connect(exit)
+	update_choices()

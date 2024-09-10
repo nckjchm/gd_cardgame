@@ -66,13 +66,14 @@ func update_buttons():
 			btn_recover_all.disabled = false
 			btn_recover_all.pressed.connect(options.turn_option.on_click)
 
-
-#{ Start, Recovery, Draw1, Main1, Battle, Draw2, Main2, End }
 func update():
+	print("updating gui")
 	update_buttons()
 	update_labels()
 	if not game_manager.game.game_state in [Game.GameState.Preparation, Game.GameState.Paused]:
 		hand.refresh_cards(game_manager.local_player.hand.cards)
+	if all_choices_menu_open:
+		all_choices_menu.update_choices()
 
 func _ready():
 	game_manager.gui = self
@@ -129,7 +130,7 @@ func open_card_list_menu(cards : Array[Card], position : Vector2):
 func open_all_choices_menu(_options : Dictionary):
 	close_all_choices_menu()
 	all_choices_menu = all_choices_menu_prefab.instantiate()
-	all_choices_menu.initialize(self, game_manager.current_options, func(): close_all_choices_menu())
+	all_choices_menu.initialize(self, func(): close_all_choices_menu())
 	all_choices_menu_open = true
 	main_control.add_child(all_choices_menu)
 
