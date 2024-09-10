@@ -15,6 +15,8 @@ var card_list_menu_prefab = preload("res://card_list_menu.tscn")
 var choice_popup_menu_open := false
 var choice_popup_menu : ChoicePopupMenu = null
 var choice_popup_menu_prefab = preload("res://choice_popup_menu.tscn")
+var card_focus : CardFocus
+var card_focus_prefab = preload("res://card_focus.tscn")
 @onready var main_control : Control = $".."
 @onready var game_manager : GameManager = $"../GameManager"
 @onready var hand : HandDisplay = $"../GameViewContainer/MidViewBox/HandPanel"
@@ -25,6 +27,7 @@ var choice_popup_menu_prefab = preload("res://choice_popup_menu.tscn")
 @onready var btn_all_choices : Button = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/AllChoicesButton"
 @onready var lbl_turn_phase : Label = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/HBoxContainer/TurnPhaseText"
 @onready var lbl_resource_text = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/ResourceText"
+@onready var card_focus_container = $"../GameViewContainer/SideGUI/SideGUIBoxContainer/CardFocusContainer"
 
 func click_to_close():
 	if card_menu_open:
@@ -79,6 +82,13 @@ func _ready():
 	game_manager.gui = self
 	game_manager.input_controller.gui = self
 	btn_all_choices.pressed.connect(func(): open_all_choices_menu(game_manager.current_options))
+	card_focus = card_focus_prefab.instantiate()
+	card_focus.initialize(game_manager.local_player.cards[0], self)
+	card_focus_container.add_child(card_focus)
+	var card_focus_vscroll : VScrollBar = card_focus_container.get_v_scroll_bar()
+	card_focus_vscroll.gui_input.connect(func(event):
+		card_focus.card_focus_input_event.emit(card_focus, event)
+	)
 	update()
 
 func close_card_menu():

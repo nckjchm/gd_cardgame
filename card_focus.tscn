@@ -1,0 +1,43 @@
+[gd_scene load_steps=2 format=3 uid="uid://2b1noc5xub5x"]
+
+[ext_resource type="Script" path="res://card_focus.gd" id="1_b70b7"]
+
+[node name="CardFocus" type="VBoxContainer"]
+size_flags_horizontal = 0
+size_flags_vertical = 0
+script = ExtResource("1_b70b7")
+
+[node name="CardGUIContainer" type="AspectRatioContainer" parent="."]
+layout_mode = 2
+
+[node name="CardName" type="Label" parent="."]
+layout_mode = 2
+text = "Name"
+
+[node name="CardType" type="Label" parent="."]
+layout_mode = 2
+text = "Type"
+
+[node name="CardAspects" type="Label" parent="."]
+layout_mode = 2
+text = "Aspects"
+
+[node name="CardHealth" type="Label" parent="."]
+layout_mode = 2
+text = "Health"
+
+[node name="CardDefense" type="Label" parent="."]
+layout_mode = 2
+text = "Defense"
+
+[node name="CardAttack" type="Label" parent="."]
+layout_mode = 2
+text = "Attack"
+
+[node name="CardSpeed" type="Label" parent="."]
+layout_mode = 2
+text = "Speed"
+
+[node name="CardText" type="Label" parent="."]
+layout_mode = 2
+text = "Text"
