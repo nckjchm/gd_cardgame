@@ -20,17 +20,21 @@ signal card_focus_input_event(card_focus : Control, event : Event)
 var card_gui_display : CardGUIDisplay
 var gui : GUIController
 var base_card : Card
+var current_card_id := -1
 
-func initialize(card : Card, _gui):
+func initialize(card : Card, _gui : GUIController):
 	gui = _gui
 	base_card = card
 
 func _ready():
 	focus_card(base_card)
+	card_focus_input_event.connect(gui.game_manager.input_controller.menu_input_event)
 
 func clear():
 	if card_gui_display != null:
 		card_gui_display.queue_free()
+	for connection_info in get_incoming_connections():
+		connection_info["signal"].disconnect(connection_info.callable)
 	set_hidden_labels()
 
 func set_hidden_labels():
@@ -76,6 +80,10 @@ func set_shown_labels():
 	lbl_card_text.text = card_gui_display.card_display.get_card_text()
 
 func focus_card(card : Card):
+	if card.id == current_card_id:
+		return
+	base_card = card
+	current_card_id = card.id
 	clear()
 	card.health_updated.connect(_on_health_updated)
 	card.defense_updated.connect(_on_defense_updated)
@@ -90,10 +98,10 @@ func focus_card(card : Card):
 	base_card = card
 	card_gui_display = Templates.card_gui_display_prefab.instantiate()
 	card_gui_display.initialize(card, gui)
-	card_focus_input_event.connect(gui.game_manager.input_controller.menu_input_event)
 	card_gui_container.add_child(card_gui_display)
 	if card.card_status != Card.CardStatus.Hidden or (card.controller == gui.game_manager.local_player and card.card_position == Card.CardPosition.Hand):
 		set_shown_labels()
+	queue_redraw()
 
 func _on_health_updated(card : Card):
 	lbl_card_health.text = "Health: %d" % card.health
