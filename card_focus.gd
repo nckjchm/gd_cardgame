@@ -1,4 +1,4 @@
-class_name CardFocus extends Control
+class_name CardFocus extends VBoxContainer
 
 signal card_focus_input_event(card_focus : Control, event : Event)
 
@@ -35,7 +35,6 @@ func clear():
 		card_gui_display.queue_free()
 	for connection_info in get_incoming_connections():
 		connection_info["signal"].disconnect(connection_info.callable)
-	set_hidden_labels()
 
 func set_hidden_labels():
 	lbl_card_name.text = "Hidden Card"
@@ -101,7 +100,9 @@ func focus_card(card : Card):
 	card_gui_container.add_child(card_gui_display)
 	if card.card_status != Card.CardStatus.Hidden or (card.controller == gui.game_manager.local_player and card.card_position == Card.CardPosition.Hand):
 		set_shown_labels()
-	queue_redraw()
+	else:
+		set_hidden_labels()
+	get_parent().minimum_size_changed.emit()
 
 func _on_health_updated(card : Card):
 	lbl_card_health.text = "Health: %d" % card.health
@@ -116,7 +117,6 @@ func _on_speed_updated(card : Card):
 	lbl_card_speed.text = "Speed: %d" % card.speed
 
 func _on_tap_state_updated(card : Card):
-	print("tap status updated: %d" % card.tap_status)
 	lbl_card_tap_status.text = "Tap Status: %d" % card.tap_status
 
 func _on_controller_updated(card : Card):
@@ -136,5 +136,4 @@ func _on_card_status_updated(card : Card):
 		set_hidden_labels()
 
 func _on_cell_updated(card : Card):
-	print("cell updated")
 	lbl_card_cell.text = card.cell.full_name

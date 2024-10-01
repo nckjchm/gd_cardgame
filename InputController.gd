@@ -118,10 +118,13 @@ func _input(event):
 			MOUSE_BUTTON_WHEEL_DOWN:
 				scroll(0.9)
 			MOUSE_BUTTON_WHEEL_UP:
-				scroll(1.1111111)
+				scroll(1.111111111)
 	if event is InputEventKey:
 		match event.keycode:
 			KEY_PLUS:
-				if event.pressed: scroll(1.1111111)
+				if event.pressed: scroll(1.111111111)
 			KEY_MINUS:
 				if event.pressed: scroll(0.9)
+			KEY_ESCAPE:
+				if not event.pressed: 
+					gui.toggle_pause_menu()

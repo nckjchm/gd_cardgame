@@ -2,21 +2,24 @@ class_name GUIController extends Node
 
 var card_menu_open := false
 var card_menu : CardMenu = null
-var card_menu_prefab = preload("res://card_menu.tscn")
+var card_menu_prefab := preload("res://card_menu.tscn")
 var cell_menu_open := false
 var cell_menu : CellMenu = null
-var cell_menu_prefab = preload("res://cell_menu.tscn")
+var cell_menu_prefab := preload("res://cell_menu.tscn")
 var all_choices_menu_open := false
 var all_choices_menu : AllChoicesMenu = null
-var all_choices_menu_prefab = preload("res://all_choices_menu.tscn")
+var all_choices_menu_prefab := preload("res://all_choices_menu.tscn")
 var card_list_menu_open := false
 var card_list_menu : CardListMenu = null
-var card_list_menu_prefab = preload("res://card_list_menu.tscn")
+var card_list_menu_prefab := preload("res://card_list_menu.tscn")
 var choice_popup_menu_open := false
 var choice_popup_menu : ChoicePopupMenu = null
-var choice_popup_menu_prefab = preload("res://choice_popup_menu.tscn")
+var choice_popup_menu_prefab := preload("res://choice_popup_menu.tscn")
 var card_focus : CardFocus
-var card_focus_prefab = preload("res://card_focus.tscn")
+var card_focus_prefab := preload("res://card_focus.tscn")
+var pause_menu : PauseMenu = null
+var pause_menu_prefab := preload("res://pause_menu.tscn")
+var pause_menu_open := false
 @onready var main_control : Control = $".."
 @onready var game_manager : GameManager = $"../GameManager"
 @onready var hand : HandDisplay = $"../GameViewContainer/MidViewBox/HandPanel"
@@ -91,6 +94,18 @@ func _ready():
 	)
 	update()
 
+func toggle_pause_menu():
+	if pause_menu_open:
+		close_pause_menu()
+	else:
+		open_pause_menu()
+
+func close_pause_menu():
+	if pause_menu_open:
+		pause_menu.queue_free()
+		pause_menu_open = false
+		pause_menu = null
+
 func close_card_menu():
 	if card_menu_open:
 		card_menu.queue_free()
@@ -162,6 +177,14 @@ func open_cell_menu(cell : Cell, position : Vector2):
 	cell_menu.cell = cell
 	main_control.add_child(cell_menu)
 	cell_menu.position = position
+
+func open_pause_menu():
+	if pause_menu_open:
+		return
+	pause_menu = pause_menu_prefab.instantiate()
+	pause_menu.initialize(self)
+	main_control.add_child(pause_menu)
+	pause_menu_open = true
 
 func player_card_click(card_display : CardDisplay, _player : Player, click_event : InputEventMouseButton):
 	card_focus.focus_card(card_display.card)

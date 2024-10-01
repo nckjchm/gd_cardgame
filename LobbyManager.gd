@@ -77,10 +77,19 @@ func load_game():
 		if seats[seat_key].player_key != 0:
 			taken_seats[seat_key] = { player_key = seats[seat_key].player_key, player_loaded = false}
 	game_info.seats = taken_seats
-	$"../MidPanel".visible = false
+	$"../MidPanel".hide()
 	var game_node = game_scene.instantiate()
 	game_manager=game_node.find_child("GameManager")
 	$"..".add_child(game_node)
+
+func exit_game():
+	remove_multiplayer_peer()
+	var game_node = $"../Game"
+	if game_node == null:
+		print("couldnt find game node in exit_game()")
+		return
+	game_node.queue_free()
+	$"../MidPanel".show()
 
 func is_start_valid() -> bool:
 	var taken_seats := 0

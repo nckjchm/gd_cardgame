@@ -170,7 +170,6 @@ func finish_action(action : Action):
 	wait_for_choice(game.current_turn.turn_player, Game.GameState.Cold)
 
 ### Game Initializing
-
 func initialize_game(playerList : Array[Player], fieldtemplate : String):
 	game = Game.new(playerList)
 	init_field(fieldtemplate)
